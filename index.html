@@ -18,7 +18,7 @@
             -webkit-tap-highlight-color: transparent;
         }
 
-        /* 🎨 Background Animated Blobs */
+        /* Background Animated Blobs */
         @keyframes blob {
             0% { transform: translate(0px, 0px) scale(1); }
             33% { transform: translate(30px, -50px) scale(1.1); }
@@ -29,7 +29,7 @@
         .animation-delay-2000 { animation-delay: 2s; }
         .animation-delay-4000 { animation-delay: 4s; }
 
-        /* ✨ UI Elements & Animations */
+        /* UI Elements */
         .glass-card { 
             background: rgba(255, 255, 255, 0.75); 
             backdrop-filter: blur(16px); 
@@ -38,7 +38,6 @@
             box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.08); 
         }
 
-        /* Input ให้อารมณ์ลอยขึ้นเวลากด */
         .input-modern {
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             background-color: rgba(249, 250, 251, 0.8);
@@ -49,19 +48,16 @@
             box-shadow: 0 8px 20px -6px rgba(34, 197, 94, 0.15);
         }
 
-        /* Bottom Navigation Bar */
         .bottom-nav { box-shadow: 0 -10px 30px rgba(0,0,0,0.05); }
         .nav-item { transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
         .nav-item.active { transform: translateY(-4px); }
         
-        /* สลับหน้าฟอร์มแบบมีแอนิเมชันเด้งดึ๋ง */
         @keyframes slideUpFade {
             0% { opacity: 0; transform: translateY(30px) scale(0.98); }
             100% { opacity: 1; transform: translateY(0) scale(1); }
         }
         .animate-tab { animation: slideUpFade 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
 
-        /* ลูกเล่นปุ่มอาจารย์ (Radio Button) */
         .instructor-radio:checked + label {
             border-color: #22c55e;
             background-color: #f0fdf4;
@@ -74,8 +70,6 @@
         }
         .instructor-radio:checked + label .check-icon { transform: scale(1); opacity: 1; }
         .check-icon { transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); transform: scale(0); opacity: 0; }
-
-        /* ปุ่มกด Bouncy */
         .btn-bouncy { transition: transform 0.2s; }
         .btn-bouncy:active { transform: scale(0.95); }
     </style>
@@ -147,6 +141,11 @@
                     </div>
                 </div>
 
+                <div class="pt-2">
+                    <label class="block text-[11px] font-bold text-gray-500 mb-1 ml-1">📸 แนบรูปลายเซ็น/หลักฐาน (ถ้ามี)</label>
+                    <input type="file" id="msg_image" accept="image/*" class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-[11px] file:font-bold file:bg-green-50 file:text-green-700 hover:file:bg-green-100 transition outline-none cursor-pointer">
+                </div>
+
                 <div class="pt-3">
                     <label class="block text-[11px] font-bold text-gray-500 mb-2 ml-1">👨‍🏫 เลือกอาจารย์ผู้ตรวจประเมิน</label>
                     <div id="instructors_massage" class="grid grid-cols-3 gap-3"></div>
@@ -170,6 +169,11 @@
                 </div>
                 <div><label class="block text-[11px] font-bold text-gray-500 mb-1 ml-1">👤 ชื่อ-สกุล มารดา</label><input type="text" id="mid_patientName" required class="input-modern w-full border border-gray-200 text-sm rounded-2xl px-4 py-3 outline-none"></div>
                 
+                <div class="pt-2">
+                    <label class="block text-[11px] font-bold text-gray-500 mb-1 ml-1">📸 แนบรูปลายเซ็น/หลักฐาน (ถ้ามี)</label>
+                    <input type="file" id="mid_image" accept="image/*" class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-[11px] file:font-bold file:bg-pink-50 file:text-pink-700 hover:file:bg-pink-100 transition outline-none cursor-pointer">
+                </div>
+
                 <div class="pt-3"><label class="block text-[11px] font-bold text-gray-500 mb-2 ml-1">👨‍🏫 เลือกอาจารย์ผู้ตรวจ</label><div id="instructors_midwifery" class="grid grid-cols-3 gap-3"></div></div>
                 
                 <button type="submit" class="btn-bouncy w-full bg-gradient-to-r from-pink-500 to-rose-500 text-white font-bold py-4 rounded-2xl shadow-lg shadow-pink-500/30 mt-4 flex justify-center items-center gap-2"><i class="fa-solid fa-paper-plane"></i> บันทึกและแจ้งเตือน</button>
@@ -191,6 +195,11 @@
                 <div class="p-4 bg-white/50 rounded-[1.5rem] border border-white shadow-sm">
                     <label class="block text-[11px] font-bold text-gray-500 mb-1 ml-1">วินิจฉัยโรคแผนไทย</label>
                     <select id="med_diseaseName" required class="input-modern w-full border border-gray-200 text-sm rounded-xl px-3 py-3 outline-none text-gray-700"></select>
+                </div>
+
+                <div class="pt-2">
+                    <label class="block text-[11px] font-bold text-gray-500 mb-1 ml-1">📸 แนบรูปลายเซ็น/หลักฐาน (ถ้ามี)</label>
+                    <input type="file" id="med_image" accept="image/*" class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-[11px] file:font-bold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 transition outline-none cursor-pointer">
                 </div>
 
                 <div class="pt-3"><label class="block text-[11px] font-bold text-gray-500 mb-2 ml-1">👨‍🏫 เลือกอาจารย์ผู้ตรวจ</label><div id="instructors_medicine" class="grid grid-cols-3 gap-3"></div></div>
@@ -333,7 +342,6 @@
                 const res = await fetch(`${FIREBASE_URL}users/${profile.userId}.json?auth=${FIREBASE_SECRET}`);
                 const userData = await res.json();
                 
-                // ดึงชื่อย่อเพื่อแสดงในมุมขวาบน
                 const firstName = profile.displayName.split(' ')[0];
                 document.getElementById('userName').innerText = userData && userData.isActive ? firstName : profile.displayName;
                 document.getElementById('userImg').src = profile.pictureUrl;
@@ -344,7 +352,7 @@
                     if (userData.role === 'instructor') {
                         roleBadge.innerText = "⭐ อาจารย์"; 
                         roleBadge.className = "text-[9px] text-orange-600 bg-orange-100 px-2 py-0.5 rounded-full font-bold mt-1 inline-block";
-                        document.getElementById('nav-dashboard').classList.remove('hidden'); // โชว์ปุ่มแดชบอร์ด
+                        document.getElementById('nav-dashboard').classList.remove('hidden'); 
                     } else {
                         roleBadge.innerText = "🎓 นักศึกษา"; 
                         roleBadge.className = "text-[9px] text-green-600 bg-green-100 px-2 py-0.5 rounded-full font-bold mt-1 inline-block";
@@ -356,7 +364,6 @@
             } catch (e) { console.error(e); }
         }
 
-        // ระบบเปลี่ยนแท็บเมนูด้านล่างสุดสมูท
         function switchTab(tabId) {
             const tabs = ['massage', 'midwifery', 'medicine', 'dashboard'];
             
@@ -379,7 +386,7 @@
             const activeNav = document.getElementById(`nav-${tabId}`);
             
             activeForm.classList.remove('hidden');
-            void activeForm.offsetWidth; // Trigger reflow for animation
+            void activeForm.offsetWidth; 
             activeForm.classList.add('animate-tab');
 
             if(activeNav) {
@@ -394,6 +401,7 @@
             }
         }
 
+        // ================= ฟังก์ชันกดส่งเคส & แปลงรูปภาพ =================
         async function submitForm(e, department) {
             e.preventDefault();
             if (!currentUser) return alert("รอระบบโหลดข้อมูลสักครู่ครับ");
@@ -402,11 +410,44 @@
 
             const btn = e.target.querySelector('button[type="submit"]');
             const originalText = btn.innerHTML;
-            btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> กำลังส่งข้อมูล...`; 
+            btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> กำลังอัปโหลด...`; 
             btn.disabled = true;
 
             try {
-                let payload = { action: "submitNewCase", department: department, studentUid: currentUser.uid, studentName: currentUser.fullName, instructorUid: selectedInstructor.value };
+                let base64String = "";
+                let mimeType = "";
+                let fileName = "";
+                
+                const fileInput = document.getElementById(`${department === 'massage' ? 'msg' : department === 'midwifery' ? 'mid' : 'med'}_image`);
+                
+                if (fileInput && fileInput.files.length > 0) {
+                    const file = fileInput.files[0];
+                    if (file.size > 5 * 1024 * 1024) {
+                        alert("⚠️ ไฟล์รูปภาพใหญ่เกินไป กรุณาเลือกไฟล์ที่ขนาดไม่เกิน 5MB ครับ");
+                        btn.innerHTML = originalText; btn.disabled = false;
+                        return;
+                    }
+                    fileName = department + "_" + Date.now() + "_" + file.name;
+                    mimeType = file.type;
+                    
+                    base64String = await new Promise((resolve, reject) => {
+                        const reader = new FileReader();
+                        reader.onload = () => resolve(reader.result.split(',')[1]); 
+                        reader.onerror = error => reject(error);
+                        reader.readAsDataURL(file);
+                    });
+                }
+
+                let payload = { 
+                    action: "submitNewCase", 
+                    department: department, 
+                    studentUid: currentUser.uid, 
+                    studentName: currentUser.fullName, 
+                    instructorUid: selectedInstructor.value,
+                    imageB64: base64String,
+                    imageMimeType: mimeType,
+                    imageName: fileName
+                };
                 
                 if (department === 'massage') {
                     payload.date = document.getElementById('msg_date').value;
@@ -423,7 +464,6 @@
                     payload.date = document.getElementById('med_date').value;
                     payload.hn = document.getElementById('med_hn').value;
                     payload.patientName = document.getElementById('med_patientName').value; 
-                    
                     const medSelect = document.getElementById('med_diseaseName');
                     payload.diseaseName = medSelect.value;
                     const selectedOption = medSelect.options[medSelect.selectedIndex];
@@ -435,9 +475,17 @@
                 const result = await res.json();
                 
                 alert(result.message);
-                if (result.success) { e.target.reset(); document.getElementById(department+'_date').valueAsDate = new Date(); }
-            } catch (err) { alert("เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์"); }
-            finally { btn.innerHTML = originalText; btn.disabled = false; }
+                if (result.success) { 
+                    e.target.reset(); 
+                    document.getElementById(department === 'massage' ? 'msg_date' : department === 'midwifery' ? 'mid_date' : 'med_date').valueAsDate = new Date(); 
+                }
+            } catch (err) { 
+                console.error(err); 
+                alert("เกิดข้อผิดพลาด หรือไฟล์มีขนาดใหญ่เกินไปทำให้เซิร์ฟเวอร์ตัดการเชื่อมต่อ"); 
+            } finally { 
+                btn.innerHTML = originalText; 
+                btn.disabled = false; 
+            }
         }
 
         // ================= ระบบ Dashboard (สำหรับอาจารย์) =================
@@ -461,6 +509,12 @@
                         if (c.status === 'pending' && c.instructorUid === currentUser.uid) {
                             let icon = dep === 'massage' ? 'fa-hands-bubbles text-green-500 bg-green-100' : dep === 'midwifery' ? 'fa-person-breastfeeding text-pink-500 bg-pink-100' : 'fa-stethoscope text-blue-500 bg-blue-100';
                             
+                            // โชว์ปุ่มดูรูปลายเซ็น (ถ้ามี)
+                            let imageBtn = "";
+                            if (c.imageUrl && c.imageUrl !== "-") {
+                                imageBtn = `<a href="${c.imageUrl}" target="_blank" class="inline-block mt-2 text-[10px] bg-blue-50 text-blue-600 px-2 py-1 rounded-lg border border-blue-100 hover:bg-blue-100 transition"><i class="fa-solid fa-image"></i> ดูรูปหลักฐาน</a>`;
+                            }
+
                             pendingHtml += `
                                 <div class="bg-white p-4 rounded-[1.5rem] shadow-sm border border-gray-100 transition-all duration-300" id="card_${caseId}">
                                     <div class="flex justify-between items-start mb-3">
@@ -473,7 +527,8 @@
                                         </div>
                                     </div>
                                     <div class="bg-gray-50 p-3 rounded-xl border border-gray-100 mb-4">
-                                        <p class="text-[12px] font-bold text-gray-700">📌 ${c.diseaseName || c.treatment || 'โปรดดูรายละเอียดเพิ่มเติมในกระดาษ'}</p>
+                                        <p class="text-[12px] font-bold text-gray-700">📌 ${c.diseaseName || c.treatment || 'โปรดดูรายละเอียดในกระดาษ'}</p>
+                                        ${imageBtn}
                                     </div>
                                     <div class="flex gap-2">
                                         <button onclick="judgeCase('${dep}', '${caseId}', 'approved')" class="btn-bouncy flex-1 bg-green-500 text-white text-[11px] font-bold py-2 rounded-xl shadow-md shadow-green-500/20 hover:bg-green-600 transition"><i class="fa-solid fa-check mr-1"></i> ผ่าน</button>
@@ -487,7 +542,7 @@
                 }
                 pendingContainer.innerHTML = pendingHtml || '<div class="text-center py-8 opacity-40"><i class="fa-solid fa-face-laugh-beam text-4xl text-gray-400 mb-3"></i><p class="text-xs font-bold text-gray-500">ยอดเยี่ยม! ไม่มีเคสรอตรวจ</p></div>';
 
-                // --- โหลดสถิตินักศึกษา ---
+                // โหลดสถิตินักศึกษา
                 const usersRes = await fetch(`${FIREBASE_URL}users.json?auth=${FIREBASE_SECRET}`);
                 const users = await usersRes.json();
                 let statsHtml = "";
@@ -525,7 +580,7 @@
                 }
                 statsContainer.innerHTML = statsHtml || '<p class="text-[11px] text-center text-gray-400 py-4">ยังไม่มีข้อมูลนักศึกษาในระบบ</p>';
 
-                // --- โหลด RANK ---
+                // โหลด RANK
                 let diseaseCount = {};
                 for (let dep of ['massage', 'medicine']) {
                     const caseRes = await fetch(`${FIREBASE_URL}cases/${dep}.json?auth=${FIREBASE_SECRET}`);
