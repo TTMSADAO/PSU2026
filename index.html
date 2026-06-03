@@ -150,12 +150,13 @@
         const FIREBASE_SECRET = '9iKYKSmC8ssrUXvEdh2OOqS4JCeyEwcaCGr83WkG';
         const LIFF_ID = "2010280091-6e8mWiGV";
         
-        // ⚠️ นำ URL จาก Apps Script มาวางที่นี่
+        // ⚠️ นำ URL จาก Apps Script มาวางที่นี่ (อย่าลืมเปลี่ยนนะครับ)
         const GAS_WEBAPP_URL = "https://script.google.com/macros/s/AKfycb.../exec"; 
 
         let currentUser = null; 
         let instructorList = [];
 
+        // ================= เริ่มทำงานเมื่อเปิดหน้าเว็บ =================
         window.onload = async () => {
             const today = new Date();
             document.getElementById('msg_date').valueAsDate = today;
@@ -167,21 +168,22 @@
             await initializeLiff();
         };
 
-async function loadDropdownConfigs() {
+        // 1. โหลดข้อมูลโรคจาก Firebase
+        async function loadDropdownConfigs() {
             try {
                 const res = await fetch(`${FIREBASE_URL}configs.json?auth=${FIREBASE_SECRET}`);
                 const configs = await res.json();
                 
                 if (configs?.diseases_massage) {
                     const msgSelect = document.getElementById('msg_diseaseName');
-                    msgSelect.innerHTML = '<option value="">-- โหลดข้อมูล... --</option>';
+                    msgSelect.innerHTML = '<option value="">-- เลือกโรค/อาการ --</option>';
                     for (const [code, name] of Object.entries(configs.diseases_massage)) {
                         msgSelect.innerHTML += `<option value="${name}">${code}: ${name}</option>`;
                     }
                 }
                 if (configs?.diseases_medicine) {
                     const medSelect = document.getElementById('med_diseaseName');
-                    medSelect.innerHTML = '<option value="">-- โหลดข้อมูล... --</option>';
+                    medSelect.innerHTML = '<option value="">-- เลือกการวินิจฉัย --</option>';
                     for (const [code, obj] of Object.entries(configs.diseases_medicine)) {
                         // ซ่อนประเภทโรค (obj.type) ไว้ใน data-category
                         medSelect.innerHTML += `<option value="${obj.name}" data-category="${obj.type}">${code}: ${obj.name}</option>`;
@@ -190,8 +192,90 @@ async function loadDropdownConfigs() {
             } catch (e) { console.error(e); }
         }
 
-        // ... ข้ามฟังก์ชันอื่นๆ ลงมาหา submitForm ...
+        // 2. ดึงรูปอาจารย์มาสร้างเป็นปุ่มกด
+        async function fetchUsersAndRenderInstructors() {
+            try {
+                const res = await fetch(`${FIREBASE_URL}users.json?auth=${FIREBASE_SECRET}`);
+                const users = await res.json();
+                for (const uid in users) {
+                    if (users[uid].role === 'instructor' && users[uid].isActive) {
+                        instructorList.push({ uid: uid, name: users[uid].fullName, picUrl: users[uid].picUrl });
+                    }
+                }
+                ['massage', 'midwifery', 'medicine'].forEach(dep => {
+                    const container = document.getElementById(`instructors_${dep}`);
+                    if(container) {
+                        container.innerHTML = instructorList.map((inst, index) => `
+                            <div class="relative">
+                                <input type="radio" name="instructor_${dep}" id="inst_${dep}_${index}" value="${inst.uid}" class="instructor-radio hidden" required>
+                                <label for="inst_${dep}_${index}" class="cursor-pointer border border-gray-200 rounded-lg p-2 flex flex-col items-center gap-1 transition relative bg-white">
+                                    <img src="${inst.picUrl}" class="w-10 h-10 rounded-full object-cover">
+                                    <span class="text-[9px] font-bold text-gray-700 text-center truncate w-full">${inst.name.split(' ')[0]}</span>
+                                    <div class="check-icon hidden absolute -top-1 -right-1 bg-green-500 text-white w-4 h-4 rounded-full items-center justify-center"><i class="fa-solid fa-check text-[9px]"></i></div>
+                                </label>
+                            </div>
+                        `).join('');
+                    }
+                });
+            } catch (e) { console.error(e); }
+        }
 
+        // 3. เริ่มต้นระบบ LIFF และบังคับล็อกอิน
+        async function initializeLiff() {
+            try {
+                await liff.init({ liffId: LIFF_ID });
+                if (liff.isLoggedIn()) {
+                    checkUserPermission(await liff.getProfile());
+                } else { 
+                    liff.login(); // บังคับให้หน้าเว็บเด้งไปล็อกอิน LINE ทันที
+                }
+            } catch (err) { 
+                console.error("LIFF Init Error: ", err);
+                document.getElementById('userName').innerText = "LIFF Error";
+                document.getElementById('userRole').innerText = "ตรวจสอบการตั้งค่า";
+                document.getElementById('userRole').className = "text-[10px] text-red-600 bg-red-100 px-2 py-0.5 rounded-full inline-block font-bold";
+                alert("⚠️ ระบบ LINE แจ้งข้อผิดพลาด:\n" + err.message + "\n\n💡 สาเหตุที่เป็นไปได้: LIFF ID ผิด หรือ Endpoint URL ในหน้า LINE Developers ไม่ตรงกับเว็บปัจจุบัน");
+            }
+        }
+
+        // 4. ตรวจสอบสิทธิ์ผู้ใช้งาน
+        async function checkUserPermission(profile) {
+            try {
+                const res = await fetch(`${FIREBASE_URL}users/${profile.userId}.json?auth=${FIREBASE_SECRET}`);
+                const userData = await res.json();
+                document.getElementById('userImg').src = profile.pictureUrl;
+                
+                if (userData && userData.isActive) {
+                    currentUser = { uid: profile.userId, ...userData };
+                    document.getElementById('userName').innerText = userData.fullName;
+                    
+                    const roleBadge = document.getElementById('userRole');
+                    if (userData.role === 'instructor') {
+                        roleBadge.innerText = "⭐ อาจารย์ผู้คุม"; 
+                        roleBadge.className = "text-[10px] text-orange-600 bg-orange-100 px-2 py-0.5 rounded-full font-bold";
+                        document.getElementById('tab-dashboard').classList.remove('hidden'); // ปลดล็อกแท็บแดชบอร์ดให้อาจารย์
+                    } else {
+                        roleBadge.innerText = "🎓 นักศึกษา"; 
+                        roleBadge.className = "text-[10px] text-green-600 bg-green-100 px-2 py-0.5 rounded-full font-bold";
+                    }
+                } else {
+                    document.getElementById('userName').innerText = "ไม่มีสิทธิ์เข้าถึง";
+                    document.getElementById('userRole').innerText = "Unregistered";
+                }
+            } catch (e) { console.error(e); }
+        }
+
+        // 5. สลับเมนูด้านบน
+        function switchTab(tabId) {
+            ['massage', 'midwifery', 'medicine', 'dashboard'].forEach(id => {
+                document.getElementById(`form-${id}`).classList.add('hidden');
+                document.getElementById(`tab-${id}`).classList.remove('active');
+            });
+            document.getElementById(`form-${tabId}`).classList.remove('hidden');
+            document.getElementById(`tab-${tabId}`).classList.add('active');
+        }
+
+        // 6. กดปุ่มส่งเคส
         async function submitForm(e, department) {
             e.preventDefault();
             if (!currentUser) return alert("รอกำลังเชื่อมต่อข้อมูลครับ");
@@ -211,7 +295,6 @@ async function loadDropdownConfigs() {
                     instructorUid: selectedInstructor.value 
                 };
                 
-                // ดึงข้อมูลฟอร์มแบบใหม่ที่ปรับให้สั้นลง
                 if (department === 'massage') {
                     payload.date = document.getElementById('msg_date').value; 
                     payload.hn = document.getElementById('msg_hn').value;
@@ -230,11 +313,9 @@ async function loadDropdownConfigs() {
                     
                     const medSelect = document.getElementById('med_diseaseName');
                     payload.diseaseName = medSelect.value;
-                    
-                    // ระบบ Auto-classify ดึงประเภทโรคที่ซ่อนไว้มาจัดหมวดเพื่อคำนวณ Stats
                     const selectedOption = medSelect.options[medSelect.selectedIndex];
                     payload.diseaseCategory = selectedOption ? selectedOption.getAttribute('data-category') : 'โรคทั่วไป';
-                    payload.caseType = 'New'; // บังคับเป็นเคสใหม่เสมอสำหรับการคำนวณเวชกรรม
+                    payload.caseType = 'New';
                 }
 
                 const res = await fetch(GAS_WEBAPP_URL, { method: 'POST', body: JSON.stringify(payload) });
@@ -253,7 +334,7 @@ async function loadDropdownConfigs() {
             }
         }
 
-       // ================= ระบบ Dashboard (สำหรับอาจารย์) =================
+        // ================= ระบบ Dashboard (สำหรับอาจารย์) =================
         async function loadDashboardData() {
             if (currentUser.role !== 'instructor') return;
             
@@ -266,7 +347,7 @@ async function loadDropdownConfigs() {
             rankContainer.innerHTML = '<p class="text-center text-xs text-gray-400 py-4"><i class="fa-solid fa-spinner fa-spin"></i> กำลังประมวลผล RANK...</p>';
 
             try {
-                // --- 1. โหลดเคสที่รอตรวจ (Pending Cases) ---
+                // โหลดเคสรอตรวจ
                 let pendingHtml = "";
                 const deps = ['massage', 'midwifery', 'medicine'];
                 
@@ -300,7 +381,7 @@ async function loadDropdownConfigs() {
                 }
                 pendingContainer.innerHTML = pendingHtml || '<p class="text-center text-xs text-gray-400 py-6">ไม่มีเคสรอตรวจครับ 🎉</p>';
 
-                // --- 2. โหลดความคืบหน้านักศึกษา (Progress Stats) ---
+                // โหลดสถิตินักศึกษา
                 const usersRes = await fetch(`${FIREBASE_URL}users.json?auth=${FIREBASE_SECRET}`);
                 const users = await usersRes.json();
                 let statsHtml = "";
@@ -338,14 +419,12 @@ async function loadDropdownConfigs() {
                 }
                 statsContainer.innerHTML = statsHtml || '<p class="text-[11px] text-center text-gray-400 py-4">ยังไม่มีข้อมูลนักศึกษาในระบบ</p>';
 
-                // --- 3. คำนวณอันดับโรค (Disease Ranking Top 10) ---
+                // คำนวณอันดับโรค
                 let diseaseCount = {};
                 for (let dep of ['massage', 'medicine']) {
                     const caseRes = await fetch(`${FIREBASE_URL}cases/${dep}.json?auth=${FIREBASE_SECRET}`);
                     const allCases = await caseRes.json();
-                    
                     for (let cid in allCases) {
-                        // นับเฉพาะเคสที่ "อนุมัติแล้ว"
                         if (allCases[cid].status === 'approved' && allCases[cid].diseaseName) {
                             const dName = allCases[cid].diseaseName;
                             diseaseCount[dName] = (diseaseCount[dName] || 0) + 1;
@@ -353,19 +432,14 @@ async function loadDropdownConfigs() {
                     }
                 }
 
-                // แปลง Object เป็น Array แล้วเรียงลำดับจากมากไปน้อย
                 const sortedRank = Object.entries(diseaseCount).sort((a, b) => b[1] - a[1]).slice(0, 10);
-                
                 if (sortedRank.length > 0) {
                     let rankHtml = '<ul class="space-y-2.5">';
                     sortedRank.forEach((item, index) => {
                         let medal = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `<span class="w-5 h-5 flex items-center justify-center bg-gray-100 rounded-full text-[9px] font-bold text-gray-500">${index+1}</span>`;
                         rankHtml += `
                             <li class="flex justify-between items-center text-[11px] border-b border-gray-50 pb-2 last:border-0">
-                                <div class="flex items-center gap-2 truncate w-3/4">
-                                    ${medal}
-                                    <span class="truncate text-gray-700">${item[0]}</span>
-                                </div>
+                                <div class="flex items-center gap-2 truncate w-3/4">${medal}<span class="truncate text-gray-700">${item[0]}</span></div>
                                 <span class="font-bold text-teal-600 bg-teal-50 px-2 py-0.5 rounded-full">${item[1]} เคส</span>
                             </li>
                         `;
@@ -375,18 +449,14 @@ async function loadDropdownConfigs() {
                 } else {
                     rankContainer.innerHTML = '<p class="text-[11px] text-center text-gray-400 py-4">ยังไม่มีข้อมูลเคสที่อนุมัติ</p>';
                 }
-
-            } catch(e) { 
-                console.error(e);
-                pendingContainer.innerHTML = '<p class="text-center text-sm text-red-400 py-4">ดึงข้อมูลล้มเหลว กรุณาลองใหม่</p>'; 
-            }
+            } catch(e) { console.error(e); pendingContainer.innerHTML = '<p class="text-center text-sm text-red-400 py-4">ดึงข้อมูลล้มเหลว กรุณาลองใหม่</p>'; }
         }
 
         async function judgeCase(department, caseId, status) {
             let remark = "";
             if (status !== 'approved') {
                 remark = prompt("กรุณาระบุหมายเหตุ (สาเหตุที่ส่งคืน หรือ ยกเลิก):");
-                if (remark === null) return; // กด Cancel
+                if (remark === null) return; 
             }
 
             document.getElementById(`card_${caseId}`).style.opacity = '0.5';
@@ -395,7 +465,11 @@ async function loadDropdownConfigs() {
                 const res = await fetch(GAS_WEBAPP_URL, { method: 'POST', body: JSON.stringify(payload) });
                 const result = await res.json();
                 
-                if (result.success) document.getElementById(`card_${caseId}`).remove();
+                if (result.success) {
+                    document.getElementById(`card_${caseId}`).remove();
+                    // ให้มันรีเฟรชยอด Progress Bar ใหม่ทันทีหลังจากกดผ่านเคส
+                    if (status === 'approved') loadDashboardData(); 
+                }
                 else { alert(result.message); document.getElementById(`card_${caseId}`).style.opacity = '1'; }
             } catch (err) { alert("Error"); document.getElementById(`card_${caseId}`).style.opacity = '1'; }
         }
