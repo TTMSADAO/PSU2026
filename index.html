@@ -3,251 +3,318 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ระบบบันทึกเคส - รพ.สะเดา</title>
+    <title>TTMED - รพ.สะเดา</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script charset="utf-8" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
 
     <style>
+        :root {
+            --app-bg: #f3f8f8;
+            --glass-bg: rgba(255, 255, 255, 0.65);
+            --glass-border: rgba(255, 255, 255, 0.8);
+        }
+
         body { 
             font-family: 'Prompt', sans-serif; 
-            background-color: #f4f7f6; 
+            background-color: var(--app-bg);
+            /* Mesh Gradient Background สุดพรีเมียม */
+            background-image: 
+                radial-gradient(at 10% 10%, hsla(153, 100%, 84%, 0.5) 0px, transparent 50%),
+                radial-gradient(at 90% 10%, hsla(199, 100%, 84%, 0.5) 0px, transparent 50%),
+                radial-gradient(at 50% 90%, hsla(43, 100%, 84%, 0.5) 0px, transparent 50%),
+                radial-gradient(at 90% 90%, hsla(333, 100%, 88%, 0.5) 0px, transparent 50%);
+            background-attachment: fixed;
             min-height: 100vh;
             overflow-x: hidden;
             -webkit-tap-highlight-color: transparent;
         }
 
-        /* Background Animated Blobs */
-        @keyframes blob {
-            0% { transform: translate(0px, 0px) scale(1); }
-            33% { transform: translate(30px, -50px) scale(1.1); }
-            66% { transform: translate(-20px, 20px) scale(0.9); }
-            100% { transform: translate(0px, 0px) scale(1); }
-        }
-        .animate-blob { animation: blob 7s infinite; }
-        .animation-delay-2000 { animation-delay: 2s; }
-        .animation-delay-4000 { animation-delay: 4s; }
-
-        /* UI Elements */
+        /* 🔮 Glassmorphism 2.0 */
         .glass-card { 
-            background: rgba(255, 255, 255, 0.75); 
-            backdrop-filter: blur(16px); 
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.8); 
-            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.08); 
+            background: var(--glass-bg); 
+            backdrop-filter: blur(20px); 
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border); 
+            box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.05), inset 0 1px 0 rgba(255,255,255,1); 
+            border-radius: 2.5rem;
         }
 
-        .input-modern {
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            background-color: rgba(249, 250, 251, 0.8);
+        /* 🕹️ Bouncy Inputs */
+        .input-wow {
+            background-color: rgba(255, 255, 255, 0.8);
+            border: 2px solid transparent;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
+            border-radius: 1.25rem;
         }
-        .input-modern:focus {
-            transform: translateY(-2px);
+        .input-wow:focus {
+            transform: translateY(-3px) scale(1.01);
             background-color: #ffffff;
-            box-shadow: 0 8px 20px -6px rgba(34, 197, 94, 0.15);
+            border-color: #34d399;
+            box-shadow: 0 15px 25px -10px rgba(52, 211, 153, 0.3);
+            outline: none;
         }
 
-        .bottom-nav { box-shadow: 0 -10px 30px rgba(0,0,0,0.05); }
+        /* 🚀 Floating Bottom Nav (แคปซูลลอย) */
+        .floating-nav { 
+            bottom: 20px;
+            width: calc(100% - 32px);
+            left: 16px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.85);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,1);
+        }
         .nav-item { transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-        .nav-item.active { transform: translateY(-4px); }
+        .nav-item.active { transform: translateY(-8px); }
+        .nav-item .icon-box { transition: all 0.4s ease; }
+        .nav-item.active .icon-box { transform: scale(1.15); box-shadow: 0 10px 20px -5px currentColor; }
+
+        /* ✨ Buttons Glow & Bounce */
+        .btn-glow {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border-radius: 999px;
+            position: relative;
+            overflow: hidden;
+        }
+        .btn-glow::after {
+            content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: all 0.5s ease;
+        }
+        .btn-glow:hover::after { left: 100%; }
+        .btn-glow:active { transform: scale(0.92); }
         
+        .btn-green { background: linear-gradient(135deg, #10b981, #059669); box-shadow: 0 10px 25px -5px rgba(16, 185, 129, 0.5); }
+        .btn-pink { background: linear-gradient(135deg, #f43f5e, #e11d48); box-shadow: 0 10px 25px -5px rgba(244, 63, 94, 0.5); }
+        .btn-blue { background: linear-gradient(135deg, #3b82f6, #2563eb); box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.5); }
+
+        /* 👨‍🏫 Instructor Selection Animation (สไตล์ IG Story) */
+        .instructor-radio:checked + label {
+            background-color: #ffffff;
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 15px 30px -10px rgba(0,0,0,0.15);
+        }
+        .instructor-radio:checked + label .avatar-ring {
+            background: linear-gradient(45deg, #10b981, #34d399, #fbbf24);
+            padding: 3px;
+        }
+        .instructor-radio:checked + label .check-icon { 
+            transform: scale(1) rotate(0deg); opacity: 1; 
+        }
+        .check-icon { 
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+            transform: scale(0) rotate(-180deg); opacity: 0; 
+        }
+        .avatar-ring { transition: all 0.3s ease; padding: 0px; border-radius: 50%; }
+
+        /* 🎬 Page Transitions */
         @keyframes slideUpFade {
-            0% { opacity: 0; transform: translateY(30px) scale(0.98); }
+            0% { opacity: 0; transform: translateY(40px) scale(0.95); }
             100% { opacity: 1; transform: translateY(0) scale(1); }
         }
-        .animate-tab { animation: slideUpFade 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-
-        .instructor-radio:checked + label {
-            border-color: #22c55e;
-            background-color: #f0fdf4;
-            transform: translateY(-3px);
-            box-shadow: 0 8px 15px -3px rgba(34, 197, 94, 0.2);
-        }
-        .instructor-radio:checked + label img {
-            border: 2px solid #22c55e;
-            transform: scale(1.05);
-        }
-        .instructor-radio:checked + label .check-icon { transform: scale(1); opacity: 1; }
-        .check-icon { transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); transform: scale(0); opacity: 0; }
-        .btn-bouncy { transition: transform 0.2s; }
-        .btn-bouncy:active { transform: scale(0.95); }
+        .animate-tab { animation: slideUpFade 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        
+        /* Staggered cards (การ์ดค่อยๆ เด้งขึ้นทีละใบ) */
+        .card-stagger { animation: slideUpFade 0.5s cubic-bezier(0.16, 1, 0.3, 1) backwards; }
     </style>
 </head>
-<body class="pb-28">
-
-    <div class="fixed top-0 left-0 w-full h-full overflow-hidden -z-10 pointer-events-none">
-        <div class="absolute top-[-5%] left-[-10%] w-72 h-72 bg-green-200 rounded-full mix-blend-multiply filter blur-3xl opacity-40 animate-blob"></div>
-        <div class="absolute top-[15%] right-[-10%] w-72 h-72 bg-emerald-200 rounded-full mix-blend-multiply filter blur-3xl opacity-40 animate-blob animation-delay-2000"></div>
-        <div class="absolute bottom-[20%] left-[10%] w-72 h-72 bg-teal-100 rounded-full mix-blend-multiply filter blur-3xl opacity-40 animate-blob animation-delay-4000"></div>
-    </div>
-
-    <div class="glass-card sticky top-0 z-40 px-4 py-3 flex items-center justify-between mb-6 border-b border-white/50">
+<body class="pb-32"> <div class="sticky top-0 z-40 px-4 py-4 flex items-center justify-between mb-4">
         <div class="flex items-center gap-3">
-            <div class="w-11 h-11 bg-white rounded-2xl shadow-sm border border-gray-100 flex items-center justify-center overflow-hidden p-1">
+            <div class="w-12 h-12 bg-white rounded-[1rem] shadow-lg border border-gray-100 flex items-center justify-center overflow-hidden p-1.5 transform hover:scale-105 transition">
                 <img src="https://github.com/TTMSADAO/ttmed-sadao-queue/blob/PIC/%E0%B9%82%E0%B8%A5%E0%B9%82%E0%B8%81%E0%B9%89%E0%B9%81%E0%B8%9C%E0%B8%99%E0%B8%81%E0%B8%B2%E0%B8%A3%E0%B8%B8%E0%B9%88%E0%B8%99%E0%B8%A1%E0%B8%AB%E0%B8%B2%E0%B9%80%E0%B8%AA%E0%B8%99%E0%B9%88%E0%B8%AB%E0%B9%8C.png?raw=true" alt="Logo" class="w-full h-full object-contain">
             </div>
             <div>
-                <h1 class="text-[15px] font-extrabold bg-gradient-to-r from-green-700 to-emerald-500 bg-clip-text text-transparent leading-tight">TTMED STUDY</h1>
-                <p class="text-[10px] font-medium text-gray-500">โรงพยาบาลสะเดา</p>
+                <h1 class="text-[17px] font-extrabold tracking-tight text-gray-800 leading-none mb-1">TTMED <span class="text-transparent bg-clip-text bg-gradient-to-r from-emerald-500 to-teal-400">STUDY</span></h1>
+                <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Sadao Hospital</p>
             </div>
         </div>
-        <div class="flex items-center gap-2 bg-white/60 p-1.5 rounded-full shadow-sm border border-white">
-            <div class="text-right pl-2 hidden sm:block">
-                <p id="userName" class="text-xs font-bold text-gray-800">กำลังโหลด...</p>
-                <p id="userRole" class="text-[9px] text-gray-500">Connecting</p>
+        <div class="flex items-center gap-2 bg-white/70 backdrop-blur-md p-1.5 rounded-full shadow-sm border border-white">
+            <div class="text-right pl-3 hidden sm:block">
+                <p id="userName" class="text-[13px] font-extrabold text-gray-800 leading-tight">กำลังโหลด...</p>
+                <p id="userRole" class="text-[9px] font-bold text-gray-400">Connecting</p>
             </div>
-            <img id="userImg" src="https://ui-avatars.com/api/?name=U" class="w-8 h-8 rounded-full border border-gray-200 object-cover">
+            <img id="userImg" src="https://ui-avatars.com/api/?name=U" class="w-9 h-9 rounded-full border-2 border-white shadow-md object-cover">
         </div>
     </div>
 
     <div class="max-w-md mx-auto px-4">
 
-        <div id="form-massage" class="glass-card p-6 rounded-[2rem] mb-6 animate-tab">
-            <div class="flex items-center gap-3 mb-5">
-                <div class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center text-green-600"><i class="fa-solid fa-hands-bubbles text-lg"></i></div>
-                <h2 class="font-bold text-gray-800 text-lg">บันทึกเคสนวดไทย</h2>
+        <div id="form-massage" class="glass-card p-6 mb-6 animate-tab">
+            <div class="flex items-center gap-3 mb-6">
+                <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-green-100 to-emerald-50 flex items-center justify-center text-emerald-500 shadow-inner"><i class="fa-solid fa-spa text-xl"></i></div>
+                <div>
+                    <h2 class="font-extrabold text-gray-800 text-lg">บันทึกเคสนวดไทย</h2>
+                    <p class="text-[11px] text-gray-500 font-medium">กรอกข้อมูลผู้ป่วยและการรักษา</p>
+                </div>
             </div>
             
-            <form onsubmit="submitForm(event, 'massage')" class="space-y-4">
-                <div class="grid grid-cols-2 gap-3">
-                    <div><label class="block text-[11px] font-bold text-gray-500 mb-1 ml-1">📅 วันที่รับบริการ</label><input type="date" id="msg_date" required class="input-modern w-full border border-gray-200 text-sm rounded-2xl px-4 py-3 outline-none"></div>
-                    <div><label class="block text-[11px] font-bold text-gray-500 mb-1 ml-1">🆔 HN</label><input type="text" id="msg_hn" placeholder="ระบุ HN" required class="input-modern w-full border border-gray-200 text-sm rounded-2xl px-4 py-3 outline-none"></div>
+            <form onsubmit="submitForm(event, 'massage')" class="space-y-5">
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-[10px] font-extrabold text-gray-400 uppercase tracking-wider mb-1.5 ml-2">วันที่รับบริการ</label>
+                        <input type="date" id="msg_date" required class="input-wow w-full text-sm px-4 py-3.5">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-extrabold text-gray-400 uppercase tracking-wider mb-1.5 ml-2">HN ผู้ป่วย</label>
+                        <input type="text" id="msg_hn" placeholder="ระบุ HN" required class="input-wow w-full text-sm px-4 py-3.5">
+                    </div>
                 </div>
-                <div><label class="block text-[11px] font-bold text-gray-500 mb-1 ml-1">👤 ชื่อ-สกุล ผู้ป่วย</label><input type="text" id="msg_patientName" placeholder="ชื่อ นามสกุล" required class="input-modern w-full border border-gray-200 text-sm rounded-2xl px-4 py-3 outline-none"></div>
+                <div>
+                    <label class="block text-[10px] font-extrabold text-gray-400 uppercase tracking-wider mb-1.5 ml-2">ชื่อ-สกุล ผู้ป่วย</label>
+                    <input type="text" id="msg_patientName" placeholder="เช่น นายสมชาย ใจดี" required class="input-wow w-full text-sm px-4 py-3.5">
+                </div>
 
-                <div class="p-4 bg-white/50 rounded-[1.5rem] border border-white shadow-sm space-y-3">
-                    <div class="grid grid-cols-2 gap-3">
+                <div class="p-5 bg-white/40 rounded-[2rem] border border-white shadow-sm space-y-4 relative overflow-hidden">
+                    <i class="fa-solid fa-leaf absolute -bottom-4 -right-4 text-5xl text-emerald-500 opacity-5"></i>
+                    
+                    <div class="grid grid-cols-2 gap-4 relative z-10">
                         <div>
-                            <label class="block text-[11px] font-bold text-gray-500 mb-1 ml-1">รูปแบบ</label>
-                            <select id="msg_caseType" class="input-modern w-full border border-gray-200 text-sm rounded-xl px-3 py-3 outline-none text-gray-700">
-                                <option value="New">🌟 เคสใหม่</option>
+                            <label class="block text-[10px] font-extrabold text-gray-400 uppercase tracking-wider mb-1.5 ml-2">รูปแบบ</label>
+                            <select id="msg_caseType" class="input-wow w-full text-sm px-3 py-3.5 text-gray-700">
+                                <option value="New">✨ เคสใหม่</option>
                                 <option value="FollowUp">🔄 ติดตามผล</option>
                             </select>
                         </div>
                         <div>
-                            <label class="block text-[11px] font-bold text-gray-500 mb-1 ml-1">กลุ่มโรค</label>
-                            <select id="msg_diseaseCategory" class="input-modern w-full border border-gray-200 text-sm rounded-xl px-3 py-3 outline-none text-gray-700">
-                                <option value="โรคทางหัตถเวชกรรมไทย">หัตถเวชกรรมไทย</option>
+                            <label class="block text-[10px] font-extrabold text-gray-400 uppercase tracking-wider mb-1.5 ml-2">กลุ่มโรค</label>
+                            <select id="msg_diseaseCategory" class="input-wow w-full text-sm px-3 py-3.5 text-gray-700">
+                                <option value="โรคทางหัตถเวชกรรมไทย">หัตถเวชกรรม</option>
                                 <option value="กลุ่มโรคไม่ติดต่อเรื้อรัง (NCDs)">NCDs</option>
                             </select>
                         </div>
                     </div>
-                    <div>
-                        <label class="block text-[11px] font-bold text-gray-500 mb-1 ml-1">ชื่อโรค / อาการ</label>
-                        <select id="msg_diseaseName" required class="input-modern w-full border border-gray-200 text-sm rounded-xl px-3 py-3 outline-none text-gray-700">
+                    <div class="relative z-10">
+                        <label class="block text-[10px] font-extrabold text-gray-400 uppercase tracking-wider mb-1.5 ml-2">ชื่อโรค / อาการ</label>
+                        <select id="msg_diseaseName" required class="input-wow w-full text-sm px-3 py-3.5 text-gray-700">
                             <option value="">-- โหลดข้อมูล... --</option>
                         </select>
                     </div>
                 </div>
 
-                <div class="pt-2">
-                    <label class="block text-[11px] font-bold text-gray-500 mb-1 ml-1">📸 แนบรูปลายเซ็น/หลักฐาน (ถ้ามี)</label>
-                    <input type="file" id="msg_image" accept="image/*" class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-[11px] file:font-bold file:bg-green-50 file:text-green-700 hover:file:bg-green-100 transition outline-none cursor-pointer">
+                <div class="pt-1">
+                    <label class="block text-[10px] font-extrabold text-gray-400 uppercase tracking-wider mb-1.5 ml-2">แนบรูปหลักฐาน (ถ้ามี)</label>
+                    <div class="relative group">
+                        <input type="file" id="msg_image" accept="image/*" class="w-full text-sm text-gray-500 file:mr-4 file:py-2.5 file:px-5 file:rounded-full file:border-0 file:text-[11px] file:font-extrabold file:bg-emerald-100 file:text-emerald-700 hover:file:bg-emerald-200 transition-all outline-none cursor-pointer input-wow py-2 px-2">
+                    </div>
                 </div>
 
                 <div class="pt-3">
-                    <label class="block text-[11px] font-bold text-gray-500 mb-2 ml-1">👨‍🏫 เลือกอาจารย์ผู้ตรวจประเมิน</label>
+                    <label class="block text-[10px] font-extrabold text-gray-400 uppercase tracking-wider mb-3 ml-2 text-center">เลือกอาจารย์ผู้ตรวจประเมิน</label>
                     <div id="instructors_massage" class="grid grid-cols-3 gap-3"></div>
                 </div>
 
-                <button type="submit" class="btn-bouncy w-full bg-gradient-to-r from-green-500 to-emerald-600 text-white font-bold py-4 rounded-2xl shadow-lg shadow-green-500/30 mt-4 flex justify-center items-center gap-2">
-                    <i class="fa-solid fa-paper-plane"></i> บันทึกและแจ้งเตือน
+                <button type="submit" class="btn-glow btn-green w-full text-white font-extrabold text-[15px] py-4 mt-6 flex justify-center items-center gap-2">
+                    <i class="fa-solid fa-paper-plane text-lg"></i> ส่งเคสให้อาจารย์
                 </button>
             </form>
         </div>
 
-        <div id="form-midwifery" class="hidden glass-card p-6 rounded-[2rem] mb-6">
-            <div class="flex items-center gap-3 mb-5">
-                <div class="w-10 h-10 rounded-full bg-pink-100 flex items-center justify-center text-pink-600"><i class="fa-solid fa-person-breastfeeding text-lg"></i></div>
-                <h2 class="font-bold text-gray-800 text-lg">บันทึกเคสผดุงครรภ์</h2>
-            </div>
-            <form onsubmit="submitForm(event, 'midwifery')" class="space-y-4">
-                <div class="grid grid-cols-2 gap-3">
-                    <div><label class="block text-[11px] font-bold text-gray-500 mb-1 ml-1">📅 วันที่</label><input type="date" id="mid_date" required class="input-modern w-full border border-gray-200 text-sm rounded-2xl px-4 py-3 outline-none"></div>
-                    <div><label class="block text-[11px] font-bold text-gray-500 mb-1 ml-1">🆔 HN มารดา</label><input type="text" id="mid_hn" required class="input-modern w-full border border-gray-200 text-sm rounded-2xl px-4 py-3 outline-none"></div>
+        <div id="form-midwifery" class="hidden glass-card p-6 mb-6">
+            <div class="flex items-center gap-3 mb-6">
+                <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-pink-100 to-rose-50 flex items-center justify-center text-rose-500 shadow-inner"><i class="fa-solid fa-person-breastfeeding text-xl"></i></div>
+                <div>
+                    <h2 class="font-extrabold text-gray-800 text-lg">บันทึกเคสผดุงครรภ์</h2>
+                    <p class="text-[11px] text-gray-500 font-medium">ข้อมูลมารดาและการดูแล</p>
                 </div>
-                <div><label class="block text-[11px] font-bold text-gray-500 mb-1 ml-1">👤 ชื่อ-สกุล มารดา</label><input type="text" id="mid_patientName" required class="input-modern w-full border border-gray-200 text-sm rounded-2xl px-4 py-3 outline-none"></div>
+            </div>
+            <form onsubmit="submitForm(event, 'midwifery')" class="space-y-5">
+                <div class="grid grid-cols-2 gap-4">
+                    <div><label class="block text-[10px] font-extrabold text-gray-400 uppercase tracking-wider mb-1.5 ml-2">วันที่</label><input type="date" id="mid_date" required class="input-wow w-full text-sm px-4 py-3.5"></div>
+                    <div><label class="block text-[10px] font-extrabold text-gray-400 uppercase tracking-wider mb-1.5 ml-2">HN มารดา</label><input type="text" id="mid_hn" required class="input-wow w-full text-sm px-4 py-3.5"></div>
+                </div>
+                <div><label class="block text-[10px] font-extrabold text-gray-400 uppercase tracking-wider mb-1.5 ml-2">ชื่อ-สกุล มารดา</label><input type="text" id="mid_patientName" required class="input-wow w-full text-sm px-4 py-3.5"></div>
                 
-                <div class="pt-2">
-                    <label class="block text-[11px] font-bold text-gray-500 mb-1 ml-1">📸 แนบรูปลายเซ็น/หลักฐาน (ถ้ามี)</label>
-                    <input type="file" id="mid_image" accept="image/*" class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-[11px] file:font-bold file:bg-pink-50 file:text-pink-700 hover:file:bg-pink-100 transition outline-none cursor-pointer">
+                <div>
+                    <label class="block text-[10px] font-extrabold text-gray-400 uppercase tracking-wider mb-1.5 ml-2">แนบรูปหลักฐาน (ถ้ามี)</label>
+                    <input type="file" id="mid_image" accept="image/*" class="w-full text-sm text-gray-500 file:mr-4 file:py-2.5 file:px-5 file:rounded-full file:border-0 file:text-[11px] file:font-extrabold file:bg-rose-100 file:text-rose-700 hover:file:bg-rose-200 transition-all cursor-pointer input-wow py-2 px-2">
                 </div>
 
-                <div class="pt-3"><label class="block text-[11px] font-bold text-gray-500 mb-2 ml-1">👨‍🏫 เลือกอาจารย์ผู้ตรวจ</label><div id="instructors_midwifery" class="grid grid-cols-3 gap-3"></div></div>
+                <div class="pt-3"><label class="block text-[10px] font-extrabold text-gray-400 uppercase tracking-wider mb-3 ml-2 text-center">เลือกอาจารย์ผู้ตรวจ</label><div id="instructors_midwifery" class="grid grid-cols-3 gap-3"></div></div>
                 
-                <button type="submit" class="btn-bouncy w-full bg-gradient-to-r from-pink-500 to-rose-500 text-white font-bold py-4 rounded-2xl shadow-lg shadow-pink-500/30 mt-4 flex justify-center items-center gap-2"><i class="fa-solid fa-paper-plane"></i> บันทึกและแจ้งเตือน</button>
+                <button type="submit" class="btn-glow btn-pink w-full text-white font-extrabold text-[15px] py-4 mt-6 flex justify-center items-center gap-2"><i class="fa-solid fa-paper-plane text-lg"></i> ส่งเคสให้อาจารย์</button>
             </form>
         </div>
 
-        <div id="form-medicine" class="hidden glass-card p-6 rounded-[2rem] mb-6">
-            <div class="flex items-center gap-3 mb-5">
-                <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600"><i class="fa-solid fa-stethoscope text-lg"></i></div>
-                <h2 class="font-bold text-gray-800 text-lg">บันทึกเคสเวชกรรม</h2>
+        <div id="form-medicine" class="hidden glass-card p-6 mb-6">
+            <div class="flex items-center gap-3 mb-6">
+                <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-100 to-indigo-50 flex items-center justify-center text-blue-500 shadow-inner"><i class="fa-solid fa-stethoscope text-xl"></i></div>
+                <div>
+                    <h2 class="font-extrabold text-gray-800 text-lg">บันทึกเคสเวชกรรม</h2>
+                    <p class="text-[11px] text-gray-500 font-medium">การตรวจวินิจฉัยโรคแผนไทย</p>
+                </div>
             </div>
-            <form onsubmit="submitForm(event, 'medicine')" class="space-y-4">
-                <div class="grid grid-cols-2 gap-3">
-                    <div><label class="block text-[11px] font-bold text-gray-500 mb-1 ml-1">📅 วันที่</label><input type="date" id="med_date" required class="input-modern w-full border border-gray-200 text-sm rounded-2xl px-4 py-3 outline-none"></div>
-                    <div><label class="block text-[11px] font-bold text-gray-500 mb-1 ml-1">🆔 HN</label><input type="text" id="med_hn" required class="input-modern w-full border border-gray-200 text-sm rounded-2xl px-4 py-3 outline-none"></div>
+            <form onsubmit="submitForm(event, 'medicine')" class="space-y-5">
+                <div class="grid grid-cols-2 gap-4">
+                    <div><label class="block text-[10px] font-extrabold text-gray-400 uppercase tracking-wider mb-1.5 ml-2">วันที่</label><input type="date" id="med_date" required class="input-wow w-full text-sm px-4 py-3.5"></div>
+                    <div><label class="block text-[10px] font-extrabold text-gray-400 uppercase tracking-wider mb-1.5 ml-2">HN</label><input type="text" id="med_hn" required class="input-wow w-full text-sm px-4 py-3.5"></div>
                 </div>
-                <div><label class="block text-[11px] font-bold text-gray-500 mb-1 ml-1">👤 ชื่อ-สกุล ผู้ป่วย</label><input type="text" id="med_patientName" required class="input-modern w-full border border-gray-200 text-sm rounded-2xl px-4 py-3 outline-none"></div>
+                <div><label class="block text-[10px] font-extrabold text-gray-400 uppercase tracking-wider mb-1.5 ml-2">ชื่อ-สกุล ผู้ป่วย</label><input type="text" id="med_patientName" required class="input-wow w-full text-sm px-4 py-3.5"></div>
                 
-                <div class="p-4 bg-white/50 rounded-[1.5rem] border border-white shadow-sm">
-                    <label class="block text-[11px] font-bold text-gray-500 mb-1 ml-1">วินิจฉัยโรคแผนไทย</label>
-                    <select id="med_diseaseName" required class="input-modern w-full border border-gray-200 text-sm rounded-xl px-3 py-3 outline-none text-gray-700"></select>
+                <div class="p-5 bg-white/40 rounded-[2rem] border border-white shadow-sm relative overflow-hidden">
+                    <i class="fa-solid fa-pills absolute -bottom-4 -right-4 text-5xl text-blue-500 opacity-5"></i>
+                    <div class="relative z-10">
+                        <label class="block text-[10px] font-extrabold text-gray-400 uppercase tracking-wider mb-1.5 ml-2">วินิจฉัยโรคแผนไทย</label>
+                        <select id="med_diseaseName" required class="input-wow w-full text-sm px-3 py-3.5 text-gray-700"></select>
+                    </div>
                 </div>
 
-                <div class="pt-2">
-                    <label class="block text-[11px] font-bold text-gray-500 mb-1 ml-1">📸 แนบรูปลายเซ็น/หลักฐาน (ถ้ามี)</label>
-                    <input type="file" id="med_image" accept="image/*" class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-[11px] file:font-bold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 transition outline-none cursor-pointer">
+                <div>
+                    <label class="block text-[10px] font-extrabold text-gray-400 uppercase tracking-wider mb-1.5 ml-2">แนบรูปหลักฐาน (ถ้ามี)</label>
+                    <input type="file" id="med_image" accept="image/*" class="w-full text-sm text-gray-500 file:mr-4 file:py-2.5 file:px-5 file:rounded-full file:border-0 file:text-[11px] file:font-extrabold file:bg-blue-100 file:text-blue-700 hover:file:bg-blue-200 transition-all cursor-pointer input-wow py-2 px-2">
                 </div>
 
-                <div class="pt-3"><label class="block text-[11px] font-bold text-gray-500 mb-2 ml-1">👨‍🏫 เลือกอาจารย์ผู้ตรวจ</label><div id="instructors_medicine" class="grid grid-cols-3 gap-3"></div></div>
+                <div class="pt-3"><label class="block text-[10px] font-extrabold text-gray-400 uppercase tracking-wider mb-3 ml-2 text-center">เลือกอาจารย์ผู้ตรวจ</label><div id="instructors_medicine" class="grid grid-cols-3 gap-3"></div></div>
                 
-                <button type="submit" class="btn-bouncy w-full bg-gradient-to-r from-blue-500 to-indigo-500 text-white font-bold py-4 rounded-2xl shadow-lg shadow-blue-500/30 mt-4 flex justify-center items-center gap-2"><i class="fa-solid fa-paper-plane"></i> บันทึกและแจ้งเตือน</button>
+                <button type="submit" class="btn-glow btn-blue w-full text-white font-extrabold text-[15px] py-4 mt-6 flex justify-center items-center gap-2"><i class="fa-solid fa-paper-plane text-lg"></i> ส่งเคสให้อาจารย์</button>
             </form>
         </div>
 
-       <div id="form-dashboard" class="hidden glass-card p-6 rounded-[2rem] mb-6">
-            <h2 class="font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-amber-500 text-xl mb-5"><i class="fa-solid fa-list-check"></i> รายการรอตรวจ</h2>
-            <div id="pending-cases-container" class="space-y-4 mb-8">
-                <div class="flex flex-col items-center justify-center py-8 opacity-50"><i class="fa-solid fa-circle-notch fa-spin text-3xl text-orange-400 mb-3"></i><p class="text-xs">กำลังโหลดข้อมูล...</p></div>
+       <div id="form-dashboard" class="hidden glass-card p-6 mb-6">
+            <h2 class="font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-pink-500 text-xl mb-6 flex items-center gap-2">
+                <div class="w-8 h-8 rounded-full bg-orange-100 flex items-center justify-center text-sm text-orange-500"><i class="fa-solid fa-inbox"></i></div> 
+                รายการรอตรวจ
+            </h2>
+            <div id="pending-cases-container" class="space-y-4 mb-10">
+                <div class="flex flex-col items-center justify-center py-10 opacity-40">
+                    <i class="fa-solid fa-asterisk fa-spin text-4xl text-orange-400 mb-4"></i>
+                    <p class="text-xs font-bold tracking-widest">LOADING...</p>
+                </div>
             </div>
             
-            <h2 class="font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-purple-500 text-xl mb-5"><i class="fa-solid fa-chart-pie"></i> ความคืบหน้า</h2>
-            <div id="student-stats-container" class="space-y-4 mb-8"></div>
+            <h2 class="font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-purple-500 text-xl mb-6 flex items-center gap-2">
+                <div class="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center text-sm text-indigo-500"><i class="fa-solid fa-chart-pie"></i></div> 
+                ความคืบหน้านักศึกษา
+            </h2>
+            <div id="student-stats-container" class="space-y-5 mb-10"></div>
 
-            <h2 class="font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-teal-500 to-emerald-500 text-xl mb-5"><i class="fa-solid fa-ranking-star"></i> อันดับโรคยอดฮิต</h2>
-            <div id="disease-rank-container" class="bg-white/80 rounded-[1.5rem] p-5 shadow-sm border border-white"></div>
+            <h2 class="font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-teal-500 to-emerald-500 text-xl mb-6 flex items-center gap-2">
+                <div class="w-8 h-8 rounded-full bg-teal-100 flex items-center justify-center text-sm text-teal-500"><i class="fa-solid fa-ranking-star"></i></div> 
+                อันดับโรคยอดฮิต
+            </h2>
+            <div id="disease-rank-container" class="bg-white/60 rounded-[2rem] p-6 shadow-sm border border-white"></div>
         </div>
 
     </div>
 
-    <nav class="fixed bottom-0 left-0 w-full bg-white/90 backdrop-blur-xl bottom-nav z-50 rounded-t-[2rem] border-t border-gray-100 pb-2 pt-1 px-4">
+    <nav class="fixed floating-nav z-50 backdrop-blur-xl border border-white/50 px-2 py-2">
         <div class="flex justify-around items-center max-w-md mx-auto">
-            <button onclick="switchTab('massage')" id="nav-massage" class="nav-item active text-green-600 flex flex-col items-center p-2 w-16">
-                <div class="icon-wrapper w-12 h-10 flex items-center justify-center rounded-2xl bg-green-100 transition-all duration-300">
-                    <i class="fa-solid fa-hands-bubbles text-[20px]"></i>
-                </div>
-                <span class="text-[10px] font-bold mt-1">นวดไทย</span>
+            <button onclick="switchTab('massage')" id="nav-massage" class="nav-item active text-emerald-500 flex flex-col items-center p-2 w-[22%] relative">
+                <div class="icon-box text-[22px] mb-1 z-10"><i class="fa-solid fa-hands-bubbles"></i></div>
+                <span class="text-[9px] font-extrabold tracking-wide z-10">นวดไทย</span>
             </button>
-            <button onclick="switchTab('midwifery')" id="nav-midwifery" class="nav-item text-gray-400 flex flex-col items-center p-2 w-16">
-                <div class="icon-wrapper w-12 h-10 flex items-center justify-center rounded-2xl transition-all duration-300">
-                    <i class="fa-solid fa-person-breastfeeding text-[20px]"></i>
-                </div>
-                <span class="text-[10px] font-bold mt-1">ผดุงครรภ์</span>
+            <button onclick="switchTab('midwifery')" id="nav-midwifery" class="nav-item text-gray-400 hover:text-rose-400 flex flex-col items-center p-2 w-[22%] relative">
+                <div class="icon-box text-[22px] mb-1 z-10"><i class="fa-solid fa-person-breastfeeding"></i></div>
+                <span class="text-[9px] font-extrabold tracking-wide z-10">ผดุงครรภ์</span>
             </button>
-            <button onclick="switchTab('medicine')" id="nav-medicine" class="nav-item text-gray-400 flex flex-col items-center p-2 w-16">
-                <div class="icon-wrapper w-12 h-10 flex items-center justify-center rounded-2xl transition-all duration-300">
-                    <i class="fa-solid fa-stethoscope text-[20px]"></i>
-                </div>
-                <span class="text-[10px] font-bold mt-1">เวชกรรม</span>
+            <button onclick="switchTab('medicine')" id="nav-medicine" class="nav-item text-gray-400 hover:text-blue-400 flex flex-col items-center p-2 w-[22%] relative">
+                <div class="icon-box text-[22px] mb-1 z-10"><i class="fa-solid fa-stethoscope"></i></div>
+                <span class="text-[9px] font-extrabold tracking-wide z-10">เวชกรรม</span>
             </button>
-            <button onclick="switchTab('dashboard'); loadDashboardData();" id="nav-dashboard" class="hidden nav-item text-gray-400 flex flex-col items-center p-2 w-16">
-                <div class="icon-wrapper w-12 h-10 flex items-center justify-center rounded-2xl transition-all duration-300">
-                    <i class="fa-solid fa-clipboard-check text-[20px]"></i>
-                </div>
-                <span class="text-[10px] font-bold mt-1">ตรวจ</span>
+            <button onclick="switchTab('dashboard'); loadDashboardData();" id="nav-dashboard" class="hidden nav-item text-gray-400 hover:text-orange-400 flex flex-col items-center p-2 w-[22%] relative">
+                <div class="icon-box text-[22px] mb-1 z-10"><i class="fa-solid fa-clipboard-check"></i></div>
+                <span class="text-[9px] font-extrabold tracking-wide z-10">ตรวจเคส</span>
             </button>
         </div>
     </nav>
@@ -258,7 +325,7 @@
         const LIFF_ID = "2010280091-6e8mWiGV";
         
         // ⚠️ นำ URL จาก Apps Script มาวางที่นี่
-        const GAS_WEBAPP_URL = "https://script.google.com/macros/s/AKfycbxFeZxtiaQ_TgT6Hzd0bDo19rbM8SjmGVMMid9BQanch9pyEtOB2ivlXtF6tB9xQGuKKQ/exec";
+        const GAS_WEBAPP_URL = "https://script.google.com/macros/s/AKfycb.../exec";
 
         let currentUser = null; 
         let instructorList = [];
@@ -311,10 +378,12 @@
                         container.innerHTML = instructorList.map((inst, index) => `
                             <div class="relative">
                                 <input type="radio" name="instructor_${dep}" id="inst_${dep}_${index}" value="${inst.uid}" class="instructor-radio hidden" required>
-                                <label for="inst_${dep}_${index}" class="cursor-pointer border-2 border-transparent bg-white rounded-[1.25rem] p-2 flex flex-col items-center gap-1.5 transition-all duration-300 relative instructor-label shadow-sm">
-                                    <img src="${inst.picUrl}" class="w-11 h-11 rounded-full object-cover shadow-sm transition-all duration-300">
-                                    <span class="text-[10px] font-bold text-gray-700 text-center truncate w-full">${inst.name.split(' ')[0]}</span>
-                                    <div class="check-icon absolute -top-2 -right-2 bg-green-500 text-white w-5 h-5 rounded-full flex items-center justify-center shadow-md"><i class="fa-solid fa-check text-[10px]"></i></div>
+                                <label for="inst_${dep}_${index}" class="cursor-pointer border-2 border-transparent bg-white/50 rounded-[1.5rem] p-2 flex flex-col items-center gap-2 transition-all duration-300 relative shadow-sm hover:bg-white">
+                                    <div class="avatar-ring">
+                                        <img src="${inst.picUrl}" class="w-11 h-11 rounded-full object-cover border-2 border-white">
+                                    </div>
+                                    <span class="text-[10px] font-extrabold text-gray-600 text-center truncate w-full">${inst.name.split(' ')[0]}</span>
+                                    <div class="check-icon absolute -top-1.5 -right-1.5 bg-emerald-500 text-white w-6 h-6 rounded-full flex items-center justify-center shadow-lg"><i class="fa-solid fa-check text-[11px]"></i></div>
                                 </label>
                             </div>
                         `).join('');
@@ -330,10 +399,9 @@
                     checkUserPermission(await liff.getProfile());
                 } else { liff.login(); }
             } catch (err) { 
-                console.error("LIFF Init Error: ", err);
                 document.getElementById('userName').innerText = "LIFF Error";
                 document.getElementById('userRole').innerText = "ตรวจสอบตั้งค่า";
-                document.getElementById('userRole').className = "text-[9px] text-red-600 bg-red-100 px-2 py-0.5 rounded-full inline-block font-bold mt-1";
+                document.getElementById('userRole').className = "text-[9px] font-extrabold text-red-500 bg-red-50 px-3 py-1 rounded-full mt-1 inline-block";
             }
         }
 
@@ -350,16 +418,16 @@
                 if (userData && userData.isActive) {
                     currentUser = { uid: profile.userId, ...userData };
                     if (userData.role === 'instructor') {
-                        roleBadge.innerText = "⭐ อาจารย์"; 
-                        roleBadge.className = "text-[9px] text-orange-600 bg-orange-100 px-2 py-0.5 rounded-full font-bold mt-1 inline-block";
+                        roleBadge.innerText = "⭐ อาจารย์แพทย์"; 
+                        roleBadge.className = "text-[9px] font-extrabold text-orange-600 bg-orange-100 px-3 py-1 rounded-full mt-1 inline-block shadow-sm";
                         document.getElementById('nav-dashboard').classList.remove('hidden'); 
                     } else {
-                        roleBadge.innerText = "🎓 นักศึกษา"; 
-                        roleBadge.className = "text-[9px] text-green-600 bg-green-100 px-2 py-0.5 rounded-full font-bold mt-1 inline-block";
+                        roleBadge.innerText = "🎓 นักศึกษาฝึกประสบการณ์"; 
+                        roleBadge.className = "text-[9px] font-extrabold text-emerald-600 bg-emerald-100 px-3 py-1 rounded-full mt-1 inline-block shadow-sm";
                     }
                 } else {
-                    document.getElementById('userName').innerText = "ไม่มีสิทธิ์";
-                    roleBadge.innerText = "Unregistered";
+                    document.getElementById('userName').innerText = "Access Denied";
+                    roleBadge.innerText = "ไม่มีสิทธิ์ใช้งาน";
                 }
             } catch (e) { console.error(e); }
         }
@@ -375,10 +443,8 @@
                 form.classList.remove('animate-tab');
                 
                 if(nav) {
-                    nav.classList.remove('active', 'text-green-600', 'text-pink-600', 'text-blue-600', 'text-orange-600');
-                    if(id !== 'dashboard') nav.classList.add('text-gray-400');
-                    const wrapper = nav.querySelector('.icon-wrapper');
-                    wrapper.classList.remove('bg-green-100', 'bg-pink-100', 'bg-blue-100', 'bg-orange-100');
+                    nav.classList.remove('active', 'text-emerald-500', 'text-rose-500', 'text-blue-500', 'text-orange-500');
+                    nav.classList.add('text-gray-400');
                 }
             });
 
@@ -392,12 +458,11 @@
             if(activeNav) {
                 activeNav.classList.remove('text-gray-400');
                 activeNav.classList.add('active');
-                const wrapper = activeNav.querySelector('.icon-wrapper');
                 
-                if(tabId === 'massage') { activeNav.classList.add('text-green-600'); wrapper.classList.add('bg-green-100'); }
-                else if(tabId === 'midwifery') { activeNav.classList.add('text-pink-600'); wrapper.classList.add('bg-pink-100'); }
-                else if(tabId === 'medicine') { activeNav.classList.add('text-blue-600'); wrapper.classList.add('bg-blue-100'); }
-                else if(tabId === 'dashboard') { activeNav.classList.add('text-orange-600'); wrapper.classList.add('bg-orange-100'); }
+                if(tabId === 'massage') activeNav.classList.add('text-emerald-500');
+                else if(tabId === 'midwifery') activeNav.classList.add('text-rose-500');
+                else if(tabId === 'medicine') activeNav.classList.add('text-blue-500');
+                else if(tabId === 'dashboard') activeNav.classList.add('text-orange-500');
             }
         }
 
@@ -410,14 +475,11 @@
 
             const btn = e.target.querySelector('button[type="submit"]');
             const originalText = btn.innerHTML;
-            btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> กำลังอัปโหลด...`; 
+            btn.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin text-lg"></i> กำลังอัปโหลด...`; 
             btn.disabled = true;
 
             try {
-                let base64String = "";
-                let mimeType = "";
-                let fileName = "";
-                
+                let base64String = ""; let mimeType = ""; let fileName = "";
                 const fileInput = document.getElementById(`${department === 'massage' ? 'msg' : department === 'midwifery' ? 'mid' : 'med'}_image`);
                 
                 if (fileInput && fileInput.files.length > 0) {
@@ -439,14 +501,9 @@
                 }
 
                 let payload = { 
-                    action: "submitNewCase", 
-                    department: department, 
-                    studentUid: currentUser.uid, 
-                    studentName: currentUser.fullName, 
-                    instructorUid: selectedInstructor.value,
-                    imageB64: base64String,
-                    imageMimeType: mimeType,
-                    imageName: fileName
+                    action: "submitNewCase", department: department, studentUid: currentUser.uid, 
+                    studentName: currentUser.fullName, instructorUid: selectedInstructor.value,
+                    imageB64: base64String, imageMimeType: mimeType, imageName: fileName
                 };
                 
                 if (department === 'massage') {
@@ -480,11 +537,9 @@
                     document.getElementById(department === 'massage' ? 'msg_date' : department === 'midwifery' ? 'mid_date' : 'med_date').valueAsDate = new Date(); 
                 }
             } catch (err) { 
-                console.error(err); 
                 alert("เกิดข้อผิดพลาด หรือไฟล์มีขนาดใหญ่เกินไปทำให้เซิร์ฟเวอร์ตัดการเชื่อมต่อ"); 
             } finally { 
-                btn.innerHTML = originalText; 
-                btn.disabled = false; 
+                btn.innerHTML = originalText; btn.disabled = false; 
             }
         }
 
@@ -495,11 +550,15 @@
             const statsContainer = document.getElementById('student-stats-container');
             const rankContainer = document.getElementById('disease-rank-container');
 
-            pendingContainer.innerHTML = '<div class="flex flex-col items-center justify-center py-8 opacity-50"><i class="fa-solid fa-circle-notch fa-spin text-3xl text-orange-400 mb-3"></i><p class="text-xs text-gray-500">กำลังดึงข้อมูลเคส...</p></div>';
+            pendingContainer.innerHTML = '<div class="flex flex-col items-center justify-center py-10 opacity-40"><i class="fa-solid fa-asterisk fa-spin text-4xl text-orange-400 mb-4"></i><p class="text-xs font-bold tracking-widest">LOADING...</p></div>';
             
             try {
                 let pendingHtml = "";
                 const deps = ['massage', 'midwifery', 'medicine'];
+                
+                // ใช้ตัวแปรช่วยในการหน่วงเวลาแอนิเมชัน (Staggered Animation)
+                let delayCounter = 0; 
+
                 for (let dep of deps) {
                     const res = await fetch(`${FIREBASE_URL}cases/${dep}.json?auth=${FIREBASE_SECRET}`);
                     const cases = await res.json();
@@ -507,45 +566,47 @@
                     for (let caseId in cases) {
                         const c = cases[caseId];
                         if (c.status === 'pending' && c.instructorUid === currentUser.uid) {
-                            let icon = dep === 'massage' ? 'fa-hands-bubbles text-green-500 bg-green-100' : dep === 'midwifery' ? 'fa-person-breastfeeding text-pink-500 bg-pink-100' : 'fa-stethoscope text-blue-500 bg-blue-100';
+                            let icon = dep === 'massage' ? 'fa-hands-bubbles text-emerald-500 bg-emerald-100' : dep === 'midwifery' ? 'fa-person-breastfeeding text-rose-500 bg-rose-100' : 'fa-stethoscope text-blue-500 bg-blue-100';
                             
-                            // โชว์ปุ่มดูรูปลายเซ็น (ถ้ามี)
                             let imageBtn = "";
                             if (c.imageUrl && c.imageUrl !== "-") {
-                                imageBtn = `<a href="${c.imageUrl}" target="_blank" class="inline-block mt-2 text-[10px] bg-blue-50 text-blue-600 px-2 py-1 rounded-lg border border-blue-100 hover:bg-blue-100 transition"><i class="fa-solid fa-image"></i> ดูรูปหลักฐาน</a>`;
+                                imageBtn = `<a href="${c.imageUrl}" target="_blank" class="inline-flex items-center gap-1.5 mt-3 text-[10px] font-extrabold bg-gray-900 text-white px-3 py-1.5 rounded-full hover:scale-105 transition transform shadow-md"><i class="fa-solid fa-image"></i> ดูรูปหลักฐาน</a>`;
                             }
 
                             pendingHtml += `
-                                <div class="bg-white p-4 rounded-[1.5rem] shadow-sm border border-gray-100 transition-all duration-300" id="card_${caseId}">
-                                    <div class="flex justify-between items-start mb-3">
+                                <div class="bg-white p-5 rounded-[2rem] shadow-sm border border-gray-100 transition-all duration-300 card-stagger" style="animation-delay: ${delayCounter * 0.1}s" id="card_${caseId}">
+                                    <div class="flex justify-between items-start mb-4">
                                         <div class="flex items-center gap-3">
-                                            <div class="w-10 h-10 rounded-full flex items-center justify-center ${icon.split(' ').slice(1).join(' ')}"><i class="fa-solid ${icon.split(' ')[0]} text-lg"></i></div>
+                                            <div class="w-12 h-12 rounded-2xl flex items-center justify-center ${icon.split(' ').slice(1).join(' ')}"><i class="fa-solid ${icon.split(' ')[0]} text-xl"></i></div>
                                             <div>
-                                                <p class="text-[13px] font-extrabold text-gray-800">${c.studentName}</p>
-                                                <p class="text-[10px] text-gray-500 font-medium">HN: ${c.hn} • วันที่: ${c.date}</p>
+                                                <p class="text-[14px] font-extrabold text-gray-800 tracking-tight leading-none mb-1">${c.studentName}</p>
+                                                <p class="text-[10px] text-gray-400 font-extrabold">HN: ${c.hn} • วันที่: ${c.date}</p>
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="bg-gray-50 p-3 rounded-xl border border-gray-100 mb-4">
-                                        <p class="text-[12px] font-bold text-gray-700">📌 ${c.diseaseName || c.treatment || 'โปรดดูรายละเอียดในกระดาษ'}</p>
-                                        ${imageBtn}
+                                    <div class="bg-gray-50 p-4 rounded-[1.5rem] border border-gray-100 mb-5 relative overflow-hidden">
+                                        <div class="absolute left-0 top-0 w-1 h-full bg-gradient-to-b from-orange-400 to-pink-400"></div>
+                                        <p class="text-[13px] font-bold text-gray-700 ml-2">📌 ${c.diseaseName || c.treatment || 'โปรดดูรายละเอียดในกระดาษ'}</p>
+                                        <div class="ml-2">${imageBtn}</div>
                                     </div>
-                                    <div class="flex gap-2">
-                                        <button onclick="judgeCase('${dep}', '${caseId}', 'approved')" class="btn-bouncy flex-1 bg-green-500 text-white text-[11px] font-bold py-2 rounded-xl shadow-md shadow-green-500/20 hover:bg-green-600 transition"><i class="fa-solid fa-check mr-1"></i> ผ่าน</button>
-                                        <button onclick="judgeCase('${dep}', '${caseId}', 'returned')" class="btn-bouncy flex-1 bg-yellow-400 text-white text-[11px] font-bold py-2 rounded-xl shadow-md shadow-yellow-400/20 hover:bg-yellow-500 transition"><i class="fa-solid fa-rotate-left mr-1"></i> ส่งแก้</button>
-                                        <button onclick="judgeCase('${dep}', '${caseId}', 'rejected')" class="btn-bouncy flex-1 bg-red-500 text-white text-[11px] font-bold py-2 rounded-xl shadow-md shadow-red-500/20 hover:bg-red-600 transition"><i class="fa-solid fa-xmark mr-1"></i> ปฏิเสธ</button>
+                                    <div class="flex gap-3">
+                                        <button onclick="judgeCase('${dep}', '${caseId}', 'approved')" class="btn-glow btn-green flex-1 text-white text-[11px] font-extrabold py-2.5 flex justify-center items-center gap-1.5"><i class="fa-solid fa-check"></i> ผ่าน</button>
+                                        <button onclick="judgeCase('${dep}', '${caseId}', 'returned')" class="btn-glow flex-1 bg-gradient-to-r from-amber-400 to-orange-400 text-white text-[11px] font-extrabold py-2.5 rounded-full shadow-lg shadow-orange-400/40 flex justify-center items-center gap-1.5"><i class="fa-solid fa-rotate-left"></i> ส่งแก้</button>
+                                        <button onclick="judgeCase('${dep}', '${caseId}', 'rejected')" class="btn-glow flex-1 bg-gradient-to-r from-red-500 to-rose-600 text-white text-[11px] font-extrabold py-2.5 rounded-full shadow-lg shadow-red-500/40 flex justify-center items-center gap-1.5"><i class="fa-solid fa-xmark"></i> ปฏิเสธ</button>
                                     </div>
                                 </div>
                             `;
+                            delayCounter++;
                         }
                     }
                 }
-                pendingContainer.innerHTML = pendingHtml || '<div class="text-center py-8 opacity-40"><i class="fa-solid fa-face-laugh-beam text-4xl text-gray-400 mb-3"></i><p class="text-xs font-bold text-gray-500">ยอดเยี่ยม! ไม่มีเคสรอตรวจ</p></div>';
+                pendingContainer.innerHTML = pendingHtml || '<div class="text-center py-10 opacity-50"><div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3"><i class="fa-solid fa-mug-hot text-2xl text-gray-400"></i></div><p class="text-xs font-extrabold tracking-wide text-gray-500">ยอดเยี่ยม! ไม่มีเคสรอตรวจ</p></div>';
 
                 // โหลดสถิตินักศึกษา
                 const usersRes = await fetch(`${FIREBASE_URL}users.json?auth=${FIREBASE_SECRET}`);
                 const users = await usersRes.json();
                 let statsHtml = "";
+                let statDelay = 0;
                 
                 for (const uid in users) {
                     if (users[uid].role === 'student' && users[uid].isActive) {
@@ -555,30 +616,33 @@
                         const medTotal = (st.medicine_general || 0) + (st.medicine_ncd || 0);
 
                         statsHtml += `
-                            <div class="bg-white p-4 rounded-[1.5rem] shadow-sm border border-gray-100">
-                                <div class="flex items-center gap-3 mb-4">
-                                    <img src="${users[uid].picUrl}" class="w-10 h-10 rounded-full border-2 border-indigo-100 object-cover">
-                                    <p class="text-[13px] font-extrabold text-gray-800">${users[uid].fullName}</p>
+                            <div class="bg-white p-5 rounded-[2rem] shadow-sm border border-gray-100 card-stagger" style="animation-delay: ${statDelay * 0.1}s">
+                                <div class="flex items-center gap-3 mb-5">
+                                    <div class="p-1 rounded-full bg-gradient-to-tr from-indigo-400 to-purple-400">
+                                        <img src="${users[uid].picUrl}" class="w-10 h-10 rounded-full border-2 border-white object-cover">
+                                    </div>
+                                    <p class="text-[14px] font-extrabold text-gray-800 tracking-tight">${users[uid].fullName}</p>
                                 </div>
                                 <div class="space-y-4">
                                     <div>
-                                        <div class="flex justify-between text-[10px] text-gray-500 mb-1.5 font-bold"><span>นวดไทย (60)</span><span class="text-green-600">${msgTotal}/60</span></div>
-                                        <div class="w-full bg-gray-100 rounded-full h-2"><div class="bg-gradient-to-r from-green-400 to-emerald-500 h-2 rounded-full shadow-sm" style="width: ${Math.min((msgTotal/60)*100, 100)}%"></div></div>
+                                        <div class="flex justify-between text-[10px] text-gray-400 uppercase tracking-widest mb-2 font-extrabold"><span>นวดไทย (60)</span><span class="text-emerald-500">${msgTotal}/60</span></div>
+                                        <div class="w-full bg-gray-100 rounded-full h-2.5 shadow-inner"><div class="bg-gradient-to-r from-emerald-400 to-teal-500 h-2.5 rounded-full shadow-md" style="width: ${Math.min((msgTotal/60)*100, 100)}%"></div></div>
                                     </div>
                                     <div>
-                                        <div class="flex justify-between text-[10px] text-gray-500 mb-1.5 font-bold"><span>ผดุงครรภ์ (10)</span><span class="text-pink-600">${midTotal}/10</span></div>
-                                        <div class="w-full bg-gray-100 rounded-full h-2"><div class="bg-gradient-to-r from-pink-400 to-rose-500 h-2 rounded-full shadow-sm" style="width: ${Math.min((midTotal/10)*100, 100)}%"></div></div>
+                                        <div class="flex justify-between text-[10px] text-gray-400 uppercase tracking-widest mb-2 font-extrabold"><span>ผดุงครรภ์ (10)</span><span class="text-rose-500">${midTotal}/10</span></div>
+                                        <div class="w-full bg-gray-100 rounded-full h-2.5 shadow-inner"><div class="bg-gradient-to-r from-rose-400 to-pink-500 h-2.5 rounded-full shadow-md" style="width: ${Math.min((midTotal/10)*100, 100)}%"></div></div>
                                     </div>
                                     <div>
-                                        <div class="flex justify-between text-[10px] text-gray-500 mb-1.5 font-bold"><span>เวชกรรม (20)</span><span class="text-blue-600">${medTotal}/20</span></div>
-                                        <div class="w-full bg-gray-100 rounded-full h-2"><div class="bg-gradient-to-r from-blue-400 to-indigo-500 h-2 rounded-full shadow-sm" style="width: ${Math.min((medTotal/20)*100, 100)}%"></div></div>
+                                        <div class="flex justify-between text-[10px] text-gray-400 uppercase tracking-widest mb-2 font-extrabold"><span>เวชกรรม (20)</span><span class="text-blue-500">${medTotal}/20</span></div>
+                                        <div class="w-full bg-gray-100 rounded-full h-2.5 shadow-inner"><div class="bg-gradient-to-r from-blue-400 to-indigo-500 h-2.5 rounded-full shadow-md" style="width: ${Math.min((medTotal/20)*100, 100)}%"></div></div>
                                     </div>
                                 </div>
                             </div>
                         `;
+                        statDelay++;
                     }
                 }
-                statsContainer.innerHTML = statsHtml || '<p class="text-[11px] text-center text-gray-400 py-4">ยังไม่มีข้อมูลนักศึกษาในระบบ</p>';
+                statsContainer.innerHTML = statsHtml || '<p class="text-[11px] text-center text-gray-400 py-4 font-bold">ยังไม่มีข้อมูลนักศึกษาในระบบ</p>';
 
                 // โหลด RANK
                 let diseaseCount = {};
@@ -595,22 +659,22 @@
 
                 const sortedRank = Object.entries(diseaseCount).sort((a, b) => b[1] - a[1]).slice(0, 10);
                 if (sortedRank.length > 0) {
-                    let rankHtml = '<ul class="space-y-3">';
+                    let rankHtml = '<ul class="space-y-4">';
                     sortedRank.forEach((item, index) => {
-                        let medal = index === 0 ? '<span class="text-xl">🥇</span>' : index === 1 ? '<span class="text-xl">🥈</span>' : index === 2 ? '<span class="text-xl">🥉</span>' : `<span class="w-6 h-6 flex items-center justify-center bg-gray-100 rounded-full text-[10px] font-extrabold text-gray-500">${index+1}</span>`;
+                        let medal = index === 0 ? '<span class="text-2xl drop-shadow-md">🥇</span>' : index === 1 ? '<span class="text-2xl drop-shadow-md">🥈</span>' : index === 2 ? '<span class="text-2xl drop-shadow-md">🥉</span>' : `<span class="w-7 h-7 flex items-center justify-center bg-gray-100 rounded-full text-[11px] font-extrabold text-gray-400 shadow-inner">${index+1}</span>`;
                         rankHtml += `
-                            <li class="flex justify-between items-center text-[12px] border-b border-gray-50 pb-3 last:border-0 last:pb-0">
-                                <div class="flex items-center gap-3 truncate w-3/4">${medal}<span class="truncate font-bold text-gray-700">${item[0]}</span></div>
-                                <span class="font-extrabold text-teal-700 bg-teal-50 px-3 py-1 rounded-lg">${item[1]}</span>
+                            <li class="flex justify-between items-center text-[13px] border-b border-gray-100/50 pb-4 last:border-0 last:pb-0 card-stagger" style="animation-delay: ${index * 0.1}s">
+                                <div class="flex items-center gap-4 truncate w-3/4">${medal}<span class="truncate font-extrabold text-gray-700">${item[0]}</span></div>
+                                <span class="font-extrabold text-teal-600 bg-teal-50 px-3 py-1.5 rounded-xl border border-teal-100">${item[1]}</span>
                             </li>
                         `;
                     });
                     rankContainer.innerHTML = rankHtml + '</ul>';
                 } else {
-                    rankContainer.innerHTML = '<p class="text-[11px] text-center text-gray-400 py-4">ยังไม่มีข้อมูลเคสที่อนุมัติ</p>';
+                    rankContainer.innerHTML = '<p class="text-[11px] text-center text-gray-400 py-4 font-bold">ยังไม่มีข้อมูลเคสที่อนุมัติ</p>';
                 }
 
-            } catch(e) { pendingContainer.innerHTML = '<p class="text-center text-sm text-red-400 py-4">ดึงข้อมูลล้มเหลว กรุณาลองใหม่</p>'; }
+            } catch(e) { pendingContainer.innerHTML = '<p class="text-center text-sm text-red-400 py-4 font-bold">ดึงข้อมูลล้มเหลว กรุณาลองใหม่</p>'; }
         }
 
         async function judgeCase(department, caseId, status) {
@@ -620,18 +684,19 @@
                 if (remark === null) return; 
             }
 
-            document.getElementById(`card_${caseId}`).style.opacity = '0.4';
-            document.getElementById(`card_${caseId}`).style.transform = 'scale(0.98)';
+            const card = document.getElementById(`card_${caseId}`);
+            card.style.opacity = '0.3';
+            card.style.transform = 'scale(0.95)';
             try {
                 const payload = { action: "updateCaseStatus", department: department, caseId: caseId, status: status, remark: remark, instructorUid: currentUser.uid };
                 const res = await fetch(GAS_WEBAPP_URL, { method: 'POST', body: JSON.stringify(payload) });
                 const result = await res.json();
                 
                 if (result.success) {
-                    document.getElementById(`card_${caseId}`).remove();
+                    card.remove();
                     if (status === 'approved') loadDashboardData(); 
-                } else { alert(result.message); document.getElementById(`card_${caseId}`).style.opacity = '1'; }
-            } catch (err) { alert("Error"); document.getElementById(`card_${caseId}`).style.opacity = '1'; }
+                } else { alert(result.message); card.style.opacity = '1'; card.style.transform = 'scale(1)'; }
+            } catch (err) { alert("Error"); card.style.opacity = '1'; card.style.transform = 'scale(1)'; }
         }
     </script>
 </body>
