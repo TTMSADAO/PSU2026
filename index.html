@@ -109,17 +109,109 @@
                 </button>
             </form>
         </div>
+<div id="form-midwifery" class="hidden glass-card p-5 rounded-2xl mb-6">
+            <h2 class="font-bold text-pink-600 mb-4 border-b border-pink-200 pb-2"><i class="fa-solid fa-person-breastfeeding mr-2"></i> บันทึกเคสผดุงครรภ์ไทย</h2>
+            <form id="midwiferyForm" onsubmit="submitForm(event, 'midwifery')" class="space-y-4">
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-600 mb-1">วันที่รับบริการ</label>
+                        <input type="date" id="mid_date" required class="w-full bg-white/80 border border-gray-200 text-sm rounded-lg px-3 py-2 outline-none focus:border-pink-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-600 mb-1">HN มารดา</label>
+                        <input type="text" id="mid_hn" placeholder="ระบุ HN" required class="w-full bg-white/80 border border-gray-200 text-sm rounded-lg px-3 py-2 outline-none focus:border-pink-500">
+                    </div>
+                </div>
 
-        <div id="form-midwifery" class="hidden glass-card p-5 rounded-2xl mb-6">
-            <h2 class="font-bold text-pink-600 mb-4">บันทึกเคสผดุงครรภ์ไทย</h2>
-            <p class="text-sm text-gray-500 text-center py-10">กำลังอยู่ในช่วงพัฒนาฟอร์ม...</p>
+                <div>
+                    <label class="block text-xs font-semibold text-gray-600 mb-1">ชื่อ-สกุล มารดาหลังคลอด</label>
+                    <input type="text" id="mid_patientName" placeholder="ชื่อ นามสกุล" required class="w-full bg-white/80 border border-gray-200 text-sm rounded-lg px-3 py-2 outline-none focus:border-pink-500">
+                </div>
+
+                <div class="p-3 bg-pink-50/50 rounded-xl border border-pink-100 space-y-3">
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-600 mb-1">ความดัน (BP)</label>
+                            <input type="text" id="mid_bp" placeholder="เช่น 120/80" class="w-full bg-white/80 border border-gray-200 text-sm rounded-lg px-3 py-2 outline-none focus:border-pink-500">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-600 mb-1">Latch Score ทารก</label>
+                            <select id="mid_latchScore" class="w-full bg-white/80 border border-gray-200 text-sm rounded-lg px-3 py-2 outline-none focus:border-pink-500">
+                                <option value="ดีมาก (8-10)">ดีมาก (8-10)</option>
+                                <option value="ปานกลาง (4-7)">ปานกลาง (4-7)</option>
+                                <option value="ต้องปรับปรุง (<4)">ต้องปรับปรุง (<4)</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-600 mb-1">สรุปหัตถการ/การดูแล (ย่อ)</label>
+                        <textarea id="mid_treatment" rows="2" placeholder="เช่น นวดเปิดท่อน้ำนม, ทับหม้อเกลือ" class="w-full bg-white/80 border border-gray-200 text-sm rounded-lg px-3 py-2 outline-none focus:border-pink-500"></textarea>
+                    </div>
+                </div>
+
+                <button type="submit" class="w-full bg-pink-600 hover:bg-pink-700 text-white font-bold py-3 rounded-xl transition shadow-md flex items-center justify-center gap-2 mt-4">
+                    <i class="fa-solid fa-paper-plane"></i> บันทึกและส่งตรวจ
+                </button>
+            </form>
         </div>
+
         <div id="form-medicine" class="hidden glass-card p-5 rounded-2xl mb-6">
-            <h2 class="font-bold text-blue-600 mb-4">บันทึกเคสเวชกรรมไทย</h2>
-            <p class="text-sm text-gray-500 text-center py-10">กำลังอยู่ในช่วงพัฒนาฟอร์ม...</p>
-        </div>
-    </div>
+            <h2 class="font-bold text-blue-600 mb-4 border-b border-blue-200 pb-2"><i class="fa-solid fa-stethoscope mr-2"></i> บันทึกเคสเวชกรรมไทย</h2>
+            <form id="medicineForm" onsubmit="submitForm(event, 'medicine')" class="space-y-4">
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-600 mb-1">วันที่รับบริการ</label>
+                        <input type="date" id="med_date" required class="w-full bg-white/80 border border-gray-200 text-sm rounded-lg px-3 py-2 outline-none focus:border-blue-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-600 mb-1">HN</label>
+                        <input type="text" id="med_hn" placeholder="ระบุ HN" required class="w-full bg-white/80 border border-gray-200 text-sm rounded-lg px-3 py-2 outline-none focus:border-blue-500">
+                    </div>
+                </div>
 
+                <div>
+                    <label class="block text-xs font-semibold text-gray-600 mb-1">ชื่อ-สกุล ผู้ป่วย</label>
+                    <input type="text" id="med_patientName" placeholder="ชื่อ นามสกุล" required class="w-full bg-white/80 border border-gray-200 text-sm rounded-lg px-3 py-2 outline-none focus:border-blue-500">
+                </div>
+
+                <div class="p-3 bg-blue-50/50 rounded-xl border border-blue-100 space-y-3">
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-600 mb-1">ประเภทเคส</label>
+                            <select id="med_caseType" class="w-full bg-white/80 border border-gray-200 text-sm rounded-lg px-3 py-2 outline-none focus:border-blue-500">
+                                <option value="New">เคสใหม่ (New)</option>
+                                <option value="FollowUp">ติดตามผล (Follow-up)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-600 mb-1">หมวดหมู่เป้าหมาย</label>
+                            <select id="med_diseaseCategory" class="w-full bg-white/80 border border-gray-200 text-sm rounded-lg px-3 py-2 outline-none focus:border-blue-500">
+                                <option value="โรคทั่วไป">โรคทั่วไป</option>
+                                <option value="โรค NCDs">โรคไม่ติดต่อเรื้อรัง (NCDs)</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-600 mb-1">การวินิจฉัยโรคแผนไทย</label>
+                        <select id="med_diseaseName" required class="w-full bg-white/80 border border-gray-200 text-sm rounded-lg px-3 py-2 outline-none focus:border-blue-500">
+                            <option value="">-- กำลังโหลดข้อมูล... --</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-600 mb-1">รูปแบบการรักษาหลัก</label>
+                        <select id="med_treatmentForm" required class="w-full bg-white/80 border border-gray-200 text-sm rounded-lg px-3 py-2 outline-none focus:border-blue-500">
+                            <option value="จ่ายยาสมุนไพร">จ่ายยาสมุนไพร</option>
+                            <option value="หัตถการ">หัตถการ</option>
+                            <option value="จ่ายยาและหัตถการ">จ่ายยาและหัตถการ</option>
+                        </select>
+                    </div>
+                </div>
+
+                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl transition shadow-md flex items-center justify-center gap-2 mt-4">
+                    <i class="fa-solid fa-paper-plane"></i> บันทึกและส่งตรวจ
+                </button>
+            </form>
+        </div>
     <script>
         const FIREBASE_URL = 'https://ttmedstudy-default-rtdb.asia-southeast1.firebasedatabase.app/';
         const FIREBASE_SECRET = '9iKYKSmC8ssrUXvEdh2OOqS4JCeyEwcaCGr83WkG';
