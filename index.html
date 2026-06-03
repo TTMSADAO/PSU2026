@@ -43,6 +43,7 @@
             <button onclick="switchTab('dashboard'); loadDashboardData();" id="tab-dashboard" class="hidden tab-btn tab-dashboard flex-1 py-3 text-center transition-all text-orange-600 bg-orange-50/50"><i class="fa-solid fa-clipboard-check"></i> ตรวจ</button>
         </div>
 
+<!-- ================= ฟอร์ม: นวดไทย ================= -->
         <div id="form-massage" class="glass-card p-5 rounded-2xl mb-6 shadow-sm">
             <h2 class="font-bold text-green-700 mb-4 border-b border-green-200 pb-2">บันทึกเคสนวดไทย</h2>
             <form onsubmit="submitForm(event, 'massage')" class="space-y-4">
@@ -86,6 +87,7 @@
             </form>
         </div>
 
+        <!-- ================= ฟอร์ม: ผดุงครรภ์ ================= -->
         <div id="form-midwifery" class="hidden glass-card p-5 rounded-2xl mb-6 shadow-sm">
             <h2 class="font-bold text-pink-600 mb-4 border-b border-pink-200 pb-2">บันทึกเคสผดุงครรภ์ไทย</h2>
             <form onsubmit="submitForm(event, 'midwifery')" class="space-y-4">
@@ -96,10 +98,12 @@
                 <div><label class="block text-[11px] font-semibold text-gray-600 mb-1">ชื่อ-สกุล มารดา</label><input type="text" id="mid_patientName" required class="w-full bg-white border border-gray-200 text-sm rounded-lg px-3 py-2 outline-none"></div>
                 
                 <div class="pt-2"><label class="block text-[11px] font-semibold text-gray-600 mb-2">เลือกอาจารย์ผู้ตรวจประเมิน</label><div id="instructors_midwifery" class="grid grid-cols-3 gap-2"></div></div>
-                <button type="submit" class="w-full bg-pink-600 text-white font-bold py-3 rounded-xl transition shadow-md">บันทึกและแจ้งเตือนอาจารย์</button>
+                
+                <button type="submit" class="w-full bg-pink-600 text-white font-bold py-3 rounded-xl transition shadow-md mt-2">บันทึกและแจ้งเตือนอาจารย์</button>
             </form>
         </div>
 
+        <!-- ================= ฟอร์ม: เวชกรรม ================= -->
         <div id="form-medicine" class="hidden glass-card p-5 rounded-2xl mb-6 shadow-sm">
             <h2 class="font-bold text-blue-600 mb-4 border-b border-blue-200 pb-2">บันทึกเคสเวชกรรมไทย</h2>
             <form onsubmit="submitForm(event, 'medicine')" class="space-y-4">
@@ -115,7 +119,8 @@
                 </div>
 
                 <div class="pt-2"><label class="block text-[11px] font-semibold text-gray-600 mb-2">เลือกอาจารย์ผู้ตรวจประเมิน</label><div id="instructors_medicine" class="grid grid-cols-3 gap-2"></div></div>
-                <button type="submit" class="w-full bg-blue-600 text-white font-bold py-3 rounded-xl transition shadow-md">บันทึกและแจ้งเตือนอาจารย์</button>
+                
+                <button type="submit" class="w-full bg-blue-600 text-white font-bold py-3 rounded-xl transition shadow-md mt-2">บันทึกและแจ้งเตือนอาจารย์</button>
             </form>
         </div>
 
@@ -162,87 +167,30 @@
             await initializeLiff();
         };
 
-        async function loadDropdownConfigs() {
+async function loadDropdownConfigs() {
             try {
                 const res = await fetch(`${FIREBASE_URL}configs.json?auth=${FIREBASE_SECRET}`);
                 const configs = await res.json();
                 
                 if (configs?.diseases_massage) {
                     const msgSelect = document.getElementById('msg_diseaseName');
-                    msgSelect.innerHTML = '<option value="">-- เลือกโรค/อาการ --</option>';
-                    for (const [code, name] of Object.entries(configs.diseases_massage)) msgSelect.innerHTML += `<option value="${name}">${code}: ${name}</option>`;
+                    msgSelect.innerHTML = '<option value="">-- โหลดข้อมูล... --</option>';
+                    for (const [code, name] of Object.entries(configs.diseases_massage)) {
+                        msgSelect.innerHTML += `<option value="${name}">${code}: ${name}</option>`;
+                    }
                 }
                 if (configs?.diseases_medicine) {
                     const medSelect = document.getElementById('med_diseaseName');
-                    medSelect.innerHTML = '<option value="">-- เลือกการวินิจฉัย --</option>';
-                    for (const [code, obj] of Object.entries(configs.diseases_medicine)) medSelect.innerHTML += `<option value="${obj.name}">${code}: ${obj.name}</option>`;
+                    medSelect.innerHTML = '<option value="">-- โหลดข้อมูล... --</option>';
+                    for (const [code, obj] of Object.entries(configs.diseases_medicine)) {
+                        // ซ่อนประเภทโรค (obj.type) ไว้ใน data-category
+                        medSelect.innerHTML += `<option value="${obj.name}" data-category="${obj.type}">${code}: ${obj.name}</option>`;
+                    }
                 }
             } catch (e) { console.error(e); }
         }
 
-        async function fetchUsersAndRenderInstructors() {
-            try {
-                const res = await fetch(`${FIREBASE_URL}users.json?auth=${FIREBASE_SECRET}`);
-                const users = await res.json();
-                for (const uid in users) {
-                    if (users[uid].role === 'instructor' && users[uid].isActive) instructorList.push({ uid: uid, name: users[uid].fullName, picUrl: users[uid].picUrl });
-                }
-                ['massage', 'midwifery', 'medicine'].forEach(dep => {
-                    document.getElementById(`instructors_${dep}`).innerHTML = instructorList.map((inst, index) => `
-                        <div class="relative">
-                            <input type="radio" name="instructor_${dep}" id="inst_${dep}_${index}" value="${inst.uid}" class="instructor-radio hidden" required>
-                            <label for="inst_${dep}_${index}" class="cursor-pointer border border-gray-200 rounded-lg p-2 flex flex-col items-center gap-1 transition relative bg-white">
-                                <img src="${inst.picUrl}" class="w-10 h-10 rounded-full object-cover">
-                                <span class="text-[9px] font-bold text-gray-700 text-center truncate w-full">${inst.name.split(' ')[0]}</span>
-                                <div class="check-icon hidden absolute -top-1 -right-1 bg-green-500 text-white w-4 h-4 rounded-full items-center justify-center"><i class="fa-solid fa-check text-[9px]"></i></div>
-                            </label>
-                        </div>
-                    `).join('');
-                });
-            } catch (e) {}
-        }
-
-        async function initializeLiff() {
-            try {
-                await liff.init({ liffId: LIFF_ID });
-                if (liff.isLoggedIn()) {
-                    checkUserPermission(await liff.getProfile());
-                } else { liff.login(); }
-            } catch (err) {}
-        }
-
-        async function checkUserPermission(profile) {
-            try {
-                const res = await fetch(`${FIREBASE_URL}users/${profile.userId}.json?auth=${FIREBASE_SECRET}`);
-                const userData = await res.json();
-                document.getElementById('userImg').src = profile.pictureUrl;
-                
-                if (userData && userData.isActive) {
-                    currentUser = { uid: profile.userId, ...userData };
-                    document.getElementById('userName').innerText = userData.fullName;
-                    
-                    const roleBadge = document.getElementById('userRole');
-                    if (userData.role === 'instructor') {
-                        roleBadge.innerText = "⭐ อาจารย์ผู้คุม"; roleBadge.className = "text-[10px] text-orange-600 bg-orange-100 px-2 py-0.5 rounded-full font-bold";
-                        document.getElementById('tab-dashboard').classList.remove('hidden'); // ปลดล็อกแท็บแดชบอร์ด
-                    } else {
-                        roleBadge.innerText = "🎓 นักศึกษา"; roleBadge.className = "text-[10px] text-green-600 bg-green-100 px-2 py-0.5 rounded-full font-bold";
-                    }
-                } else {
-                    document.getElementById('userName').innerText = "ไม่มีสิทธิ์";
-                    document.getElementById('userRole').innerText = "Unregistered";
-                }
-            } catch (e) {}
-        }
-
-        function switchTab(tabId) {
-            ['massage', 'midwifery', 'medicine', 'dashboard'].forEach(id => {
-                document.getElementById(`form-${id}`).classList.add('hidden');
-                document.getElementById(`tab-${id}`).classList.remove('active');
-            });
-            document.getElementById(`form-${tabId}`).classList.remove('hidden');
-            document.getElementById(`tab-${tabId}`).classList.add('active');
-        }
+        // ... ข้ามฟังก์ชันอื่นๆ ลงมาหา submitForm ...
 
         async function submitForm(e, department) {
             e.preventDefault();
@@ -255,26 +203,54 @@
             btn.innerHTML = `กำลังส่งข้อมูล...`; btn.disabled = true;
 
             try {
-                let payload = { action: "submitNewCase", department: department, studentUid: currentUser.uid, studentName: currentUser.fullName, instructorUid: selectedInstructor.value };
+                let payload = { 
+                    action: "submitNewCase", 
+                    department: department, 
+                    studentUid: currentUser.uid, 
+                    studentName: currentUser.fullName, 
+                    instructorUid: selectedInstructor.value 
+                };
                 
+                // ดึงข้อมูลฟอร์มแบบใหม่ที่ปรับให้สั้นลง
                 if (department === 'massage') {
-                    payload.date = document.getElementById('msg_date').value; payload.hn = document.getElementById('msg_hn').value;
-                    payload.patientName = document.getElementById('msg_patientName').value; payload.caseType = document.getElementById('msg_caseType').value;
+                    payload.date = document.getElementById('msg_date').value; 
+                    payload.hn = document.getElementById('msg_hn').value;
+                    payload.patientName = document.getElementById('msg_patientName').value; 
+                    payload.caseType = document.getElementById('msg_caseType').value;
+                    payload.diseaseCategory = document.getElementById('msg_diseaseCategory').value;
                     payload.diseaseName = document.getElementById('msg_diseaseName').value;
                 } else if (department === 'midwifery') {
-                    payload.date = document.getElementById('mid_date').value; payload.hn = document.getElementById('mid_hn').value;
+                    payload.date = document.getElementById('mid_date').value; 
+                    payload.hn = document.getElementById('mid_hn').value;
+                    payload.patientName = document.getElementById('mid_patientName').value; 
                 } else if (department === 'medicine') {
-                    payload.date = document.getElementById('med_date').value; payload.hn = document.getElementById('med_hn').value;
-                    payload.diseaseName = document.getElementById('med_diseaseName').value;
+                    payload.date = document.getElementById('med_date').value; 
+                    payload.hn = document.getElementById('med_hn').value;
+                    payload.patientName = document.getElementById('med_patientName').value; 
+                    
+                    const medSelect = document.getElementById('med_diseaseName');
+                    payload.diseaseName = medSelect.value;
+                    
+                    // ระบบ Auto-classify ดึงประเภทโรคที่ซ่อนไว้มาจัดหมวดเพื่อคำนวณ Stats
+                    const selectedOption = medSelect.options[medSelect.selectedIndex];
+                    payload.diseaseCategory = selectedOption ? selectedOption.getAttribute('data-category') : 'โรคทั่วไป';
+                    payload.caseType = 'New'; // บังคับเป็นเคสใหม่เสมอสำหรับการคำนวณเวชกรรม
                 }
 
                 const res = await fetch(GAS_WEBAPP_URL, { method: 'POST', body: JSON.stringify(payload) });
                 const result = await res.json();
                 
                 alert(result.message);
-                if (result.success) { e.target.reset(); document.getElementById(department+'_date').valueAsDate = new Date(); }
-            } catch (err) { alert("เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์"); }
-            finally { btn.innerHTML = originalText; btn.disabled = false; }
+                if (result.success) { 
+                    e.target.reset(); 
+                    document.getElementById(department+'_date').valueAsDate = new Date(); 
+                }
+            } catch (err) { 
+                alert("เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์"); 
+            } finally { 
+                btn.innerHTML = originalText; 
+                btn.disabled = false; 
+            }
         }
 
        // ================= ระบบ Dashboard (สำหรับอาจารย์) =================
