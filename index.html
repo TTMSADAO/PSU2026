@@ -10,200 +10,246 @@
     <script charset="utf-8" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
 
     <style>
-        :root { --app-bg: #f4faf8; --glass-bg: rgba(255, 255, 255, 0.7); }
+        :root { --app-bg: #eefdf6; --glass-bg: rgba(255, 255, 255, 0.85); }
         body { 
-            font-family: 'Prompt', sans-serif; 
-            background-color: var(--app-bg);
+            font-family: 'Prompt', sans-serif; background-color: var(--app-bg);
+            /* พื้นหลัง Mesh Gradient แบบสดใสและมีมิติ */
             background-image: 
-                radial-gradient(at 10% 10%, hsla(153, 100%, 84%, 0.4) 0px, transparent 50%),
-                radial-gradient(at 90% 10%, hsla(199, 100%, 84%, 0.4) 0px, transparent 50%),
-                radial-gradient(at 50% 90%, hsla(43, 100%, 84%, 0.4) 0px, transparent 50%);
-            background-attachment: fixed;
-            min-height: 100vh; overflow-x: hidden; -webkit-tap-highlight-color: transparent;
+                radial-gradient(at 10% 10%, hsla(153, 100%, 80%, 0.5) 0px, transparent 50%), 
+                radial-gradient(at 90% 10%, hsla(199, 100%, 80%, 0.5) 0px, transparent 50%), 
+                radial-gradient(at 50% 90%, hsla(43, 100%, 82%, 0.5) 0px, transparent 50%);
+            background-attachment: fixed; min-height: 100vh; overflow-x: hidden; -webkit-tap-highlight-color: transparent;
+            color: #0f172a; /* ตั้งค่าสีข้อความหลักให้คมชัด */
         }
 
         .glass-card { 
-            background: var(--glass-bg); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.9); box-shadow: 0 15px 35px -10px rgba(0, 0, 0, 0.05); 
-            border-radius: 2rem;
+            background: var(--glass-bg); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); 
+            border: 1px solid rgba(255, 255, 255, 1); box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.08); border-radius: 2rem; 
         }
+        
+        /* เมนูด้านบนของฟอร์ม */
+        .sub-nav { display: flex; background: rgba(255,255,255,0.8); padding: 6px; border-radius: 999px; box-shadow: inset 0 2px 5px rgba(0,0,0,0.05); margin-bottom: 24px;}
+        .sub-nav-btn { flex: 1; text-align: center; font-size: 12px; font-weight: 800; padding: 12px 0; border-radius: 999px; color: #64748b; transition: all 0.3s; }
+        .sub-nav-btn.active { background: white; color: #059669; box-shadow: 0 4px 15px rgba(0,0,0,0.08); transform: scale(1.02); }
+        .sub-nav-btn.active-mid { color: #e11d48; } .sub-nav-btn.active-med { color: #2563eb; }
 
-        /* Top Sub-Nav (Pill tabs) */
-        .sub-nav { display: flex; background: rgba(255,255,255,0.6); padding: 5px; border-radius: 999px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.03); margin-bottom: 20px;}
-        .sub-nav-btn { flex: 1; text-align: center; font-size: 11px; font-weight: 700; padding: 10px 0; border-radius: 999px; color: #9ca3af; transition: all 0.3s; }
-        .sub-nav-btn.active { background: white; color: #10b981; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
-        .sub-nav-btn.active-mid { color: #f43f5e; } .sub-nav-btn.active-med { color: #3b82f6; }
+        /* แถบกรองอาจารย์ */
+        .filter-pill { padding: 8px 16px; border-radius: 999px; font-size: 12px; font-weight: 800; color: #475569; background: white; border: 1.5px solid #cbd5e1; transition: all 0.3s; white-space: nowrap; cursor: pointer;}
+        .filter-pill.active-pending { background: #fffbeb; color: #b45309; border-color: #fbbf24; box-shadow: 0 4px 12px rgba(245,158,11,0.2); transform: translateY(-2px);}
+        .filter-pill.active-approved { background: #ecfdf5; color: #047857; border-color: #34d399; box-shadow: 0 4px 12px rgba(16,185,129,0.2); transform: translateY(-2px);}
+        .filter-pill.active-returned { background: #fef2f2; color: #be123c; border-color: #fb7185; box-shadow: 0 4px 12px rgba(225,29,72,0.2); transform: translateY(-2px);}
+        .filter-pill.active-std { background: #f1f5f9; color: #0f172a; border-color: #94a3b8; box-shadow: 0 4px 12px rgba(0,0,0,0.1); transform: translateY(-2px);}
 
-        .input-wow {
-            background-color: rgba(255, 255, 255, 0.9); border: 2px solid transparent; transition: all 0.3s;
-            box-shadow: inset 0 2px 4px rgba(0,0,0,0.02); border-radius: 1.25rem;
-        }
-        .input-wow:focus { transform: translateY(-2px); border-color: #34d399; box-shadow: 0 10px 20px -10px rgba(52, 211, 153, 0.3); outline: none; }
-
-        .floating-nav { 
-            bottom: 20px; width: calc(100% - 32px); left: 16px; border-radius: 999px;
-            background: rgba(255, 255, 255, 0.9); box-shadow: 0 20px 40px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,1);
-        }
-        .nav-item { transition: all 0.3s; } .nav-item.active { transform: translateY(-5px); color: #10b981; }
-        .nav-item .icon-box { transition: all 0.3s ease; } .nav-item.active .icon-box { transform: scale(1.15); }
-
+        /* Input Fields ให้ขอบชัดเจนเมื่อกด */
+        .input-wow { background-color: rgba(255, 255, 255, 0.95); border: 2px solid #e2e8f0; transition: all 0.3s; border-radius: 1.25rem; font-weight: 600; color: #1e293b;}
+        .input-wow:focus { transform: translateY(-2px); border-color: #10b981; box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.15); outline: none; }
+        
+        /* Floating Bottom Nav */
+        .floating-nav { bottom: 20px; width: calc(100% - 32px); left: 16px; border-radius: 999px; background: rgba(255, 255, 255, 0.95); box-shadow: 0 20px 50px rgba(0,0,0,0.15), inset 0 2px 0 rgba(255,255,255,1); border: 1px solid #f1f5f9; }
+        .nav-item { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); } .nav-item.active { transform: translateY(-6px); color: #059669; }
+        .nav-item .icon-box { transition: all 0.3s ease; } .nav-item.active .icon-box { transform: scale(1.2); }
+        
+        /* Buttons */
         .btn-glow { transition: all 0.2s; border-radius: 999px; position: relative; overflow: hidden; }
         .btn-glow:active { transform: scale(0.95); }
-        .btn-primary { background: linear-gradient(135deg, #10b981, #059669); box-shadow: 0 8px 20px -5px rgba(16, 185, 129, 0.4); color: white;}
-        .btn-outline { background: white; border: 2px solid #10b981; color: #10b981; }
+        .btn-primary { background: linear-gradient(135deg, #059669, #047857); box-shadow: 0 8px 25px -5px rgba(5, 150, 105, 0.5); color: white;}
+        .btn-outline { background: white; border: 2.5px solid #059669; color: #059669; }
 
-        .instructor-radio:checked + label { background-color: #ffffff; transform: translateY(-4px) scale(1.02); box-shadow: 0 10px 20px -5px rgba(0,0,0,0.1); }
-        .instructor-radio:checked + label .avatar-ring { background: linear-gradient(45deg, #10b981, #34d399); padding: 3px; }
+        /* Instructor Selectors */
+        .instructor-radio:checked + label { background-color: #ffffff; transform: translateY(-4px) scale(1.03); box-shadow: 0 12px 25px -5px rgba(0,0,0,0.15); border-color: #34d399;}
+        .instructor-radio:checked + label .avatar-ring { background: linear-gradient(45deg, #10b981, #059669); padding: 4px; }
         .instructor-radio:checked + label .check-icon { transform: scale(1); opacity: 1; }
         .check-icon { transition: all 0.3s; transform: scale(0); opacity: 0; }
         .avatar-ring { transition: all 0.3s; padding: 0px; border-radius: 50%; }
-
+        
+        /* Animations */
         @keyframes slideUp { 0% { opacity: 0; transform: translateY(20px); } 100% { opacity: 1; transform: translateY(0); } }
         .animate-tab { animation: slideUp 0.4s ease forwards; }
         
-        .badge { padding: 2px 8px; border-radius: 999px; font-size: 9px; font-weight: 800; }
-        .badge-draft { background: #f3f4f6; color: #6b7280; border: 1px solid #d1d5db; }
-        .badge-pending { background: #fffbeb; color: #d97706; border: 1px solid #fde68a; }
-        .badge-returned { background: #fef2f2; color: #e11d48; border: 1px solid #fecdd3; }
-        .badge-approved { background: #ecfdf5; color: #059669; border: 1px solid #a7f3d0; }
+        /* Badges */
+        .badge { padding: 4px 10px; border-radius: 999px; font-size: 10px; font-weight: 800; letter-spacing: 0.5px;}
+        .badge-draft { background: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; }
+        .badge-pending { background: #fef3c7; color: #b45309; border: 1px solid #fcd34d; }
+        .badge-returned { background: #ffe4e6; color: #be123c; border: 1px solid #fda4af; }
+        .badge-approved { background: #d1fae5; color: #047857; border: 1px solid #6ee7b7; }
+        
+        .no-scrollbar::-webkit-scrollbar { display: none; } .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
 </head>
 <body class="pb-32">
 
-    <div class="sticky top-0 z-40 px-4 py-4 flex items-center justify-between mb-2">
+    <div class="sticky top-0 z-40 px-4 py-4 flex items-center justify-between mb-4">
         <div class="flex items-center gap-3">
-            <div class="w-12 h-12 bg-white rounded-[1rem] shadow-sm border border-gray-100 flex items-center justify-center overflow-hidden p-1.5">
+            <div class="w-14 h-14 bg-white rounded-[1.2rem] shadow-md border border-gray-100 flex items-center justify-center overflow-hidden p-2 transform hover:scale-105 transition">
                 <img src="https://github.com/TTMSADAO/ttmed-sadao-queue/blob/PIC/%E0%B9%82%E0%B8%A5%E0%B9%82%E0%B8%81%E0%B9%89%E0%B9%81%E0%B8%9C%E0%B8%99%E0%B8%81%E0%B8%B2%E0%B8%A3%E0%B8%B8%E0%B9%88%E0%B8%99%E0%B8%A1%E0%B8%AB%E0%B8%B2%E0%B9%80%E0%B8%AA%E0%B8%99%E0%B9%88%E0%B8%AB%E0%B9%8C.png?raw=true" class="w-full h-full object-contain">
             </div>
             <div>
-                <h1 class="text-[16px] font-extrabold text-gray-800 leading-none mb-1">TTMED <span class="text-emerald-500">STUDY</span></h1>
-                <p class="text-[9px] font-bold text-gray-400 uppercase tracking-widest">Sadao Hospital</p>
+                <h1 class="text-[18px] font-extrabold text-slate-900 leading-none mb-1 tracking-tight">TTMED <span class="text-emerald-600">STUDY</span></h1>
+                <p class="text-[10px] font-extrabold text-slate-500 uppercase tracking-widest">Sadao Hospital</p>
             </div>
         </div>
-        <div class="flex items-center gap-2 bg-white/70 backdrop-blur-md p-1.5 rounded-full shadow-sm">
+        <div class="flex items-center gap-2 bg-white/90 backdrop-blur-md p-1.5 rounded-full shadow-md border border-white">
             <div class="text-right pl-3 hidden sm:block">
-                <p id="userName" class="text-[12px] font-extrabold text-gray-800">กำลังโหลด...</p>
-                <p id="userRole" class="text-[9px] font-bold text-gray-400">Connecting</p>
+                <p id="userName" class="text-[13px] font-extrabold text-slate-900">กำลังโหลด...</p>
+                <div id="userRoleContainer"></div>
             </div>
-            <img id="userImg" src="https://ui-avatars.com/api/?name=U" class="w-9 h-9 rounded-full border-2 border-white shadow-sm object-cover">
+            <img id="userImg" src="https://ui-avatars.com/api/?name=U" class="w-10 h-10 rounded-full border-2 border-white shadow-sm object-cover">
         </div>
     </div>
 
     <div class="max-w-md mx-auto px-4">
-        <div id="edit-banner" class="hidden bg-yellow-100 border border-yellow-300 text-yellow-800 px-4 py-2 rounded-xl mb-4 flex justify-between items-center text-xs font-bold animate-tab">
-            <span><i class="fa-solid fa-pen-to-square"></i> โหมดแก้ไขเคส (Draft/ส่งแก้)</span>
-            <button onclick="cancelEdit()" class="text-yellow-600 hover:text-red-500"><i class="fa-solid fa-xmark text-lg"></i></button>
+        <div id="edit-banner" class="hidden bg-amber-100 border border-amber-300 text-amber-900 px-5 py-3 rounded-2xl mb-5 flex justify-between items-center text-[13px] font-extrabold animate-tab shadow-sm">
+            <span class="flex items-center gap-2"><i class="fa-solid fa-pen-to-square text-amber-600 text-lg"></i> โหมดแก้ไขเคส (Draft / ส่งแก้)</span>
+            <button onclick="cancelEdit()" class="text-amber-600 hover:text-red-600 bg-amber-200/50 w-8 h-8 rounded-full flex items-center justify-center transition"><i class="fa-solid fa-xmark"></i></button>
         </div>
 
-        <div id="view-forms" class="animate-tab block">
+        <div id="view-forms" class="hidden animate-tab">
             <div class="sub-nav">
-                <button onclick="switchForm('massage')" id="sub-massage" class="sub-nav-btn active">นวดไทย</button>
-                <button onclick="switchForm('midwifery')" id="sub-midwifery" class="sub-nav-btn">ผดุงครรภ์</button>
-                <button onclick="switchForm('medicine')" id="sub-medicine" class="sub-nav-btn">เวชกรรม</button>
+                <button onclick="switchForm('massage')" id="sub-massage" class="sub-nav-btn active">🌿 นวดไทย</button>
+                <button onclick="switchForm('midwifery')" id="sub-midwifery" class="sub-nav-btn">🤱 ผดุงครรภ์</button>
+                <button onclick="switchForm('medicine')" id="sub-medicine" class="sub-nav-btn">🩺 เวชกรรม</button>
             </div>
 
             <div id="form-massage" class="glass-card p-6 block">
-                <form onsubmit="event.preventDefault();" id="formObj-massage" class="space-y-4">
-                    <div class="grid grid-cols-2 gap-3">
-                        <div><label class="block text-[10px] font-extrabold text-gray-400 uppercase ml-2 mb-1">วันที่</label><input type="date" id="msg_date" required class="input-wow w-full text-sm px-4 py-3"></div>
-                        <div><label class="block text-[10px] font-extrabold text-gray-400 uppercase ml-2 mb-1">HN</label><input type="text" id="msg_hn" placeholder="ระบุ HN" required class="input-wow w-full text-sm px-4 py-3"></div>
+                <form onsubmit="event.preventDefault();" id="formObj-massage" class="space-y-5">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div><label class="block text-[11px] font-extrabold text-slate-700 uppercase ml-2 mb-1.5 tracking-wide">📅 วันที่</label><input type="date" id="msg_date" required class="input-wow w-full text-[14px] px-4 py-3.5"></div>
+                        <div><label class="block text-[11px] font-extrabold text-slate-700 uppercase ml-2 mb-1.5 tracking-wide">🆔 รหัส HN</label><input type="text" id="msg_hn" placeholder="ระบุ HN" required class="input-wow w-full text-[14px] px-4 py-3.5"></div>
                     </div>
-                    <div><label class="block text-[10px] font-extrabold text-gray-400 uppercase ml-2 mb-1">ชื่อ-สกุล ผู้ป่วย</label><input type="text" id="msg_patientName" required class="input-wow w-full text-sm px-4 py-3"></div>
-                    <div class="p-4 bg-white/40 rounded-[1.5rem] border border-white shadow-sm space-y-3">
-                        <div class="grid grid-cols-2 gap-3">
-                            <div><label class="block text-[10px] font-extrabold text-gray-400 uppercase ml-2 mb-1">รูปแบบ</label><select id="msg_caseType" class="input-wow w-full text-sm px-3 py-3"><option value="New">✨ เคสใหม่</option><option value="FollowUp">🔄 ติดตามผล</option></select></div>
-                            <div><label class="block text-[10px] font-extrabold text-gray-400 uppercase ml-2 mb-1">กลุ่มโรค</label><select id="msg_diseaseCategory" class="input-wow w-full text-sm px-3 py-3"><option value="โรคทางหัตถเวชกรรมไทย">หัตถเวชกรรม</option><option value="กลุ่มโรคไม่ติดต่อเรื้อรัง (NCDs)">NCDs</option></select></div>
-                        </div>
-                        <div><label class="block text-[10px] font-extrabold text-gray-400 uppercase ml-2 mb-1">ชื่อโรค / อาการ</label><select id="msg_diseaseName" required class="input-wow w-full text-sm px-3 py-3"><option value="">-- โหลดข้อมูล... --</option></select></div>
-                    </div>
-                    <div><label class="block text-[10px] font-extrabold text-gray-400 uppercase ml-2 mb-1">แนบรูป (ถ้ามี)</label><input type="file" id="msg_image" accept="image/*" class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-[11px] file:font-bold file:bg-emerald-100 file:text-emerald-700 cursor-pointer input-wow py-1.5 px-1.5"></div>
-                    <div class="pt-2"><label class="block text-[10px] font-extrabold text-gray-400 uppercase ml-2 mb-2 text-center">ต้องเลือกอาจารย์ก่อนบันทึก</label><div id="instructors_massage" class="grid grid-cols-3 gap-2"></div></div>
+                    <div><label class="block text-[11px] font-extrabold text-slate-700 uppercase ml-2 mb-1.5 tracking-wide">👤 ชื่อ-สกุล ผู้ป่วย</label><input type="text" id="msg_patientName" placeholder="ระบุชื่อและนามสกุล" required class="input-wow w-full text-[14px] px-4 py-3.5"></div>
                     
-                    <div class="flex gap-2 pt-4">
-                        <button type="button" onclick="submitCaseAction('massage', true)" class="btn-glow btn-outline flex-1 text-[12px] font-extrabold py-3.5 flex justify-center items-center gap-1"><i class="fa-solid fa-floppy-disk"></i> บันทึกร่าง</button>
-                        <button type="button" onclick="submitCaseAction('massage', false)" class="btn-glow btn-primary flex-1 text-[12px] font-extrabold py-3.5 flex justify-center items-center gap-1"><i class="fa-solid fa-paper-plane"></i> ส่งตรวจทันที</button>
+                    <div class="p-5 bg-white/60 rounded-[1.5rem] border border-white shadow-sm space-y-4">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div><label class="block text-[11px] font-extrabold text-slate-700 uppercase ml-2 mb-1.5 tracking-wide">รูปแบบ</label><select id="msg_caseType" class="input-wow w-full text-[13px] px-3 py-3.5 cursor-pointer"><option value="New">✨ เคสใหม่</option><option value="FollowUp">🔄 ติดตามผล</option></select></div>
+                            <div><label class="block text-[11px] font-extrabold text-slate-700 uppercase ml-2 mb-1.5 tracking-wide">กลุ่มโรค</label><select id="msg_diseaseCategory" class="input-wow w-full text-[13px] px-3 py-3.5 cursor-pointer"><option value="โรคทางหัตถเวชกรรมไทย">หัตถเวชกรรม</option><option value="กลุ่มโรคไม่ติดต่อเรื้อรัง (NCDs)">NCDs</option></select></div>
+                        </div>
+                        <div><label class="block text-[11px] font-extrabold text-slate-700 uppercase ml-2 mb-1.5 tracking-wide">ชื่อโรค / อาการ</label><select id="msg_diseaseName" required class="input-wow w-full text-[14px] px-3 py-3.5 cursor-pointer"><option value="">-- โหลดข้อมูล... --</option></select></div>
+                    </div>
+                    
+                    <div><label class="block text-[11px] font-extrabold text-slate-700 uppercase ml-2 mb-1.5 tracking-wide">📸 แนบรูปหลักฐาน (ถ้ามี)</label><input type="file" id="msg_image" accept="image/*" class="w-full text-[13px] text-slate-600 file:mr-4 file:py-2.5 file:px-5 file:rounded-full file:border-0 file:text-[12px] file:font-extrabold file:bg-emerald-100 file:text-emerald-800 hover:file:bg-emerald-200 transition cursor-pointer input-wow py-1.5 px-1.5"></div>
+                    
+                    <div class="pt-2">
+                        <label class="block text-[12px] font-extrabold text-slate-800 uppercase ml-2 mb-3 text-center tracking-wide">👨‍🏫 เลือกอาจารย์ผู้ตรวจ</label>
+                        <div id="instructors_massage" class="grid grid-cols-3 gap-3"></div>
+                    </div>
+                    
+                    <div class="flex gap-3 pt-4">
+                        <button type="button" onclick="submitCaseAction('massage', true)" class="btn-glow btn-outline flex-1 text-[13px] font-extrabold py-4 rounded-full flex justify-center items-center gap-2"><i class="fa-solid fa-floppy-disk text-lg"></i> บันทึกร่าง</button>
+                        <button type="button" onclick="submitCaseAction('massage', false)" class="btn-glow btn-primary flex-1 text-[13px] font-extrabold py-4 rounded-full flex justify-center items-center gap-2"><i class="fa-solid fa-paper-plane text-lg"></i> ส่งตรวจทันที</button>
                     </div>
                 </form>
             </div>
 
             <div id="form-midwifery" class="glass-card p-6 hidden">
-                <form onsubmit="event.preventDefault();" id="formObj-midwifery" class="space-y-4">
-                    <div class="grid grid-cols-2 gap-3">
-                        <div><label class="block text-[10px] font-extrabold text-gray-400 uppercase ml-2 mb-1">วันที่</label><input type="date" id="mid_date" required class="input-wow w-full text-sm px-4 py-3"></div>
-                        <div><label class="block text-[10px] font-extrabold text-gray-400 uppercase ml-2 mb-1">HN มารดา</label><input type="text" id="mid_hn" required class="input-wow w-full text-sm px-4 py-3"></div>
+                <form onsubmit="event.preventDefault();" id="formObj-midwifery" class="space-y-5">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div><label class="block text-[11px] font-extrabold text-slate-700 uppercase ml-2 mb-1.5 tracking-wide">📅 วันที่</label><input type="date" id="mid_date" required class="input-wow w-full text-[14px] px-4 py-3.5"></div>
+                        <div><label class="block text-[11px] font-extrabold text-slate-700 uppercase ml-2 mb-1.5 tracking-wide">🆔 HN มารดา</label><input type="text" id="mid_hn" required class="input-wow w-full text-[14px] px-4 py-3.5"></div>
                     </div>
-                    <div><label class="block text-[10px] font-extrabold text-gray-400 uppercase ml-2 mb-1">ชื่อ-สกุล มารดา</label><input type="text" id="mid_patientName" required class="input-wow w-full text-sm px-4 py-3"></div>
-                    <div><label class="block text-[10px] font-extrabold text-gray-400 uppercase ml-2 mb-1">แนบรูป (ถ้ามี)</label><input type="file" id="mid_image" accept="image/*" class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-[11px] file:font-bold file:bg-rose-100 file:text-rose-700 cursor-pointer input-wow py-1.5 px-1.5"></div>
-                    <div class="pt-2"><label class="block text-[10px] font-extrabold text-gray-400 uppercase ml-2 mb-2 text-center">ต้องเลือกอาจารย์ก่อนบันทึก</label><div id="instructors_midwifery" class="grid grid-cols-3 gap-2"></div></div>
+                    <div><label class="block text-[11px] font-extrabold text-slate-700 uppercase ml-2 mb-1.5 tracking-wide">👤 ชื่อ-สกุล มารดา</label><input type="text" id="mid_patientName" required class="input-wow w-full text-[14px] px-4 py-3.5"></div>
+                    <div><label class="block text-[11px] font-extrabold text-slate-700 uppercase ml-2 mb-1.5 tracking-wide">📸 แนบรูปหลักฐาน (ถ้ามี)</label><input type="file" id="mid_image" accept="image/*" class="w-full text-[13px] text-slate-600 file:mr-4 file:py-2.5 file:px-5 file:rounded-full file:border-0 file:text-[12px] file:font-extrabold file:bg-rose-100 file:text-rose-800 hover:file:bg-rose-200 transition cursor-pointer input-wow py-1.5 px-1.5"></div>
+                    <div class="pt-2"><label class="block text-[12px] font-extrabold text-slate-800 uppercase ml-2 mb-3 text-center tracking-wide">👨‍🏫 เลือกอาจารย์ผู้ตรวจ</label><div id="instructors_midwifery" class="grid grid-cols-3 gap-3"></div></div>
                     
-                    <div class="flex gap-2 pt-4">
-                        <button type="button" onclick="submitCaseAction('midwifery', true)" class="btn-glow bg-white border-2 border-rose-500 text-rose-500 flex-1 text-[12px] font-extrabold py-3.5 rounded-full flex justify-center items-center gap-1"><i class="fa-solid fa-floppy-disk"></i> บันทึกร่าง</button>
-                        <button type="button" onclick="submitCaseAction('midwifery', false)" class="btn-glow bg-gradient-to-r from-rose-500 to-pink-600 text-white flex-1 text-[12px] font-extrabold py-3.5 rounded-full flex justify-center items-center gap-1 shadow-lg shadow-rose-500/30"><i class="fa-solid fa-paper-plane"></i> ส่งตรวจทันที</button>
+                    <div class="flex gap-3 pt-4">
+                        <button type="button" onclick="submitCaseAction('midwifery', true)" class="btn-glow bg-white border-[2.5px] border-rose-600 text-rose-600 flex-1 text-[13px] font-extrabold py-4 rounded-full flex justify-center items-center gap-2"><i class="fa-solid fa-floppy-disk text-lg"></i> บันทึกร่าง</button>
+                        <button type="button" onclick="submitCaseAction('midwifery', false)" class="btn-glow bg-gradient-to-r from-rose-600 to-pink-700 text-white flex-1 text-[13px] font-extrabold py-4 rounded-full flex justify-center items-center gap-2 shadow-lg shadow-rose-600/30"><i class="fa-solid fa-paper-plane text-lg"></i> ส่งตรวจทันที</button>
                     </div>
                 </form>
             </div>
 
             <div id="form-medicine" class="glass-card p-6 hidden">
-                <form onsubmit="event.preventDefault();" id="formObj-medicine" class="space-y-4">
-                    <div class="grid grid-cols-2 gap-3">
-                        <div><label class="block text-[10px] font-extrabold text-gray-400 uppercase ml-2 mb-1">วันที่</label><input type="date" id="med_date" required class="input-wow w-full text-sm px-4 py-3"></div>
-                        <div><label class="block text-[10px] font-extrabold text-gray-400 uppercase ml-2 mb-1">HN</label><input type="text" id="med_hn" required class="input-wow w-full text-sm px-4 py-3"></div>
+                <form onsubmit="event.preventDefault();" id="formObj-medicine" class="space-y-5">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div><label class="block text-[11px] font-extrabold text-slate-700 uppercase ml-2 mb-1.5 tracking-wide">📅 วันที่</label><input type="date" id="med_date" required class="input-wow w-full text-[14px] px-4 py-3.5"></div>
+                        <div><label class="block text-[11px] font-extrabold text-slate-700 uppercase ml-2 mb-1.5 tracking-wide">🆔 รหัส HN</label><input type="text" id="med_hn" required class="input-wow w-full text-[14px] px-4 py-3.5"></div>
                     </div>
-                    <div><label class="block text-[10px] font-extrabold text-gray-400 uppercase ml-2 mb-1">ชื่อ-สกุล ผู้ป่วย</label><input type="text" id="med_patientName" required class="input-wow w-full text-sm px-4 py-3"></div>
-                    <div class="p-4 bg-white/40 rounded-[1.5rem] border border-white shadow-sm"><label class="block text-[10px] font-extrabold text-gray-400 uppercase ml-2 mb-1">วินิจฉัยโรคแผนไทย</label><select id="med_diseaseName" required class="input-wow w-full text-sm px-3 py-3"><option value="">-- โหลดข้อมูล... --</option></select></div>
-                    <div><label class="block text-[10px] font-extrabold text-gray-400 uppercase ml-2 mb-1">แนบรูป (ถ้ามี)</label><input type="file" id="med_image" accept="image/*" class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-[11px] file:font-bold file:bg-blue-100 file:text-blue-700 cursor-pointer input-wow py-1.5 px-1.5"></div>
-                    <div class="pt-2"><label class="block text-[10px] font-extrabold text-gray-400 uppercase ml-2 mb-2 text-center">ต้องเลือกอาจารย์ก่อนบันทึก</label><div id="instructors_medicine" class="grid grid-cols-3 gap-2"></div></div>
+                    <div><label class="block text-[11px] font-extrabold text-slate-700 uppercase ml-2 mb-1.5 tracking-wide">👤 ชื่อ-สกุล ผู้ป่วย</label><input type="text" id="med_patientName" required class="input-wow w-full text-[14px] px-4 py-3.5"></div>
+                    <div class="p-5 bg-white/60 rounded-[1.5rem] border border-white shadow-sm"><label class="block text-[11px] font-extrabold text-slate-700 uppercase ml-2 mb-1.5 tracking-wide">วินิจฉัยโรคแผนไทย</label><select id="med_diseaseName" required class="input-wow w-full text-[14px] px-3 py-3.5 cursor-pointer"><option value="">-- โหลดข้อมูล... --</option></select></div>
+                    <div><label class="block text-[11px] font-extrabold text-slate-700 uppercase ml-2 mb-1.5 tracking-wide">📸 แนบรูปหลักฐาน (ถ้ามี)</label><input type="file" id="med_image" accept="image/*" class="w-full text-[13px] text-slate-600 file:mr-4 file:py-2.5 file:px-5 file:rounded-full file:border-0 file:text-[12px] file:font-extrabold file:bg-blue-100 file:text-blue-800 hover:file:bg-blue-200 transition cursor-pointer input-wow py-1.5 px-1.5"></div>
+                    <div class="pt-2"><label class="block text-[12px] font-extrabold text-slate-800 uppercase ml-2 mb-3 text-center tracking-wide">👨‍🏫 เลือกอาจารย์ผู้ตรวจ</label><div id="instructors_medicine" class="grid grid-cols-3 gap-3"></div></div>
                     
-                    <div class="flex gap-2 pt-4">
-                        <button type="button" onclick="submitCaseAction('medicine', true)" class="btn-glow bg-white border-2 border-blue-500 text-blue-500 flex-1 text-[12px] font-extrabold py-3.5 rounded-full flex justify-center items-center gap-1"><i class="fa-solid fa-floppy-disk"></i> บันทึกร่าง</button>
-                        <button type="button" onclick="submitCaseAction('medicine', false)" class="btn-glow bg-gradient-to-r from-blue-500 to-indigo-600 text-white flex-1 text-[12px] font-extrabold py-3.5 rounded-full flex justify-center items-center gap-1 shadow-lg shadow-blue-500/30"><i class="fa-solid fa-paper-plane"></i> ส่งตรวจทันที</button>
+                    <div class="flex gap-3 pt-4">
+                        <button type="button" onclick="submitCaseAction('medicine', true)" class="btn-glow bg-white border-[2.5px] border-blue-600 text-blue-600 flex-1 text-[13px] font-extrabold py-4 rounded-full flex justify-center items-center gap-2"><i class="fa-solid fa-floppy-disk text-lg"></i> บันทึกร่าง</button>
+                        <button type="button" onclick="submitCaseAction('medicine', false)" class="btn-glow bg-gradient-to-r from-blue-600 to-indigo-700 text-white flex-1 text-[13px] font-extrabold py-4 rounded-full flex justify-center items-center gap-2 shadow-lg shadow-blue-600/30"><i class="fa-solid fa-paper-plane text-lg"></i> ส่งตรวจทันที</button>
                     </div>
                 </form>
             </div>
         </div>
 
-        <div id="view-mycases" class="hidden glass-card p-5 mb-6">
-            <h2 class="font-extrabold text-gray-800 text-lg mb-4 flex items-center gap-2"><i class="fa-solid fa-folder-open text-emerald-500"></i> เคสของฉัน</h2>
-            <div id="mycases-container" class="space-y-3"><p class="text-center text-xs text-gray-400 py-8">กำลังโหลดข้อมูล...</p></div>
+        <div id="view-mycases" class="hidden glass-card p-6 mb-6">
+            <h2 class="font-extrabold text-slate-900 text-[18px] mb-5 flex items-center gap-3"><div class="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600"><i class="fa-solid fa-folder-open"></i></div> เคสของฉัน</h2>
+            <div id="mycases-container" class="space-y-4"><p class="text-center text-[13px] font-bold text-slate-500 py-10"><i class="fa-solid fa-spinner fa-spin text-xl mb-2 block"></i> กำลังโหลดข้อมูล...</p></div>
         </div>
 
-        <div id="view-feed" class="hidden glass-card p-5 mb-6">
-            <h2 class="font-extrabold text-gray-800 text-lg mb-3 flex items-center gap-2"><i class="fa-solid fa-globe text-blue-500"></i> กระดานเคสรวม</h2>
-            <input type="text" id="feed-search" placeholder="🔍 ค้นหา HN หรือ ชื่อโรค..." class="input-wow w-full text-sm px-4 py-3 mb-4" onkeyup="filterFeed()">
-            <div id="feed-container" class="space-y-3"><p class="text-center text-xs text-gray-400 py-8">กำลังโหลดข้อมูล...</p></div>
+        <div id="view-feed" class="hidden glass-card p-6 mb-6">
+            <h2 class="font-extrabold text-slate-900 text-[18px] mb-5 flex items-center gap-3"><div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600"><i class="fa-solid fa-globe"></i></div> กระดานเคสรวม</h2>
+            <div class="relative mb-6">
+                <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 transform -translate-y-1/2 text-slate-400 text-lg"></i>
+                <input type="text" id="feed-search" placeholder="พิมพ์ HN หรือ ชื่อโรค เพื่อค้นหา..." class="input-wow w-full text-[14px] pl-12 pr-4 py-4" onkeyup="filterFeed()">
+            </div>
+            <div id="feed-container" class="space-y-4"><p class="text-center text-[13px] font-bold text-slate-500 py-10"><i class="fa-solid fa-spinner fa-spin text-xl mb-2 block"></i> กำลังโหลดข้อมูล...</p></div>
         </div>
 
         <div id="view-dashboard" class="hidden glass-card p-6 mb-6">
-            <div id="dash-instructor" class="hidden mb-8 border-b border-gray-200 pb-6">
-                <h2 class="font-extrabold text-orange-500 text-lg mb-4 flex items-center gap-2"><i class="fa-solid fa-inbox"></i> รายการรอตรวจ</h2>
-                <div id="pending-cases-container" class="space-y-3"><p class="text-center text-xs text-gray-400 py-4">กำลังโหลดข้อมูล...</p></div>
+            <div id="dash-instructor" class="hidden mb-10 border-b-2 border-slate-100 pb-8">
+                <h2 class="font-extrabold text-slate-900 text-[20px] mb-5 flex items-center gap-3"><div class="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center text-orange-600"><i class="fa-solid fa-inbox text-lg"></i></div> ระบบตรวจประเมิน</h2>
+                
+                <div class="flex gap-2 overflow-x-auto no-scrollbar mb-4 pb-2" id="filter-students">
+                    <button class="filter-pill active-std" onclick="setStudentFilter('all')" id="btn-std-all">รวมทุกคน</button>
+                </div>
+                <div class="flex gap-2 overflow-x-auto no-scrollbar mb-6 pb-2">
+                    <button class="filter-pill active-pending" onclick="setStatusFilter('pending')" id="btn-stat-pending">⏳ รอตรวจ</button>
+                    <button class="filter-pill" onclick="setStatusFilter('approved')" id="btn-stat-approved">✅ ตรวจแล้ว</button>
+                    <button class="filter-pill" onclick="setStatusFilter('returned')" id="btn-stat-returned">⚠️ ส่งแก้</button>
+                </div>
+                
+                <div id="instructor-cases-container" class="space-y-4"><p class="text-center text-[13px] font-bold text-slate-500 py-6"><i class="fa-solid fa-spinner fa-spin text-xl mb-2 block"></i> ดึงข้อมูลเคส...</p></div>
             </div>
 
-            <h2 class="font-extrabold text-indigo-500 text-lg mb-4 flex items-center gap-2"><i class="fa-solid fa-chart-pie"></i> ความคืบหน้านักศึกษา</h2>
-            <div id="student-stats-container" class="space-y-4 mb-8"></div>
+            <h2 class="font-extrabold text-indigo-700 text-[18px] mb-5 flex items-center gap-3"><div class="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600"><i class="fa-solid fa-chart-pie"></i></div> ความคืบหน้านักศึกษา</h2>
+            <div id="student-stats-container" class="space-y-5 mb-10"></div>
 
-            <h2 class="font-extrabold text-teal-500 text-lg mb-4 flex items-center gap-2"><i class="fa-solid fa-ranking-star"></i> อันดับโรคยอดฮิต</h2>
-            <div id="disease-rank-container" class="bg-white/60 rounded-[1.5rem] p-4 border border-white"></div>
+            <h2 class="font-extrabold text-teal-700 text-[18px] mb-5 flex items-center gap-3"><div class="w-10 h-10 rounded-full bg-teal-100 flex items-center justify-center text-teal-600"><i class="fa-solid fa-ranking-star"></i></div> อันดับโรคยอดฮิต</h2>
+            <div id="disease-rank-container" class="bg-white/80 rounded-[1.5rem] p-5 border border-white shadow-sm"></div>
         </div>
 
     </div>
 
-    <nav class="fixed floating-nav z-50 backdrop-blur-xl px-2 py-1.5 flex justify-between items-center">
-        <button onclick="switchMainView('forms')" id="nav-forms" class="nav-item active text-gray-400 flex flex-col items-center p-2 w-[24%] relative">
-            <div class="icon-box text-[20px] mb-0.5"><i class="fa-solid fa-plus-circle"></i></div>
-            <span class="text-[9px] font-extrabold">เพิ่มเคส</span>
+    <div id="judge-modal" class="fixed inset-0 z-[60] hidden flex items-center justify-center p-4">
+        <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity" onclick="closeJudgeModal()"></div>
+        <div class="bg-white w-full max-w-sm rounded-[2rem] shadow-2xl relative z-10 overflow-hidden animate-tab">
+            <div class="bg-gradient-to-r from-orange-500 to-amber-500 p-5 text-center">
+                <h3 class="text-white font-extrabold text-[16px] tracking-wide" id="judge-title">📝 ยืนยันการตรวจเคส</h3>
+            </div>
+            <div class="p-6 space-y-5">
+                <div>
+                    <label class="block text-[12px] font-extrabold text-slate-700 uppercase mb-2 tracking-wide">หมายเหตุ / คำแนะนำ</label>
+                    <textarea id="judge-remark" rows="3" placeholder="ระบุข้อความเพื่อแจ้งเตือนกลับไปยังนักศึกษา..." class="input-wow w-full text-[14px] px-4 py-3 bg-slate-50"></textarea>
+                </div>
+                <div class="bg-orange-50/80 p-5 rounded-[1.5rem] border border-orange-200">
+                    <label class="block text-[12px] font-extrabold text-slate-700 uppercase mb-3 tracking-wide">📸 ถ่ายรูปกระดาษเคส (ถ้ามี)</label>
+                    <input type="file" id="judge-image" accept="image/*" capture="environment" class="w-full text-[13px] text-slate-600 file:mr-4 file:py-2.5 file:px-5 file:rounded-full file:border-0 file:text-[12px] file:font-extrabold file:bg-orange-100 file:text-orange-800 cursor-pointer">
+                </div>
+                <div class="flex gap-4 pt-3">
+                    <button onclick="closeJudgeModal()" class="flex-1 py-3.5 text-slate-600 font-extrabold text-[13px] bg-slate-100 rounded-full hover:bg-slate-200 transition">ยกเลิก</button>
+                    <button id="judge-submit-btn" class="flex-1 py-3.5 text-white font-extrabold text-[13px] bg-gradient-to-r from-orange-500 to-amber-500 rounded-full shadow-lg shadow-orange-500/40 btn-glow">ยืนยันบันทึก</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <nav class="fixed floating-nav z-50 backdrop-blur-xl px-2 py-2 flex justify-between items-center">
+        <button onclick="switchMainView('forms')" id="nav-forms" class="nav-item active text-emerald-600 flex flex-col items-center p-2 w-[24%] relative">
+            <div class="icon-box text-[22px] mb-1"><i class="fa-solid fa-plus-circle"></i></div><span class="text-[10px] font-extrabold tracking-wide">เพิ่มเคส</span>
         </button>
-        <button onclick="switchMainView('mycases'); loadMyCases();" id="nav-mycases" class="nav-item text-gray-400 flex flex-col items-center p-2 w-[24%] relative">
-            <div class="icon-box text-[20px] mb-0.5"><i class="fa-solid fa-folder-open"></i></div>
-            <span class="text-[9px] font-extrabold">ของฉัน</span>
+        <button onclick="switchMainView('mycases'); loadMyCases();" id="nav-mycases" class="nav-item text-slate-500 flex flex-col items-center p-2 w-[24%] relative">
+            <div class="icon-box text-[22px] mb-1"><i class="fa-solid fa-folder-open"></i></div><span class="text-[10px] font-extrabold tracking-wide">ของฉัน</span>
         </button>
-        <button onclick="switchMainView('feed'); loadGlobalFeed();" id="nav-feed" class="nav-item text-gray-400 flex flex-col items-center p-2 w-[24%] relative">
-            <div class="icon-box text-[20px] mb-0.5"><i class="fa-solid fa-globe"></i></div>
-            <span class="text-[9px] font-extrabold">เคสรวม</span>
+        <button onclick="switchMainView('feed'); loadGlobalFeed();" id="nav-feed" class="nav-item text-slate-500 flex flex-col items-center p-2 w-[24%] relative">
+            <div class="icon-box text-[22px] mb-1"><i class="fa-solid fa-globe"></i></div><span class="text-[10px] font-extrabold tracking-wide">เคสรวม</span>
         </button>
-        <button onclick="switchMainView('dashboard'); loadDashboardData();" id="nav-dashboard" class="nav-item text-gray-400 flex flex-col items-center p-2 w-[24%] relative">
-            <div class="icon-box text-[20px] mb-0.5"><i class="fa-solid fa-chart-pie"></i></div>
-            <span class="text-[9px] font-extrabold">สถิติ</span>
+        <button onclick="switchMainView('dashboard'); loadDashboardData();" id="nav-dashboard" class="nav-item text-slate-500 flex flex-col items-center p-2 w-[24%] relative">
+            <div class="icon-box text-[22px] mb-1"><i class="fa-solid fa-chart-pie"></i></div><span class="text-[10px] font-extrabold tracking-wide">สถิติ/ตรวจ</span>
         </button>
     </nav>
 
@@ -212,385 +258,271 @@
         const FIREBASE_SECRET = '9iKYKSmC8ssrUXvEdh2OOqS4JCeyEwcaCGr83WkG';
         const LIFF_ID = "2010280091-6e8mWiGV";
         
-        // ⚠️ วาง URL Web App อันใหม่ที่เพิ่ง Deploy มาตรงนี้นะครับ
-        const GAS_WEBAPP_URL = "https://script.google.com/macros/s/AKfycbxFeZxtiaQ_TgT6Hzd0bDo19rbM8SjmGVMMid9BQanch9pyEtOB2ivlXtF6tB9xQGuKKQ/exec";
+        // ⚠️ วาง URL Web App อันใหม่ที่เพิ่ง Deploy มาตรงนี้
+        const GAS_WEBAPP_URL = "https://script.google.com/macros/s/AKfycbwO6E2k3H5r3KSTTfDORB1B0jWJ_kC11R8_pC4d-uE8y_D7Z1-U01M1z1A01L0K2Q0/exec";
 
-        let currentUser = null; 
-        let instructorList = [];
-        let currentEditCaseId = null; // ตัวแปรเก็บ ID เคสที่กำลังถูกแก้ไข
+        let currentUser = null; let instructorList = []; let currentEditCaseId = null;
+
+        // ตัวแปรสำหรับ Dashboard อาจารย์
+        let allInstructorCases = []; let currentStatusFilter = 'pending'; let currentStudentFilter = 'all';
 
         window.onload = async () => {
-            const today = new Date();
-            document.getElementById('msg_date').valueAsDate = today;
-            document.getElementById('mid_date').valueAsDate = today;
-            document.getElementById('med_date').valueAsDate = today;
-
-            await loadDropdownConfigs();
-            await fetchUsersAndRenderInstructors(); 
-            await initializeLiff();
+            const today = new Date(); document.getElementById('msg_date').valueAsDate = today; document.getElementById('mid_date').valueAsDate = today; document.getElementById('med_date').valueAsDate = today;
+            await loadDropdownConfigs(); await fetchUsersAndRenderInstructors(); await initializeLiff();
         };
 
         async function loadDropdownConfigs() {
             try {
-                const res = await fetch(`${FIREBASE_URL}configs.json?auth=${FIREBASE_SECRET}`);
-                const configs = await res.json();
+                const res = await fetch(`${FIREBASE_URL}configs.json?auth=${FIREBASE_SECRET}`); const configs = await res.json();
                 if (configs?.diseases_massage) {
-                    const msgSelect = document.getElementById('msg_diseaseName');
-                    msgSelect.innerHTML = '<option value="">-- เลือกโรค/อาการ --</option>';
-                    for (const [code, name] of Object.entries(configs.diseases_massage)) msgSelect.innerHTML += `<option value="${name}">${code}: ${name}</option>`;
+                    const msgSelect = document.getElementById('msg_diseaseName'); msgSelect.innerHTML = '<option value="">-- เลือกโรค/อาการ --</option>';
+                    for (const [code, name] of Object.entries(configs.diseases_massage)) msgSelect.innerHTML += `<option value="${name}" class="font-semibold text-slate-700">${code}: ${name}</option>`;
                 }
                 if (configs?.diseases_medicine) {
-                    const medSelect = document.getElementById('med_diseaseName');
-                    medSelect.innerHTML = '<option value="">-- เลือกการวินิจฉัย --</option>';
-                    for (const [code, obj] of Object.entries(configs.diseases_medicine)) medSelect.innerHTML += `<option value="${obj.name}" data-category="${obj.type}">${code}: ${obj.name}</option>`;
+                    const medSelect = document.getElementById('med_diseaseName'); medSelect.innerHTML = '<option value="">-- เลือกการวินิจฉัย --</option>';
+                    for (const [code, obj] of Object.entries(configs.diseases_medicine)) medSelect.innerHTML += `<option value="${obj.name}" data-category="${obj.type}" class="font-semibold text-slate-700">${code}: ${obj.name}</option>`;
                 }
-            } catch (e) { console.error(e); }
+            } catch (e) {}
         }
 
         async function fetchUsersAndRenderInstructors() {
             try {
-                const res = await fetch(`${FIREBASE_URL}users.json?auth=${FIREBASE_SECRET}`);
-                const users = await res.json();
+                const res = await fetch(`${FIREBASE_URL}users.json?auth=${FIREBASE_SECRET}`); const users = await res.json();
                 for (const uid in users) if (users[uid].role === 'instructor' && users[uid].isActive) instructorList.push({ uid: uid, name: users[uid].fullName, picUrl: users[uid].picUrl });
-                
                 ['massage', 'midwifery', 'medicine'].forEach(dep => {
                     const container = document.getElementById(`instructors_${dep}`);
-                    if(container){
-                        container.innerHTML = instructorList.map((inst, index) => `
-                            <div class="relative">
-                                <input type="radio" name="instructor_${dep}" id="inst_${dep}_${index}" value="${inst.uid}" class="instructor-radio hidden" required>
-                                <label for="inst_${dep}_${index}" class="cursor-pointer border-2 border-transparent bg-white/50 rounded-2xl p-2 flex flex-col items-center gap-1 transition-all relative shadow-sm hover:bg-white">
-                                    <div class="avatar-ring"><img src="${inst.picUrl}" class="w-9 h-9 rounded-full object-cover border border-white"></div>
-                                    <span class="text-[9px] font-extrabold text-gray-600 text-center truncate w-full">${inst.name.split(' ')[0]}</span>
-                                    <div class="check-icon absolute -top-1 -right-1 bg-emerald-500 text-white w-5 h-5 rounded-full flex items-center justify-center shadow-md"><i class="fa-solid fa-check text-[9px]"></i></div>
-                                </label>
-                            </div>
-                        `).join('');
-                    }
+                    if(container) container.innerHTML = instructorList.map((inst, index) => `<div class="relative"><input type="radio" name="instructor_${dep}" id="inst_${dep}_${index}" value="${inst.uid}" class="instructor-radio hidden" required><label for="inst_${dep}_${index}" class="cursor-pointer border-2 border-transparent bg-white/70 rounded-[1.2rem] p-2 flex flex-col items-center gap-1.5 transition-all relative shadow-sm hover:bg-white"><div class="avatar-ring"><img src="${inst.picUrl}" class="w-10 h-10 rounded-full object-cover border border-white"></div><span class="text-[11px] font-extrabold text-slate-700 text-center truncate w-full">${inst.name.split(' ')[0]}</span><div class="check-icon absolute -top-1 -right-1 bg-emerald-500 text-white w-6 h-6 rounded-full flex items-center justify-center shadow-md"><i class="fa-solid fa-check text-[10px]"></i></div></label></div>`).join('');
                 });
-            } catch (e) { console.error(e); }
+            } catch (e) {}
         }
 
-        async function initializeLiff() {
-            try {
-                await liff.init({ liffId: LIFF_ID });
-                if (liff.isLoggedIn()) checkUserPermission(await liff.getProfile());
-                else liff.login();
-            } catch (err) { alert("LIFF Error"); }
-        }
+        async function initializeLiff() { try { await liff.init({ liffId: LIFF_ID }); if (liff.isLoggedIn()) checkUserPermission(await liff.getProfile()); else liff.login(); } catch (err) { alert("LIFF Error"); } }
 
+        // ================= ควบคุมสิทธิ์ และปรับหน้าจอ =================
         async function checkUserPermission(profile) {
             try {
-                const res = await fetch(`${FIREBASE_URL}users/${profile.userId}.json?auth=${FIREBASE_SECRET}`);
+                const res = await fetch(`${FIREBASE_URL}users/${profile.userId}.json?auth=${FIREBASE_SECRET}`); 
                 const userData = await res.json();
-                const firstName = profile.displayName.split(' ')[0];
-                document.getElementById('userName').innerText = userData && userData.isActive ? firstName : profile.displayName;
+                const firstName = profile.displayName.split(' ')[0]; 
+                document.getElementById('userName').innerText = userData && userData.isActive ? firstName : profile.displayName; 
                 document.getElementById('userImg').src = profile.pictureUrl;
                 
-                const roleBadge = document.getElementById('userRole');
+                const roleContainer = document.getElementById('userRoleContainer');
                 if (userData && userData.isActive) {
                     currentUser = { uid: profile.userId, ...userData };
-                    if (userData.role === 'instructor') {
-                        roleBadge.innerText = "⭐ อาจารย์"; 
-                        roleBadge.className = "text-[9px] font-extrabold text-orange-600 bg-orange-100 px-2 py-0.5 rounded-full mt-1 inline-block";
-                        document.getElementById('dash-instructor').classList.remove('hidden'); // โชว์ส่วนรอตรวจของอาจารย์
-                    } else {
-                        roleBadge.innerText = "🎓 นักศึกษา"; 
-                        roleBadge.className = "text-[9px] font-extrabold text-emerald-600 bg-emerald-100 px-2 py-0.5 rounded-full mt-1 inline-block";
+                    
+                    if (userData.role === 'instructor') { 
+                        roleContainer.innerHTML = '<span class="text-[10px] font-extrabold text-white bg-gradient-to-r from-orange-500 to-amber-500 px-3 py-1 rounded-full mt-1 inline-block shadow-sm">⭐ อาจารย์แพทย์</span>';
+                        document.getElementById('dash-instructor').classList.remove('hidden'); 
+                        
+                        // อาจารย์: ซ่อนแท็บที่ไม่ใช้ + ขยายแท็บที่เหลือ + บังคับเปิด Dashboard
+                        document.getElementById('nav-forms').style.display = 'none';
+                        document.getElementById('nav-mycases').style.display = 'none';
+                        document.getElementById('nav-feed').classList.replace('w-[24%]', 'w-[48%]');
+                        document.getElementById('nav-dashboard').classList.replace('w-[24%]', 'w-[48%]');
+                        
+                        switchMainView('dashboard'); 
+                        loadDashboardData();
+                    } else { 
+                        roleContainer.innerHTML = '<span class="text-[10px] font-extrabold text-white bg-gradient-to-r from-emerald-500 to-teal-500 px-3 py-1 rounded-full mt-1 inline-block shadow-sm">🎓 นศ.แพทย์แผนไทย</span>';
+                        switchMainView('forms');
                     }
-                } else {
-                    document.getElementById('userName').innerText = "Access Denied";
-                    roleBadge.innerText = "ไม่มีสิทธิ์ใช้งาน";
+                } else { 
+                    document.getElementById('userName').innerText = "Access Denied"; 
+                    roleContainer.innerHTML = '<span class="text-[10px] font-extrabold text-white bg-slate-500 px-3 py-1 rounded-full mt-1 inline-block shadow-sm">ไม่มีสิทธิ์ใช้งาน</span>';
                 }
-            } catch (e) { console.error(e); }
+            } catch (e) { console.error("Permission Check Error", e); }
         }
 
-        // ================= UI Navigation =================
         function switchMainView(viewId) {
-            ['forms', 'mycases', 'feed', 'dashboard'].forEach(id => {
-                document.getElementById(`view-${id}`).classList.add('hidden');
-                document.getElementById(`view-${id}`).classList.remove('animate-tab');
-                document.getElementById(`nav-${id}`).classList.remove('active', 'text-emerald-500');
-                document.getElementById(`nav-${id}`).classList.add('text-gray-400');
-            });
-            const v = document.getElementById(`view-${viewId}`);
-            v.classList.remove('hidden'); void v.offsetWidth; v.classList.add('animate-tab');
-            const n = document.getElementById(`nav-${viewId}`);
-            n.classList.remove('text-gray-400'); n.classList.add('active', 'text-emerald-500');
+            ['forms', 'mycases', 'feed', 'dashboard'].forEach(id => { document.getElementById(`view-${id}`).classList.add('hidden'); document.getElementById(`view-${id}`).classList.remove('animate-tab'); document.getElementById(`nav-${id}`).classList.remove('active', 'text-emerald-600'); document.getElementById(`nav-${id}`).classList.add('text-slate-500'); });
+            const v = document.getElementById(`view-${viewId}`); v.classList.remove('hidden'); void v.offsetWidth; v.classList.add('animate-tab');
+            const n = document.getElementById(`nav-${viewId}`); n.classList.remove('text-slate-500'); n.classList.add('active', 'text-emerald-600');
         }
 
         function switchForm(dep) {
-            ['massage', 'midwifery', 'medicine'].forEach(id => {
-                document.getElementById(`form-${id}`).classList.add('hidden');
-                document.getElementById(`sub-${id}`).classList.remove('active', 'active-mid', 'active-med');
-            });
+            ['massage', 'midwifery', 'medicine'].forEach(id => { document.getElementById(`form-${id}`).classList.add('hidden'); document.getElementById(`sub-${id}`).classList.remove('active', 'active-mid', 'active-med'); });
             document.getElementById(`form-${dep}`).classList.remove('hidden');
-            const btn = document.getElementById(`sub-${dep}`);
-            btn.classList.add('active');
-            if(dep === 'midwifery') btn.classList.add('active-mid');
-            if(dep === 'medicine') btn.classList.add('active-med');
+            const btn = document.getElementById(`sub-${dep}`); btn.classList.add('active');
+            if(dep === 'midwifery') btn.classList.add('active-mid'); if(dep === 'medicine') btn.classList.add('active-med');
         }
 
-        // ================= 1. ฟอร์ม: บันทึก & อัปโหลด =================
         async function submitCaseAction(department, isDraft) {
             if (!currentUser) return alert("รอระบบโหลดข้อมูลสักครู่ครับ");
-            
-            const formObj = document.getElementById(`formObj-${department}`);
-            if (!formObj.checkValidity()) { formObj.reportValidity(); return; } // ตรวจจับช่องบังคับกรอก
-            
-            const selectedInstructor = document.querySelector(`input[name="instructor_${department}"]:checked`);
-            if (!selectedInstructor) return alert("⚠️ กรุณาเลือกอาจารย์ผู้ตรวจประเมินก่อนกดบันทึกครับ");
+            const formObj = document.getElementById(`formObj-${department}`); if (!formObj.checkValidity()) { formObj.reportValidity(); return; }
+            const selectedInstructor = document.querySelector(`input[name="instructor_${department}"]:checked`); if (!selectedInstructor) return alert("⚠️ กรุณาเลือกอาจารย์ผู้ตรวจประเมินก่อนกดบันทึกครับ");
 
-            // หาปุ่มที่ถูกกดเพื่อแสดง Loading
-            const btnPrimary = document.querySelector(`#form-${department} .btn-primary`);
-            const btnOutline = document.querySelector(`#form-${department} .btn-outline`);
-            btnPrimary.disabled = true; btnOutline.disabled = true;
-            const originalText = isDraft ? btnOutline.innerHTML : btnPrimary.innerHTML;
-            if(isDraft) btnOutline.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> กำลังบันทึก...`;
-            else btnPrimary.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> กำลังส่ง...`;
+            const btnPrimary = document.querySelector(`#form-${department} .btn-primary`); const btnOutline = document.querySelector(`#form-${department} .btn-outline`);
+            btnPrimary.disabled = true; btnOutline.disabled = true; const originalText = isDraft ? btnOutline.innerHTML : btnPrimary.innerHTML;
+            if(isDraft) btnOutline.innerHTML = `<i class="fa-solid fa-spinner fa-spin text-lg"></i> บันทึก...`; else btnPrimary.innerHTML = `<i class="fa-solid fa-spinner fa-spin text-lg"></i> ส่ง...`;
 
             try {
-                let base64String = ""; let mimeType = ""; let fileName = "";
-                const fileInput = document.getElementById(`${department === 'massage' ? 'msg' : department === 'midwifery' ? 'mid' : 'med'}_image`);
-                
-                if (fileInput && fileInput.files.length > 0) {
-                    const file = fileInput.files[0];
-                    if (file.size > 5 * 1024 * 1024) { alert("⚠️ ไฟล์รูปภาพใหญ่เกิน 5MB"); throw new Error("Size"); }
-                    fileName = department + "_" + Date.now() + "_" + file.name; mimeType = file.type;
-                    base64String = await new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(r.result.split(',')[1]); r.onerror = e => rej(e); r.readAsDataURL(file); });
-                }
+                let base64String = ""; let mimeType = ""; let fileName = ""; const fileInput = document.getElementById(`${department === 'massage' ? 'msg' : department === 'midwifery' ? 'mid' : 'med'}_image`);
+                if (fileInput && fileInput.files.length > 0) { const file = fileInput.files[0]; if (file.size > 5 * 1024 * 1024) { alert("⚠️ ไฟล์รูปใหญ่เกิน 5MB"); throw new Error("Size"); } fileName = department + "_" + Date.now() + "_" + file.name; mimeType = file.type; base64String = await new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(r.result.split(',')[1]); r.onerror = e => rej(e); r.readAsDataURL(file); }); }
 
-                let payload = { 
-                    action: "saveCaseData", department: department, studentUid: currentUser.uid, 
-                    studentName: currentUser.fullName, instructorUid: selectedInstructor.value,
-                    status: isDraft ? 'draft' : 'pending', // ส่งสถานะไปให้ DB
-                    imageB64: base64String, imageMimeType: mimeType, imageName: fileName,
-                    caseId: currentEditCaseId, // ส่ง ID ไปถ้าเป็นการแก้ไข
-                    existingImageUrl: window.tempImageUrl || null // คืนค่ารูปเดิมถ้าไม่ได้อัปใหม่
-                };
+                let payload = { action: "saveCaseData", department: department, studentUid: currentUser.uid, studentName: currentUser.fullName, instructorUid: selectedInstructor.value, status: isDraft ? 'draft' : 'pending', imageB64: base64String, imageMimeType: mimeType, imageName: fileName, caseId: currentEditCaseId, existingImageUrl: window.tempImageUrl || null };
                 
-                if (department === 'massage') {
-                    payload.date = document.getElementById('msg_date').value; payload.hn = document.getElementById('msg_hn').value;
-                    payload.patientName = document.getElementById('msg_patientName').value; payload.caseType = document.getElementById('msg_caseType').value;
-                    payload.diseaseCategory = document.getElementById('msg_diseaseCategory').value; payload.diseaseName = document.getElementById('msg_diseaseName').value;
-                } else if (department === 'midwifery') {
-                    payload.date = document.getElementById('mid_date').value; payload.hn = document.getElementById('mid_hn').value; payload.patientName = document.getElementById('mid_patientName').value; 
-                } else if (department === 'medicine') {
-                    payload.date = document.getElementById('med_date').value; payload.hn = document.getElementById('med_hn').value; payload.patientName = document.getElementById('med_patientName').value; 
-                    const medSelect = document.getElementById('med_diseaseName'); payload.diseaseName = medSelect.value;
-                    payload.diseaseCategory = medSelect.options[medSelect.selectedIndex] ? medSelect.options[medSelect.selectedIndex].getAttribute('data-category') : 'โรคทั่วไป'; payload.caseType = 'New';
-                }
+                if (department === 'massage') { payload.date = document.getElementById('msg_date').value; payload.hn = document.getElementById('msg_hn').value; payload.patientName = document.getElementById('msg_patientName').value; payload.caseType = document.getElementById('msg_caseType').value; payload.diseaseCategory = document.getElementById('msg_diseaseCategory').value; payload.diseaseName = document.getElementById('msg_diseaseName').value; } 
+                else if (department === 'midwifery') { payload.date = document.getElementById('mid_date').value; payload.hn = document.getElementById('mid_hn').value; payload.patientName = document.getElementById('mid_patientName').value; } 
+                else if (department === 'medicine') { payload.date = document.getElementById('med_date').value; payload.hn = document.getElementById('med_hn').value; payload.patientName = document.getElementById('med_patientName').value; const medSelect = document.getElementById('med_diseaseName'); payload.diseaseName = medSelect.value; payload.diseaseCategory = medSelect.options[medSelect.selectedIndex] ? medSelect.options[medSelect.selectedIndex].getAttribute('data-category') : 'โรคทั่วไป'; payload.caseType = 'New'; }
 
-                const res = await fetch(GAS_WEBAPP_URL, { method: 'POST', body: JSON.stringify(payload) });
-                const result = await res.json();
-                
-                alert(result.message);
-                if (result.success) { 
-                    formObj.reset(); cancelEdit(); // ล้างฟอร์ม
-                    document.getElementById(department === 'massage' ? 'msg_date' : department === 'midwifery' ? 'mid_date' : 'med_date').valueAsDate = new Date(); 
-                    if(isDraft) { switchMainView('mycases'); loadMyCases(); } // ถ้าบันทึกร่าง ให้เด้งไปหน้ารายการของฉัน
-                }
-            } catch (err) { if(err.message !== "Size") alert("เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์"); } 
-            finally { 
-                btnPrimary.disabled = false; btnOutline.disabled = false;
-                if(isDraft) btnOutline.innerHTML = originalText; else btnPrimary.innerHTML = originalText; 
-            }
+                const res = await fetch(GAS_WEBAPP_URL, { method: 'POST', body: JSON.stringify(payload) }); const result = await res.json(); alert(result.message);
+                if (result.success) { formObj.reset(); cancelEdit(); document.getElementById(department === 'massage' ? 'msg_date' : department === 'midwifery' ? 'mid_date' : 'med_date').valueAsDate = new Date(); if(isDraft) { switchMainView('mycases'); loadMyCases(); } }
+            } catch (err) { if(err.message !== "Size") alert("เกิดข้อผิดพลาดในการเชื่อมต่อ"); } 
+            finally { btnPrimary.disabled = false; btnOutline.disabled = false; if(isDraft) btnOutline.innerHTML = originalText; else btnPrimary.innerHTML = originalText; }
         }
 
-        // ================= 2. วิว: รายการของฉัน (My Cases) =================
         async function loadMyCases() {
-            const container = document.getElementById('mycases-container');
-            container.innerHTML = '<p class="text-center text-xs text-gray-400 py-6"><i class="fa-solid fa-spinner fa-spin"></i> กำลังโหลดเคสของคุณ...</p>';
+            const container = document.getElementById('mycases-container'); container.innerHTML = '<p class="text-center text-[13px] font-bold text-slate-500 py-10"><i class="fa-solid fa-spinner fa-spin text-xl mb-2 block"></i> กำลังโหลดเคสของคุณ...</p>';
             try {
                 let html = ""; const deps = ['massage', 'midwifery', 'medicine'];
                 for (let dep of deps) {
-                    const res = await fetch(`${FIREBASE_URL}cases/${dep}.json?auth=${FIREBASE_SECRET}`);
-                    const cases = await res.json();
+                    const res = await fetch(`${FIREBASE_URL}cases/${dep}.json?auth=${FIREBASE_SECRET}`); const cases = await res.json();
                     for (let cid in cases) {
                         const c = cases[caseId=cid];
-                        if (c.studentUid === currentUser.uid) { // ดึงเฉพาะเคสตัวเอง
-                            let badge = c.status === 'draft' ? '<span class="badge badge-draft">📝 ฉบับร่าง</span>' : c.status === 'pending' ? '<span class="badge badge-pending">⏳ รอตรวจ</span>' : c.status === 'returned' ? '<span class="badge badge-returned">⚠️ ส่งแก้</span>' : '<span class="badge badge-approved">✅ ผ่านแล้ว</span>';
-                            let actionBtns = "";
-                            // ถ้าเป็นร่าง หรือ ส่งแก้ ให้ปุ่ม "แก้ไข"
-                            if (c.status === 'draft' || c.status === 'returned') {
-                                actionBtns = `<button onclick='editDraft(${JSON.stringify(c)}, "${dep}", "${cid}")' class="mt-2 text-[10px] font-bold text-blue-500 bg-blue-50 px-3 py-1.5 rounded-lg border border-blue-100 hover:bg-blue-100"><i class="fa-solid fa-pen"></i> แก้ไขข้อมูล & ส่งตรวจ</button>`;
-                            }
-                            let remarkAlert = c.status === 'returned' && c.remark ? `<div class="mt-2 text-[9px] text-red-600 bg-red-50 p-1.5 rounded border border-red-100"><b>หมายเหตุจากอาจารย์:</b> ${c.remark}</div>` : "";
+                        if (c.studentUid === currentUser.uid) {
+                            let badge = c.status === 'draft' ? '<span class="badge badge-draft">📝 ร่าง</span>' : c.status === 'pending' ? '<span class="badge badge-pending">⏳ รอตรวจ</span>' : c.status === 'returned' ? '<span class="badge badge-returned">⚠️ ส่งแก้</span>' : '<span class="badge badge-approved">✅ ผ่านแล้ว</span>';
+                            let actionBtns = (c.status === 'draft' || c.status === 'returned') ? `<button onclick='editDraft(${JSON.stringify(c)}, "${dep}", "${cid}")' class="mt-3 text-[11px] font-extrabold text-blue-600 bg-blue-50 px-4 py-2 rounded-xl border border-blue-200 hover:bg-blue-100 transition"><i class="fa-solid fa-pen"></i> แก้ไขข้อมูล & ส่งตรวจ</button>` : "";
+                            let remarkAlert = c.status === 'returned' && c.remark ? `<div class="mt-3 text-[11px] text-rose-700 bg-rose-50 p-2.5 rounded-xl border border-rose-200"><b>หมายเหตุ:</b> ${c.remark}</div>` : "";
+                            let instImgBtn = (c.instructorImageUrl && c.instructorImageUrl !== "-") ? `<a href="${c.instructorImageUrl}" target="_blank" class="mt-3 ml-2 inline-block text-[11px] font-extrabold text-orange-600 bg-orange-50 px-3 py-2 rounded-xl border border-orange-200 hover:bg-orange-100 transition"><i class="fa-solid fa-image"></i> รูปจากอาจารย์</a>` : "";
+                            let myImgBtn = (c.imageUrl && c.imageUrl !== "-") ? `<a href="${c.imageUrl}" target="_blank" class="mt-3 inline-block text-[11px] font-extrabold text-emerald-600 bg-emerald-50 px-3 py-2 rounded-xl border border-emerald-200 hover:bg-emerald-100 transition"><i class="fa-solid fa-image"></i> รูปของคุณ</a>` : "";
 
-                            html += `
-                                <div class="bg-white p-4 rounded-[1rem] shadow-sm border border-gray-100">
-                                    <div class="flex justify-between items-start mb-1">
-                                        <p class="text-[12px] font-extrabold text-gray-800">HN: ${c.hn} <span class="text-gray-400 font-normal ml-1">(${c.date})</span></p>
-                                        ${badge}
-                                    </div>
-                                    <p class="text-[11px] font-bold text-gray-600">${c.patientName}</p>
-                                    <p class="text-[10px] text-gray-500 mt-1 truncate">📌 ${c.diseaseName || 'ผดุงครรภ์'}</p>
-                                    ${remarkAlert}
-                                    ${actionBtns}
-                                </div>`;
+                            html += `<div class="bg-white p-5 rounded-[1.5rem] shadow-sm border border-slate-100"><div class="flex justify-between items-start mb-2"><p class="text-[14px] font-extrabold text-slate-900">HN: ${c.hn} <span class="text-slate-500 font-bold ml-1 text-[11px]">(${c.date})</span></p>${badge}</div><p class="text-[13px] font-extrabold text-slate-700">${c.patientName}</p><p class="text-[11px] font-bold text-slate-500 mt-1 truncate">📌 ${c.diseaseName || 'ผดุงครรภ์'}</p>${remarkAlert}<div class="flex flex-wrap items-center mt-1">${myImgBtn}${instImgBtn}</div>${actionBtns}</div>`;
                         }
                     }
                 }
-                container.innerHTML = html || '<p class="text-center text-xs text-gray-400 py-6">ยังไม่มีเคสที่บันทึกไว้ครับ</p>';
-            } catch(e) { container.innerHTML = '<p class="text-center text-xs text-red-400">โหลดข้อมูลล้มเหลว</p>'; }
+                container.innerHTML = html || '<p class="text-center text-[13px] font-bold text-slate-500 py-10">ยังไม่มีเคสที่บันทึกไว้ครับ</p>';
+            } catch(e) { container.innerHTML = '<p class="text-center text-[13px] font-bold text-red-500 py-10">โหลดข้อมูลล้มเหลว</p>'; }
         }
 
         function editDraft(data, dep, cid) {
-            currentEditCaseId = cid; window.tempImageUrl = data.imageUrl; // จำรููปเก่าไว้
-            switchMainView('forms'); switchForm(dep); document.getElementById('edit-banner').classList.remove('hidden');
-            
-            // นำข้อมูลกลับมาใส่ฟอร์ม
-            let pre = dep === 'massage' ? 'msg' : dep === 'midwifery' ? 'mid' : 'med';
-            document.getElementById(`${pre}_date`).value = data.date; document.getElementById(`${pre}_hn`).value = data.hn; document.getElementById(`${pre}_patientName`).value = data.patientName;
+            currentEditCaseId = cid; window.tempImageUrl = data.imageUrl; switchMainView('forms'); switchForm(dep); document.getElementById('edit-banner').classList.remove('hidden');
+            let pre = dep === 'massage' ? 'msg' : dep === 'midwifery' ? 'mid' : 'med'; document.getElementById(`${pre}_date`).value = data.date; document.getElementById(`${pre}_hn`).value = data.hn; document.getElementById(`${pre}_patientName`).value = data.patientName;
             if(dep === 'massage') { document.getElementById('msg_caseType').value = data.caseType; document.getElementById('msg_diseaseCategory').value = data.diseaseCategory; document.getElementById('msg_diseaseName').value = data.diseaseName; }
             if(dep === 'medicine') { document.getElementById('med_diseaseName').value = data.diseaseName; }
-            
-            // เลือกอาจารย์ให้เหมือนเดิม
-            const radios = document.getElementsByName(`instructor_${dep}`);
-            for(let i=0; i<radios.length; i++){ if(radios[i].value === data.instructorUid) radios[i].checked = true; }
+            const radios = document.getElementsByName(`instructor_${dep}`); for(let i=0; i<radios.length; i++) if(radios[i].value === data.instructorUid) radios[i].checked = true;
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        function cancelEdit() {
-            currentEditCaseId = null; window.tempImageUrl = null;
-            document.getElementById('edit-banner').classList.add('hidden');
-            document.getElementById('formObj-massage').reset(); document.getElementById('formObj-midwifery').reset(); document.getElementById('formObj-medicine').reset();
-            const today = new Date(); document.getElementById('msg_date').valueAsDate = today; document.getElementById('mid_date').valueAsDate = today; document.getElementById('med_date').valueAsDate = today;
-        }
+        function cancelEdit() { currentEditCaseId = null; window.tempImageUrl = null; document.getElementById('edit-banner').classList.add('hidden'); document.getElementById('formObj-massage').reset(); document.getElementById('formObj-midwifery').reset(); document.getElementById('formObj-medicine').reset(); const today = new Date(); document.getElementById('msg_date').valueAsDate = today; document.getElementById('mid_date').valueAsDate = today; document.getElementById('med_date').valueAsDate = today; }
 
-        // ================= 3. วิว: กระดานเคสรวม (Global Feed) =================
         async function loadGlobalFeed() {
-            const container = document.getElementById('feed-container');
-            container.innerHTML = '<p class="text-center text-xs text-gray-400 py-6"><i class="fa-solid fa-spinner fa-spin"></i> กำลังโหลดเคสรวม...</p>';
+            const container = document.getElementById('feed-container'); container.innerHTML = '<p class="text-center text-[13px] font-bold text-slate-500 py-10"><i class="fa-solid fa-spinner fa-spin text-xl mb-2 block"></i> กำลังโหลดเคสรวม...</p>';
             try {
                 let html = ""; const deps = ['massage', 'midwifery', 'medicine']; let allCases = [];
-                for (let dep of deps) {
-                    const res = await fetch(`${FIREBASE_URL}cases/${dep}.json?auth=${FIREBASE_SECRET}`);
-                    const cases = await res.json();
-                    for (let cid in cases) { allCases.push({...cases[cid], depName: dep}); }
-                }
-                // เรียงตามวันที่ล่าสุด
+                for (let dep of deps) { const res = await fetch(`${FIREBASE_URL}cases/${dep}.json?auth=${FIREBASE_SECRET}`); const cases = await res.json(); for (let cid in cases) { if(cases[cid].status !== 'draft') allCases.push({...cases[cid], depName: dep}); } }
                 allCases.sort((a,b) => b.timestamp - a.timestamp);
-                
-                allCases.forEach(c => {
-                    let badge = c.status === 'draft' ? '📝 ร่าง' : c.status === 'pending' ? '⏳ รอตรวจ' : c.status === 'returned' ? '⚠️ แก้ไข' : '✅ ผ่าน';
-                    html += `
-                        <div class="feed-card bg-white p-4 rounded-[1rem] shadow-sm border border-gray-100">
-                            <div class="flex justify-between items-start mb-1">
-                                <p class="text-[12px] font-extrabold text-gray-800">HN: <span class="search-target">${c.hn}</span></p>
-                                <span class="text-[9px] font-bold text-gray-400">${badge}</span>
-                            </div>
-                            <p class="text-[11px] font-bold text-gray-600 search-target">${c.patientName}</p>
-                            <div class="flex justify-between items-end mt-2">
-                                <p class="text-[10px] text-gray-500 truncate w-2/3 search-target">📌 ${c.diseaseName || 'ผดุงครรภ์'}</p>
-                                <p class="text-[9px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded">นศ. ${c.studentName.split(' ')[0]}</p>
-                            </div>
-                        </div>`;
-                });
-                container.innerHTML = html || '<p class="text-center text-xs text-gray-400 py-6">ยังไม่มีเคสในระบบ</p>';
-            } catch(e) { container.innerHTML = '<p class="text-center text-xs text-red-400">โหลดข้อมูลล้มเหลว</p>'; }
+                allCases.forEach(c => { let badge = c.status === 'pending' ? '⏳ รอตรวจ' : c.status === 'returned' ? '⚠️ แก้ไข' : '✅ ผ่าน'; html += `<div class="feed-card bg-white p-5 rounded-[1.5rem] shadow-sm border border-slate-100"><div class="flex justify-between items-start mb-2"><p class="text-[14px] font-extrabold text-slate-900">HN: <span class="search-target">${c.hn}</span></p><span class="text-[10px] font-bold text-slate-500">${badge}</span></div><p class="text-[13px] font-extrabold text-slate-700 search-target">${c.patientName}</p><div class="flex justify-between items-end mt-3"><p class="text-[11px] font-bold text-slate-500 truncate w-2/3 search-target">📌 ${c.diseaseName || 'ผดุงครรภ์'}</p><p class="text-[10px] font-extrabold text-emerald-700 bg-emerald-100 px-3 py-1 rounded-xl">นศ. ${c.studentName.split(' ')[0]}</p></div></div>`; });
+                container.innerHTML = html || '<p class="text-center text-[13px] font-bold text-slate-500 py-10">ยังไม่มีเคสในระบบ</p>';
+            } catch(e) {}
         }
+        function filterFeed() { let input = document.getElementById('feed-search').value.toLowerCase(); let cards = document.getElementsByClassName('feed-card'); for (let i = 0; i < cards.length; i++) cards[i].style.display = cards[i].innerText.toLowerCase().includes(input) ? "" : "none"; }
 
-        function filterFeed() {
-            let input = document.getElementById('feed-search').value.toLowerCase();
-            let cards = document.getElementsByClassName('feed-card');
-            for (let i = 0; i < cards.length; i++) {
-                let text = cards[i].innerText.toLowerCase();
-                cards[i].style.display = text.includes(input) ? "" : "none";
-            }
-        }
-
-        // ================= 4. วิว: แดชบอร์ด (สถิติ & ตรวจเคส) =================
+        // ================= Dashboard อาจารย์ (มี Filter) =================
         async function loadDashboardData() {
-            const pendingContainer = document.getElementById('pending-cases-container');
-            const statsContainer = document.getElementById('student-stats-container');
-            const rankContainer = document.getElementById('disease-rank-container');
-            if(currentUser.role === 'instructor') pendingContainer.innerHTML = '<p class="text-center text-xs text-gray-400 py-6"><i class="fa-solid fa-spinner fa-spin"></i> กำลังดึงเคส...</p>';
-            statsContainer.innerHTML = '<p class="text-center text-xs text-gray-400 py-6"><i class="fa-solid fa-spinner fa-spin"></i> กำลังโหลดข้อมูล...</p>';
+            const statsContainer = document.getElementById('student-stats-container'); const rankContainer = document.getElementById('disease-rank-container');
+            statsContainer.innerHTML = '<p class="text-center text-[13px] font-bold text-slate-500 py-6"><i class="fa-solid fa-spinner fa-spin text-xl mb-2 block"></i> กำลังโหลดข้อมูล...</p>';
             
             try {
-                // ส่วนที่ 1: เคสรอตรวจ (โหลดเฉพาะอาจารย์)
                 if (currentUser.role === 'instructor') {
-                    let pendingHtml = ""; const deps = ['massage', 'midwifery', 'medicine'];
+                    document.getElementById('instructor-cases-container').innerHTML = '<p class="text-center text-[13px] font-bold text-slate-500 py-6"><i class="fa-solid fa-spinner fa-spin text-xl mb-2 block"></i> ดึงข้อมูลเคส...</p>';
+                    allInstructorCases = []; const deps = ['massage', 'midwifery', 'medicine']; let studentSet = new Set();
+                    
                     for (let dep of deps) {
-                        const res = await fetch(`${FIREBASE_URL}cases/${dep}.json?auth=${FIREBASE_SECRET}`);
-                        const cases = await res.json();
-                        for (let caseId in cases) {
-                            const c = cases[caseId];
-                            if (c.status === 'pending' && c.instructorUid === currentUser.uid) {
-                                let imageBtn = (c.imageUrl && c.imageUrl !== "-") ? `<a href="${c.imageUrl}" target="_blank" class="inline-block mt-2 text-[9px] font-bold bg-gray-800 text-white px-2 py-1 rounded"><i class="fa-solid fa-image"></i> ดูหลักฐาน</a>` : "";
-                                pendingHtml += `
-                                    <div class="bg-white p-4 rounded-[1.25rem] shadow-sm border border-gray-100" id="card_${caseId}">
-                                        <div class="flex justify-between items-start mb-2"><p class="text-[12px] font-extrabold text-gray-800">${c.studentName}</p><p class="text-[10px] text-gray-500">HN: ${c.hn}</p></div>
-                                        <div class="bg-gray-50 p-2.5 rounded-xl border border-gray-100 mb-3"><p class="text-[11px] font-bold text-gray-700">📌 ${c.diseaseName || 'ดูรายละเอียดในกระดาษ'}</p>${imageBtn}</div>
-                                        <div class="flex gap-2">
-                                            <button onclick="judgeCase('${dep}', '${caseId}', 'approved')" class="btn-glow btn-primary flex-1 text-[10px] font-bold py-2 rounded-xl"><i class="fa-solid fa-check"></i> ผ่าน</button>
-                                            <button onclick="judgeCase('${dep}', '${caseId}', 'returned')" class="btn-glow bg-amber-400 text-white flex-1 text-[10px] font-bold py-2 rounded-xl"><i class="fa-solid fa-rotate-left"></i> ส่งแก้</button>
-                                            <button onclick="judgeCase('${dep}', '${caseId}', 'rejected')" class="btn-glow bg-rose-500 text-white flex-1 text-[10px] font-bold py-2 rounded-xl"><i class="fa-solid fa-xmark"></i> ปฏิเสธ</button>
-                                        </div>
-                                    </div>`;
+                        const res = await fetch(`${FIREBASE_URL}cases/${dep}.json?auth=${FIREBASE_SECRET}`); const cases = await res.json();
+                        for (let cid in cases) {
+                            if (cases[cid].instructorUid === currentUser.uid && cases[cid].status !== 'draft') {
+                                allInstructorCases.push({...cases[cid], caseId: cid, depName: dep});
+                                studentSet.add(JSON.stringify({uid: cases[cid].studentUid, name: cases[cid].studentName.split(' ')[0]}));
                             }
                         }
                     }
-                    pendingContainer.innerHTML = pendingHtml || '<p class="text-center text-xs text-gray-400 py-6">ไม่มีเคสรอตรวจครับ 🎉</p>';
+                    allInstructorCases.sort((a,b) => b.timestamp - a.timestamp); 
+
+                    let stdHtml = `<button class="filter-pill ${currentStudentFilter === 'all' ? 'active-std' : ''}" onclick="setStudentFilter('all')" id="btn-std-all">รวมทุกคน</button>`;
+                    Array.from(studentSet).forEach(sStr => { const s = JSON.parse(sStr); stdHtml += `<button class="filter-pill ${currentStudentFilter === s.uid ? 'active-std' : ''}" onclick="setStudentFilter('${s.uid}')" id="btn-std-${s.uid}">นศ. ${s.name}</button>`; });
+                    document.getElementById('filter-students').innerHTML = stdHtml;
+                    renderInstructorCases();
                 }
 
-                // ส่วนที่ 2: สถิตินักศึกษา
-                const usersRes = await fetch(`${FIREBASE_URL}users.json?auth=${FIREBASE_SECRET}`);
-                const users = await usersRes.json();
-                let statsHtml = "";
+                // สถิติ
+                const usersRes = await fetch(`${FIREBASE_URL}users.json?auth=${FIREBASE_SECRET}`); const users = await usersRes.json(); let statsHtml = "";
                 for (const uid in users) {
                     if (users[uid].role === 'student' && users[uid].isActive) {
-                        const st = users[uid].stats || {};
-                        const msgTotal = (st.massage_new || 0) + (st.massage_followup || 0);
-                        const midTotal = (st.midwifery || 0); const medTotal = (st.medicine_general || 0) + (st.medicine_ncd || 0);
-                        
-                        // ไฮไลท์การ์ดถ้าเป็นตัวเอง
-                        let isMe = uid === currentUser.uid ? 'border-2 border-emerald-400 bg-emerald-50/30' : 'border border-gray-100 bg-white';
-                        statsHtml += `
-                            <div class="${isMe} p-4 rounded-[1.5rem] shadow-sm">
-                                <div class="flex items-center gap-3 mb-3"><img src="${users[uid].picUrl}" class="w-8 h-8 rounded-full border border-gray-200"><p class="text-[12px] font-extrabold text-gray-800">${users[uid].fullName}</p></div>
-                                <div class="space-y-3">
-                                    <div><div class="flex justify-between text-[9px] text-gray-500 font-bold mb-1"><span>นวดไทย (60)</span><span class="text-emerald-500">${msgTotal}/60</span></div><div class="w-full bg-gray-200 rounded-full h-1.5"><div class="bg-emerald-400 h-1.5 rounded-full" style="width: ${Math.min((msgTotal/60)*100, 100)}%"></div></div></div>
-                                    <div><div class="flex justify-between text-[9px] text-gray-500 font-bold mb-1"><span>ผดุงครรภ์ (10)</span><span class="text-rose-500">${midTotal}/10</span></div><div class="w-full bg-gray-200 rounded-full h-1.5"><div class="bg-rose-400 h-1.5 rounded-full" style="width: ${Math.min((midTotal/10)*100, 100)}%"></div></div></div>
-                                    <div><div class="flex justify-between text-[9px] text-gray-500 font-bold mb-1"><span>เวชกรรม (20)</span><span class="text-blue-500">${medTotal}/20</span></div><div class="w-full bg-gray-200 rounded-full h-1.5"><div class="bg-blue-400 h-1.5 rounded-full" style="width: ${Math.min((medTotal/20)*100, 100)}%"></div></div></div>
-                                </div>
-                            </div>`;
+                        const st = users[uid].stats || {}; const msgTotal = (st.massage_new || 0) + (st.massage_followup || 0); const midTotal = (st.midwifery || 0); const medTotal = (st.medicine_general || 0) + (st.medicine_ncd || 0);
+                        let isMe = uid === currentUser.uid ? 'border-[2.5px] border-indigo-400 bg-indigo-50/50 shadow-md' : 'border border-slate-100 bg-white shadow-sm';
+                        statsHtml += `<div class="${isMe} p-5 rounded-[1.5rem]"><div class="flex items-center gap-3 mb-4"><img src="${users[uid].picUrl}" class="w-10 h-10 rounded-full border border-slate-200"><p class="text-[14px] font-extrabold text-slate-900">${users[uid].fullName}</p></div><div class="space-y-4"><div><div class="flex justify-between text-[11px] text-slate-600 font-extrabold mb-1.5 uppercase tracking-wide"><span>นวดไทย (60)</span><span class="text-emerald-600">${msgTotal}/60</span></div><div class="w-full bg-slate-100 rounded-full h-2 shadow-inner"><div class="bg-gradient-to-r from-emerald-400 to-emerald-600 h-2 rounded-full shadow-sm" style="width: ${Math.min((msgTotal/60)*100, 100)}%"></div></div></div><div><div class="flex justify-between text-[11px] text-slate-600 font-extrabold mb-1.5 uppercase tracking-wide"><span>ผดุงครรภ์ (10)</span><span class="text-rose-600">${midTotal}/10</span></div><div class="w-full bg-slate-100 rounded-full h-2 shadow-inner"><div class="bg-gradient-to-r from-rose-400 to-rose-600 h-2 rounded-full shadow-sm" style="width: ${Math.min((midTotal/10)*100, 100)}%"></div></div></div><div><div class="flex justify-between text-[11px] text-slate-600 font-extrabold mb-1.5 uppercase tracking-wide"><span>เวชกรรม (20)</span><span class="text-blue-600">${medTotal}/20</span></div><div class="w-full bg-slate-100 rounded-full h-2 shadow-inner"><div class="bg-gradient-to-r from-blue-400 to-blue-600 h-2 rounded-full shadow-sm" style="width: ${Math.min((medTotal/20)*100, 100)}%"></div></div></div></div></div>`;
                     }
                 }
-                statsContainer.innerHTML = statsHtml || '<p class="text-center text-xs text-gray-400">ยังไม่มีข้อมูล</p>';
-
-                // ส่วนที่ 3: RANK โรคยอดฮิต
-                let diseaseCount = {};
-                for (let dep of ['massage', 'medicine']) {
-                    const caseRes = await fetch(`${FIREBASE_URL}cases/${dep}.json?auth=${FIREBASE_SECRET}`);
-                    const allCases = await caseRes.json();
-                    for (let cid in allCases) if (allCases[cid].status === 'approved' && allCases[cid].diseaseName) diseaseCount[allCases[cid].diseaseName] = (diseaseCount[allCases[cid].diseaseName] || 0) + 1;
-                }
-                const sortedRank = Object.entries(diseaseCount).sort((a, b) => b[1] - a[1]).slice(0, 5); // เอา 5 อันดับแรกพอ
-                if (sortedRank.length > 0) {
-                    let rankHtml = '<ul class="space-y-3">';
-                    sortedRank.forEach((item, index) => {
-                        let m = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `<span class="px-1.5 rounded text-[9px] bg-gray-100">${index+1}</span>`;
-                        rankHtml += `<li class="flex justify-between items-center text-[11px] border-b border-gray-100 pb-2"><div class="flex items-center gap-2 truncate w-3/4">${m}<span class="truncate font-bold text-gray-700">${item[0]}</span></div><span class="font-extrabold text-teal-600 bg-teal-50 px-2 py-0.5 rounded-lg">${item[1]}</span></li>`;
-                    });
-                    rankContainer.innerHTML = rankHtml + '</ul>';
-                } else rankContainer.innerHTML = '<p class="text-center text-xs text-gray-400 py-4">ยังไม่มีข้อมูล</p>';
-
-            } catch(e) { console.error(e); }
+                statsContainer.innerHTML = statsHtml || '<p class="text-center text-[13px] font-bold text-slate-500 py-6">ยังไม่มีข้อมูล</p>';
+                
+                let diseaseCount = {}; for (let dep of ['massage', 'medicine']) { const caseRes = await fetch(`${FIREBASE_URL}cases/${dep}.json?auth=${FIREBASE_SECRET}`); const allCases = await caseRes.json(); for (let cid in allCases) if (allCases[cid].status === 'approved' && allCases[cid].diseaseName) diseaseCount[allCases[cid].diseaseName] = (diseaseCount[allCases[cid].diseaseName] || 0) + 1; }
+                const sortedRank = Object.entries(diseaseCount).sort((a, b) => b[1] - a[1]).slice(0, 5);
+                if (sortedRank.length > 0) { let rankHtml = '<ul class="space-y-4">'; sortedRank.forEach((item, index) => { let m = index === 0 ? '<span class="text-2xl drop-shadow-md">🥇</span>' : index === 1 ? '<span class="text-2xl drop-shadow-md">🥈</span>' : index === 2 ? '<span class="text-2xl drop-shadow-md">🥉</span>' : `<span class="w-8 h-8 flex items-center justify-center bg-slate-100 rounded-full text-[12px] font-extrabold text-slate-500 shadow-inner">${index+1}</span>`; rankHtml += `<li class="flex justify-between items-center text-[13px] border-b border-slate-100 pb-3 last:border-0 last:pb-0"><div class="flex items-center gap-3 truncate w-3/4">${m}<span class="truncate font-extrabold text-slate-800">${item[0]}</span></div><span class="font-extrabold text-teal-700 bg-teal-50 px-3 py-1.5 rounded-xl border border-teal-100">${item[1]}</span></li>`; }); rankContainer.innerHTML = rankHtml + '</ul>'; } else rankContainer.innerHTML = '<p class="text-center text-[13px] font-bold text-slate-500 py-6">ยังไม่มีข้อมูล</p>';
+            } catch(e) {}
         }
 
-        async function judgeCase(department, caseId, status) {
-            let remark = "";
-            if (status !== 'approved') { remark = prompt("ระบุหมายเหตุ (สาเหตุที่ส่งคืน/ปฏิเสธ):"); if (remark === null) return; }
-            document.getElementById(`card_${caseId}`).style.opacity = '0.3';
+        function setStatusFilter(status) {
+            currentStatusFilter = status;
+            document.getElementById('btn-stat-pending').className = `filter-pill ${status === 'pending' ? 'active-pending' : ''}`;
+            document.getElementById('btn-stat-approved').className = `filter-pill ${status === 'approved' ? 'active-approved' : ''}`;
+            document.getElementById('btn-stat-returned').className = `filter-pill ${status === 'returned' ? 'active-returned' : ''}`;
+            renderInstructorCases();
+        }
+
+        function setStudentFilter(uid) {
+            currentStudentFilter = uid;
+            document.querySelectorAll('#filter-students .filter-pill').forEach(btn => btn.classList.remove('active-std'));
+            document.getElementById(`btn-std-${uid}`).classList.add('active-std');
+            renderInstructorCases();
+        }
+
+        function renderInstructorCases() {
+            const container = document.getElementById('instructor-cases-container'); let html = "";
+            const filtered = allInstructorCases.filter(c => c.status === currentStatusFilter && (currentStudentFilter === 'all' || c.studentUid === currentStudentFilter));
+            
+            filtered.forEach(c => {
+                let imageBtn = (c.imageUrl && c.imageUrl !== "-") ? `<a href="${c.imageUrl}" target="_blank" class="inline-block mt-2 text-[11px] font-extrabold bg-slate-800 text-white px-3 py-1.5 rounded-xl hover:bg-slate-700 transition"><i class="fa-solid fa-image"></i> รูปจาก นศ.</a>` : "";
+                let buttons = ""; let remarkTxt = "";
+                
+                if (c.status === 'pending') {
+                    buttons = `<div class="flex gap-3"><button onclick="judgeCase('${c.depName}', '${c.caseId}', 'approved')" class="btn-glow bg-emerald-500 text-white flex-1 text-[12px] font-extrabold py-3 rounded-xl shadow-lg shadow-emerald-500/30"><i class="fa-solid fa-check text-lg mb-1 block"></i> ผ่าน</button><button onclick="judgeCase('${c.depName}', '${c.caseId}', 'returned')" class="btn-glow bg-amber-500 text-white flex-1 text-[12px] font-extrabold py-3 rounded-xl shadow-lg shadow-amber-500/30"><i class="fa-solid fa-rotate-left text-lg mb-1 block"></i> ส่งแก้</button><button onclick="judgeCase('${c.depName}', '${c.caseId}', 'rejected')" class="btn-glow bg-rose-600 text-white flex-1 text-[12px] font-extrabold py-3 rounded-xl shadow-lg shadow-rose-600/30"><i class="fa-solid fa-xmark text-lg mb-1 block"></i> ปฏิเสธ</button></div>`;
+                } else if (c.status === 'returned' && c.remark) {
+                    remarkTxt = `<p class="text-[11px] text-rose-700 bg-rose-50 p-2.5 rounded-xl border border-rose-200 mt-3"><b>หมายเหตุ:</b> ${c.remark}</p>`;
+                }
+                
+                html += `<div class="bg-white p-5 rounded-[1.5rem] shadow-sm border border-slate-100 mb-4" id="card_${c.caseId}"><div class="flex justify-between items-start mb-3"><p class="text-[14px] font-extrabold text-slate-900">${c.studentName}</p><p class="text-[11px] font-bold text-slate-500">HN: ${c.hn}</p></div><div class="bg-slate-50 p-4 rounded-[1.25rem] border border-slate-100 mb-4"><p class="text-[13px] font-extrabold text-slate-700">📌 ${c.diseaseName || 'หมวด: ' + c.depName}</p>${imageBtn}${remarkTxt}</div>${buttons}</div>`;
+            });
+            container.innerHTML = html || `<p class="text-center text-[13px] font-bold text-slate-500 py-6">ไม่มีข้อมูลในหมวดนี้ครับ</p>`;
+        }
+
+        let pendingJudgeData = null; 
+        function judgeCase(department, caseId, status) {
+            pendingJudgeData = { department, caseId, status }; document.getElementById('judge-remark').value = ""; document.getElementById('judge-image').value = ""; document.getElementById('judge-modal').classList.remove('hidden');
+            const title = document.getElementById('judge-title');
+            if(status === 'approved') { title.innerHTML = '<i class="fa-solid fa-check-circle text-xl align-middle"></i> อนุมัติผ่านเคสนี้'; title.parentElement.className = 'bg-gradient-to-r from-emerald-500 to-teal-600 p-5 text-center'; }
+            else if(status === 'returned') { title.innerHTML = '<i class="fa-solid fa-rotate-left text-xl align-middle"></i> ส่งกลับให้แก้ไข'; title.parentElement.className = 'bg-gradient-to-r from-amber-500 to-orange-500 p-5 text-center'; }
+            else { title.innerHTML = '<i class="fa-solid fa-xmark-circle text-xl align-middle"></i> ปฏิเสธเคสนี้'; title.parentElement.className = 'bg-gradient-to-r from-red-600 to-rose-700 p-5 text-center'; }
+            document.getElementById('judge-submit-btn').onclick = submitJudgeResult;
+        }
+
+        function closeJudgeModal() { document.getElementById('judge-modal').classList.add('hidden'); pendingJudgeData = null; }
+
+        async function submitJudgeResult() {
+            if (!pendingJudgeData) return; const { department, caseId, status } = pendingJudgeData; const remark = document.getElementById('judge-remark').value; const fileInput = document.getElementById('judge-image');
+            const btn = document.getElementById('judge-submit-btn'); const originalText = btn.innerHTML; btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin text-lg"></i> กำลังบันทึก...`; btn.disabled = true;
             try {
-                const payload = { action: "updateCaseStatus", department: department, caseId: caseId, status: status, remark: remark, instructorUid: currentUser.uid };
-                const res = await fetch(GAS_WEBAPP_URL, { method: 'POST', body: JSON.stringify(payload) });
-                const result = await res.json();
-                if (result.success) { document.getElementById(`card_${caseId}`).remove(); if (status === 'approved') loadDashboardData(); } 
-                else { alert(result.message); document.getElementById(`card_${caseId}`).style.opacity = '1'; }
-            } catch (err) { alert("Error"); document.getElementById(`card_${caseId}`).style.opacity = '1'; }
+                let base64String = ""; let mimeType = ""; let fileName = "";
+                if (fileInput.files.length > 0) { const file = fileInput.files[0]; if (file.size > 5 * 1024 * 1024) { alert("⚠️ รูปใหญ่เกิน 5MB"); btn.innerHTML = originalText; btn.disabled = false; return; } fileName = `INSTRUCTOR_${department}_${Date.now()}_${file.name}`; mimeType = file.type; base64String = await new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(r.result.split(',')[1]); r.onerror = e => rej(e); r.readAsDataURL(file); }); }
+                const payload = { action: "updateCaseStatus", department: department, caseId: caseId, status: status, remark: remark, instructorUid: currentUser.uid, imageB64: base64String, imageMimeType: mimeType, imageName: fileName };
+                const res = await fetch(GAS_WEBAPP_URL, { method: 'POST', body: JSON.stringify(payload) }); const result = await res.json();
+                if (result.success) { 
+                    closeJudgeModal(); 
+                    const caseIndex = allInstructorCases.findIndex(c => c.caseId === caseId);
+                    if(caseIndex > -1) { allInstructorCases[caseIndex].status = status; allInstructorCases[caseIndex].remark = remark; }
+                    renderInstructorCases(); 
+                } else alert(result.message);
+            } catch (err) { alert("เกิดข้อผิดพลาด"); } finally { btn.innerHTML = originalText; btn.disabled = false; }
         }
     </script>
 </body>
