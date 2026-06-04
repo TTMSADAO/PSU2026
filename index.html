@@ -406,7 +406,17 @@
                         const c = cases[caseId=cid];
                         if (c.studentUid === currentUser.uid) {
                             let badge = c.status === 'draft' ? '<span class="badge badge-draft">📝 ร่าง</span>' : c.status === 'pending' ? '<span class="badge badge-pending">⏳ รอตรวจ</span>' : c.status === 'returned' ? '<span class="badge badge-returned">⚠️ ส่งแก้</span>' : '<span class="badge badge-approved">✅ ผ่านแล้ว</span>';
-                            let actionBtns = (c.status === 'draft' || c.status === 'returned') ? `<button onclick='editDraft(${JSON.stringify(c)}, "${dep}", "${cid}")' class="mt-3 text-[11px] font-extrabold text-blue-600 bg-blue-50 px-4 py-2 rounded-xl border border-blue-200 hover:bg-blue-100 transition"><i class="fa-solid fa-pen"></i> แก้ไขข้อมูล & ส่งตรวจ</button>` : "";
+                            
+                            // 🌟 แก้ไขตรงนี้: เพิ่มปุ่มถังขยะสีแดง เข้าไปข้างๆ ปุ่มแก้ไข
+                            let actionBtns = "";
+                            if (c.status === 'draft' || c.status === 'returned') {
+                                actionBtns = `
+                                <div class="flex gap-2 mt-4">
+                                    <button onclick='editDraft(${JSON.stringify(c)}, "${dep}", "${cid}")' class="flex-1 text-[11px] font-extrabold text-blue-600 bg-blue-50 px-4 py-2.5 rounded-xl border border-blue-200 hover:bg-blue-100 transition"><i class="fa-solid fa-pen"></i> แก้ไข & ส่งตรวจ</button>
+                                    <button onclick='deleteCaseData("${dep}", "${cid}")' class="text-[11px] font-extrabold text-rose-600 bg-rose-50 px-4 py-2.5 rounded-xl border border-rose-200 hover:bg-rose-100 transition shadow-sm"><i class="fa-solid fa-trash"></i> ลบ</button>
+                                </div>`;
+                            }
+                            
                             let remarkAlert = c.status === 'returned' && c.remark ? `<div class="mt-3 text-[11px] text-rose-700 bg-rose-50 p-2.5 rounded-xl border border-rose-200"><b>หมายเหตุ:</b> ${c.remark}</div>` : "";
                             let instImgBtn = (c.instructorImageUrl && c.instructorImageUrl !== "-") ? `<a href="${c.instructorImageUrl}" target="_blank" class="mt-3 ml-2 inline-block text-[11px] font-extrabold text-orange-600 bg-orange-50 px-3 py-2 rounded-xl border border-orange-200 hover:bg-orange-100 transition"><i class="fa-solid fa-image"></i> รูปจากอาจารย์</a>` : "";
                             let myImgBtn = (c.imageUrl && c.imageUrl !== "-") ? `<a href="${c.imageUrl}" target="_blank" class="mt-3 inline-block text-[11px] font-extrabold text-emerald-600 bg-emerald-50 px-3 py-2 rounded-xl border border-emerald-200 hover:bg-emerald-100 transition"><i class="fa-solid fa-image"></i> รูปของคุณ</a>` : "";
@@ -418,7 +428,6 @@
                 container.innerHTML = html || '<p class="text-center text-[13px] font-bold text-slate-500 py-10">ยังไม่มีเคสที่บันทึกไว้ครับ</p>';
             } catch(e) { container.innerHTML = '<p class="text-center text-[13px] font-bold text-red-500 py-10">โหลดข้อมูลล้มเหลว</p>'; }
         }
-
         function editDraft(data, dep, cid) {
             currentEditCaseId = cid; window.tempImageUrl = data.imageUrl; switchMainView('forms'); switchForm(dep); document.getElementById('edit-banner').classList.remove('hidden');
             let pre = dep === 'massage' ? 'msg' : dep === 'midwifery' ? 'mid' : 'med'; document.getElementById(`${pre}_date`).value = data.date; document.getElementById(`${pre}_hn`).value = data.hn; document.getElementById(`${pre}_patientName`).value = data.patientName;
@@ -509,17 +518,23 @@
                 let imageBtn = (c.imageUrl && c.imageUrl !== "-") ? `<a href="${c.imageUrl}" target="_blank" class="inline-block mt-2 text-[11px] font-extrabold bg-slate-800 text-white px-3 py-1.5 rounded-xl hover:bg-slate-700 transition"><i class="fa-solid fa-image"></i> รูปจาก นศ.</a>` : "";
                 let buttons = ""; let remarkTxt = "";
                 
+                // 🌟 เพิ่มปุ่มถังขยะเล็กๆ มุมขวาบน ให้อาจารย์กดลบเคสทิ้งได้
+                let deleteIconBtn = `<button onclick="deleteCaseData('${c.depName}', '${c.caseId}')" class="absolute top-4 right-5 text-slate-300 hover:text-rose-500 transition"><i class="fa-solid fa-trash text-lg"></i></button>`;
+                
                 if (c.status === 'pending') {
                     buttons = `<div class="flex gap-3"><button onclick="judgeCase('${c.depName}', '${c.caseId}', 'approved')" class="btn-glow bg-emerald-500 text-white flex-1 text-[12px] font-extrabold py-3 rounded-xl shadow-lg shadow-emerald-500/30"><i class="fa-solid fa-check text-lg mb-1 block"></i> ผ่าน</button><button onclick="judgeCase('${c.depName}', '${c.caseId}', 'returned')" class="btn-glow bg-amber-500 text-white flex-1 text-[12px] font-extrabold py-3 rounded-xl shadow-lg shadow-amber-500/30"><i class="fa-solid fa-rotate-left text-lg mb-1 block"></i> ส่งแก้</button><button onclick="judgeCase('${c.depName}', '${c.caseId}', 'rejected')" class="btn-glow bg-rose-600 text-white flex-1 text-[12px] font-extrabold py-3 rounded-xl shadow-lg shadow-rose-600/30"><i class="fa-solid fa-xmark text-lg mb-1 block"></i> ปฏิเสธ</button></div>`;
                 } else if (c.status === 'returned' && c.remark) {
                     remarkTxt = `<p class="text-[11px] text-rose-700 bg-rose-50 p-2.5 rounded-xl border border-rose-200 mt-3"><b>หมายเหตุ:</b> ${c.remark}</p>`;
                 }
                 
-                html += `<div class="bg-white p-5 rounded-[1.5rem] shadow-sm border border-slate-100 mb-4" id="card_${c.caseId}"><div class="flex justify-between items-start mb-3"><p class="text-[14px] font-extrabold text-slate-900">${c.studentName}</p><p class="text-[11px] font-bold text-slate-500">HN: ${c.hn}</p></div><div class="bg-slate-50 p-4 rounded-[1.25rem] border border-slate-100 mb-4"><p class="text-[13px] font-extrabold text-slate-700">📌 ${c.diseaseName || 'หมวด: ' + c.depName}</p>${imageBtn}${remarkTxt}</div>${buttons}</div>`;
+                // สังเกตว่าใส่ class 'relative' เพื่อให้ปุ่มถังขยะไปอยู่มุมขวาบน
+                html += `<div class="bg-white p-5 rounded-[1.5rem] shadow-sm border border-slate-100 mb-4 relative" id="card_${c.caseId}">
+                            ${deleteIconBtn}
+                            <div class="flex justify-between items-start mb-3 pr-8"><p class="text-[14px] font-extrabold text-slate-900">${c.studentName}</p><p class="text-[11px] font-bold text-slate-500">HN: ${c.hn}</p></div><div class="bg-slate-50 p-4 rounded-[1.25rem] border border-slate-100 mb-4"><p class="text-[13px] font-extrabold text-slate-700">📌 ${c.diseaseName || 'หมวด: ' + c.depName}</p>${imageBtn}${remarkTxt}</div>${buttons}
+                         </div>`;
             });
             container.innerHTML = html || `<p class="text-center text-[13px] font-bold text-slate-500 py-6">ไม่มีข้อมูลในหมวดนี้ครับ</p>`;
         }
-
         let pendingJudgeData = null; 
         function judgeCase(department, caseId, status) {
             pendingJudgeData = { department, caseId, status }; document.getElementById('judge-remark').value = ""; document.getElementById('judge-image').value = ""; document.getElementById('judge-modal').classList.remove('hidden');
@@ -550,6 +565,43 @@
                 } else Swal.fire({ icon: 'error', title: 'ข้อผิดพลาด', text: result.message, confirmButtonColor: '#ef4444' });
             } catch (err) { Swal.fire({ icon: 'error', title: 'การเชื่อมต่อขัดข้อง', text: 'เกิดข้อผิดพลาดในการบันทึกข้อมูล', confirmButtonColor: '#ef4444' }); } 
             finally { btn.innerHTML = originalText; btn.disabled = false; }
+        }
+        // ================= ฟังก์ชันลบเคส (ล้ำสมัยด้วย SweetAlert2) =================
+        async function deleteCaseData(department, caseId) {
+            const result = await Swal.fire({
+                title: 'ยืนยันการลบเคส?',
+                text: "หากลบแล้ว ข้อมูลนี้จะหายไปจากระบบทันที!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#ef4444',
+                cancelButtonColor: '#94a3b8',
+                confirmButtonText: '<i class="fa-solid fa-trash"></i> ใช่, ลบเลย!',
+                cancelButtonText: 'ยกเลิก',
+                reverseButtons: true
+            });
+
+            if (result.isConfirmed) {
+                Swal.fire({ title: 'กำลังลบข้อมูล...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); }});
+                try {
+                    const payload = { action: "deleteCase", department: department, caseId: caseId };
+                    const res = await fetch(GAS_WEBAPP_URL, { method: 'POST', body: JSON.stringify(payload) });
+                    const resData = await res.json();
+                    
+                    if (resData.success) {
+                        Swal.fire({ icon: 'success', title: 'ลบสำเร็จ!', showConfirmButton: false, timer: 1500 });
+                        
+                        // ลบการ์ดนั้นออกจากหน้าจอทันที แบบไม่ต้องรีเฟรชหน้า
+                        const card1 = document.getElementById(`card_${caseId}`);
+                        if(card1) card1.remove();
+                        
+                        // โหลดข้อมูลในหน้านั้นๆ ใหม่เพื่อความชัวร์
+                        if(!document.getElementById('view-mycases').classList.contains('hidden')) loadMyCases();
+                        if(!document.getElementById('view-dashboard').classList.contains('hidden')) loadDashboardData();
+                        if(!document.getElementById('view-feed').classList.contains('hidden')) loadGlobalFeed();
+                        
+                    } else { Swal.fire('ข้อผิดพลาด', resData.message, 'error'); }
+                } catch(e) { Swal.fire('ข้อผิดพลาด', 'ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์', 'error'); }
+            }
         }
     </script>
 </body>
