@@ -8,7 +8,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <!-- 🌟 เพิ่ม SweetAlert2 สำหรับ Pop-up ล้ำสมัย -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script charset="utf-8" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
 
@@ -34,12 +33,10 @@
         .sub-nav-btn.active { background: white; color: #059669; box-shadow: 0 4px 15px rgba(0,0,0,0.08); transform: scale(1.02); }
         .sub-nav-btn.active-mid { color: #e11d48; } .sub-nav-btn.active-med { color: #2563eb; }
 
-        /* 🎨 ปรับปรุงแถบตัวกรอง แก้ปัญหาขอบตัดและสีกลืน */
         .filter-pill { padding: 8px 16px; border-radius: 999px; font-size: 12px; font-weight: 800; color: #475569; background: white; border: 1.5px solid #cbd5e1; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); white-space: nowrap; cursor: pointer;}
         .filter-pill.active-pending { background: #fffbeb; color: #b45309; border-color: #fbbf24; box-shadow: 0 6px 12px -2px rgba(245,158,11,0.25); transform: translateY(-3px);}
         .filter-pill.active-approved { background: #ecfdf5; color: #047857; border-color: #34d399; box-shadow: 0 6px 12px -2px rgba(16,185,129,0.25); transform: translateY(-3px);}
         .filter-pill.active-returned { background: #fef2f2; color: #be123c; border-color: #fb7185; box-shadow: 0 6px 12px -2px rgba(225,29,72,0.25); transform: translateY(-3px);}
-        /* 🟣 เปลี่ยนสีปุ่ม นศ. ให้เป็นสี Indigo สว่างๆ จะได้ไม่กลืนกับพื้น */
         .filter-pill.active-std { background: linear-gradient(135deg, #e0e7ff, #c7d2fe); color: #3730a3; border-color: #818cf8; box-shadow: 0 6px 12px -2px rgba(79, 70, 229, 0.25); transform: translateY(-3px);}
 
         .input-wow { background-color: rgba(255, 255, 255, 0.95); border: 2px solid #e2e8f0; transition: all 0.3s; border-radius: 1.25rem; font-weight: 600; color: #1e293b;}
@@ -70,14 +67,11 @@
         .badge-approved { background: #d1fae5; color: #047857; border: 1px solid #6ee7b7; }
         
         .no-scrollbar::-webkit-scrollbar { display: none; } .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-        
-        /* สไตล์สำหรับ SweetAlert2 ให้ขอบมนเข้ากับแอป */
         div:where(.swal2-container) div:where(.swal2-popup) { border-radius: 1.5rem !important; font-family: 'Prompt', sans-serif !important; }
     </style>
 </head>
 <body class="pb-32">
 
-    <!-- Header -->
     <div class="sticky top-0 z-40 px-4 py-4 flex items-center justify-between mb-4">
         <div class="flex items-center gap-3">
             <div class="w-14 h-14 bg-white rounded-[1.2rem] shadow-md border border-gray-100 flex items-center justify-center overflow-hidden p-2 transform hover:scale-105 transition">
@@ -98,13 +92,11 @@
     </div>
 
     <div class="max-w-md mx-auto px-4">
-        <!-- Banner โหมดแก้ไข -->
         <div id="edit-banner" class="hidden bg-amber-100 border border-amber-300 text-amber-900 px-5 py-3 rounded-2xl mb-5 flex justify-between items-center text-[13px] font-extrabold animate-tab shadow-sm">
             <span class="flex items-center gap-2"><i class="fa-solid fa-pen-to-square text-amber-600 text-lg"></i> โหมดแก้ไขเคส (Draft / ส่งแก้)</span>
             <button onclick="cancelEdit()" class="text-amber-600 hover:text-red-600 bg-amber-200/50 w-8 h-8 rounded-full flex items-center justify-center transition"><i class="fa-solid fa-xmark"></i></button>
         </div>
 
-        <!-- ================= VIEW 1: แบบฟอร์มส่งเคส ================= -->
         <div id="view-forms" class="hidden animate-tab">
             <div class="sub-nav">
                 <button onclick="switchForm('massage')" id="sub-massage" class="sub-nav-btn active">🌿 นวดไทย</button>
@@ -112,7 +104,6 @@
                 <button onclick="switchForm('medicine')" id="sub-medicine" class="sub-nav-btn">🩺 เวชกรรม</button>
             </div>
 
-            <!-- ฟอร์ม: นวดไทย -->
             <div id="form-massage" class="glass-card p-6 block">
                 <form onsubmit="event.preventDefault();" id="formObj-massage" class="space-y-5">
                     <div class="grid grid-cols-2 gap-4">
@@ -143,7 +134,6 @@
                 </form>
             </div>
 
-            <!-- ฟอร์ม: ผดุงครรภ์ -->
             <div id="form-midwifery" class="glass-card p-6 hidden">
                 <form onsubmit="event.preventDefault();" id="formObj-midwifery" class="space-y-5">
                     <div class="grid grid-cols-2 gap-4">
@@ -161,7 +151,6 @@
                 </form>
             </div>
 
-            <!-- ฟอร์ม: เวชกรรม -->
             <div id="form-medicine" class="glass-card p-6 hidden">
                 <form onsubmit="event.preventDefault();" id="formObj-medicine" class="space-y-5">
                     <div class="grid grid-cols-2 gap-4">
@@ -181,13 +170,11 @@
             </div>
         </div>
 
-        <!-- ================= VIEW 2: รายการของฉัน ================= -->
         <div id="view-mycases" class="hidden glass-card p-6 mb-6">
             <h2 class="font-extrabold text-slate-900 text-[18px] mb-5 flex items-center gap-3"><div class="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600"><i class="fa-solid fa-folder-open"></i></div> เคสของฉัน</h2>
             <div id="mycases-container" class="space-y-4"><p class="text-center text-[13px] font-bold text-slate-500 py-10"><i class="fa-solid fa-spinner fa-spin text-xl mb-2 block"></i> กำลังโหลดข้อมูล...</p></div>
         </div>
 
-        <!-- ================= VIEW 3: กระดานเคสรวม ================= -->
         <div id="view-feed" class="hidden glass-card p-6 mb-6">
             <h2 class="font-extrabold text-slate-900 text-[18px] mb-5 flex items-center gap-3"><div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600"><i class="fa-solid fa-globe"></i></div> กระดานเคสรวม</h2>
             <div class="relative mb-6">
@@ -197,13 +184,10 @@
             <div id="feed-container" class="space-y-4"><p class="text-center text-[13px] font-bold text-slate-500 py-10"><i class="fa-solid fa-spinner fa-spin text-xl mb-2 block"></i> กำลังโหลดข้อมูล...</p></div>
         </div>
 
-        <!-- ================= VIEW 4: แดชบอร์ด (สถิติ/ตรวจเคส) ================= -->
         <div id="view-dashboard" class="hidden glass-card p-6 mb-6">
-            <!-- ส่วนของอาจารย์ (มีระบบฟิลเตอร์) -->
             <div id="dash-instructor" class="hidden mb-10 border-b-2 border-slate-100 pb-8">
                 <h2 class="font-extrabold text-slate-900 text-[20px] mb-5 flex items-center gap-3"><div class="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center text-orange-600"><i class="fa-solid fa-inbox text-lg"></i></div> ระบบตรวจประเมิน</h2>
                 
-                <!-- 🛠️ เพิ่ม pt-2 และ px-1 ป้องกันขอบเงาและเส้นขอบตัดหายไปเวลาเด้ง -->
                 <div class="flex gap-2 overflow-x-auto no-scrollbar mb-4 pt-2 pb-3 px-1 -mx-1" id="filter-students">
                     <button class="filter-pill active-std" onclick="setStudentFilter('all')" id="btn-std-all">รวมทุกคน</button>
                 </div>
@@ -216,7 +200,6 @@
                 <div id="instructor-cases-container" class="space-y-4"><p class="text-center text-[13px] font-bold text-slate-500 py-6"><i class="fa-solid fa-spinner fa-spin text-xl mb-2 block"></i> ดึงข้อมูลเคส...</p></div>
             </div>
 
-            <!-- สถิติ (เห็นทุกคน) -->
             <h2 class="font-extrabold text-indigo-700 text-[18px] mb-5 flex items-center gap-3"><div class="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600"><i class="fa-solid fa-chart-pie"></i></div> ความคืบหน้านักศึกษา</h2>
             <div id="student-stats-container" class="space-y-5 mb-10"></div>
 
@@ -226,7 +209,6 @@
 
     </div>
 
-    <!-- 🖼️ Modal: สำหรับอาจารย์ตรวจเคสและแนบรูป -->
     <div id="judge-modal" class="fixed inset-0 z-[60] hidden flex items-center justify-center p-4">
         <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity" onclick="closeJudgeModal()"></div>
         <div class="bg-white w-full max-w-sm rounded-[2rem] shadow-2xl relative z-10 overflow-hidden animate-tab">
@@ -250,7 +232,6 @@
         </div>
     </div>
 
-    <!-- 🚀 Floating Bottom Navigation Bar -->
     <nav class="fixed floating-nav z-50 backdrop-blur-xl px-2 py-2 flex justify-between items-center">
         <button onclick="switchMainView('forms')" id="nav-forms" class="nav-item active text-emerald-600 flex flex-col items-center p-2 w-[24%] relative">
             <div class="icon-box text-[22px] mb-1"><i class="fa-solid fa-plus-circle"></i></div><span class="text-[10px] font-extrabold tracking-wide">เพิ่มเคส</span>
@@ -271,17 +252,24 @@
         const FIREBASE_SECRET = '9iKYKSmC8ssrUXvEdh2OOqS4JCeyEwcaCGr83WkG';
         const LIFF_ID = "2010280091-6e8mWiGV";
         
-        // ⚠️ วาง URL Web App อันใหม่ที่เพิ่ง Deploy มาตรงนี้
+        // ⚠️ ลิงก์ Web App ล่าสุดของอาจารย์ครับ
         const GAS_WEBAPP_URL = "https://script.google.com/macros/s/AKfycbxFeZxtiaQ_TgT6Hzd0bDo19rbM8SjmGVMMid9BQanch9pyEtOB2ivlXtF6tB9xQGuKKQ/exec";
 
         let currentUser = null; let instructorList = []; let currentEditCaseId = null;
-
         let allInstructorCases = []; let currentStatusFilter = 'pending'; let currentStudentFilter = 'all';
 
         window.onload = async () => {
             const today = new Date(); document.getElementById('msg_date').valueAsDate = today; document.getElementById('mid_date').valueAsDate = today; document.getElementById('med_date').valueAsDate = today;
             await loadDropdownConfigs(); await fetchUsersAndRenderInstructors(); await initializeLiff();
         };
+
+        // ================= ฟังก์ชันแปลงเวลาให้เป็นภาษาไทย =================
+        function formatTimeThai(timestamp) {
+            if (!timestamp) return "-";
+            const d = new Date(timestamp);
+            return d.toLocaleDateString('th-TH', { year: '2-digit', month: 'short', day: 'numeric' }) + " เวลา " + 
+                   d.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' }) + " น.";
+        }
 
         async function loadDropdownConfigs() {
             try {
@@ -403,11 +391,10 @@
                 for (let dep of deps) {
                     const res = await fetch(`${FIREBASE_URL}cases/${dep}.json?auth=${FIREBASE_SECRET}`); const cases = await res.json();
                     for (let cid in cases) {
-                        const c = cases[caseId=cid];
+                        const c = cases[cid];
                         if (c.studentUid === currentUser.uid) {
                             let badge = c.status === 'draft' ? '<span class="badge badge-draft">📝 ร่าง</span>' : c.status === 'pending' ? '<span class="badge badge-pending">⏳ รอตรวจ</span>' : c.status === 'returned' ? '<span class="badge badge-returned">⚠️ ส่งแก้</span>' : '<span class="badge badge-approved">✅ ผ่านแล้ว</span>';
                             
-                            // 🌟 แก้ไขตรงนี้: เพิ่มปุ่มถังขยะสีแดง เข้าไปข้างๆ ปุ่มแก้ไข
                             let actionBtns = "";
                             if (c.status === 'draft' || c.status === 'returned') {
                                 actionBtns = `
@@ -421,13 +408,25 @@
                             let instImgBtn = (c.instructorImageUrl && c.instructorImageUrl !== "-") ? `<a href="${c.instructorImageUrl}" target="_blank" class="mt-3 ml-2 inline-block text-[11px] font-extrabold text-orange-600 bg-orange-50 px-3 py-2 rounded-xl border border-orange-200 hover:bg-orange-100 transition"><i class="fa-solid fa-image"></i> รูปจากอาจารย์</a>` : "";
                             let myImgBtn = (c.imageUrl && c.imageUrl !== "-") ? `<a href="${c.imageUrl}" target="_blank" class="mt-3 inline-block text-[11px] font-extrabold text-emerald-600 bg-emerald-50 px-3 py-2 rounded-xl border border-emerald-200 hover:bg-emerald-100 transition"><i class="fa-solid fa-image"></i> รูปของคุณ</a>` : "";
 
-                            html += `<div class="bg-white p-5 rounded-[1.5rem] shadow-sm border border-slate-100"><div class="flex justify-between items-start mb-2"><p class="text-[14px] font-extrabold text-slate-900">HN: ${c.hn} <span class="text-slate-500 font-bold ml-1 text-[11px]">(${c.date})</span></p>${badge}</div><p class="text-[13px] font-extrabold text-slate-700">${c.patientName}</p><p class="text-[11px] font-bold text-slate-500 mt-1 truncate">📌 ${c.diseaseName || 'ผดุงครรภ์'}</p>${remarkAlert}<div class="flex flex-wrap items-center mt-1">${myImgBtn}${instImgBtn}</div>${actionBtns}</div>`;
+                            html += `<div class="bg-white p-5 rounded-[1.5rem] shadow-sm border border-slate-100" id="card_${cid}">
+                                        <div class="flex justify-between items-start mb-2">
+                                            <p class="text-[14px] font-extrabold text-slate-900">HN: ${c.hn}</p>
+                                            ${badge}
+                                        </div>
+                                        <p class="text-[13px] font-extrabold text-slate-700">${c.patientName}</p>
+                                        <p class="text-[10px] text-slate-400 mt-1"><i class="fa-regular fa-clock"></i> อัปเดตล่าสุด: ${formatTimeThai(c.timestamp)}</p>
+                                        <p class="text-[11px] font-bold text-slate-500 mt-2 truncate">📌 ${c.diseaseName || 'ผดุงครรภ์'}</p>
+                                        ${remarkAlert}
+                                        <div class="flex flex-wrap items-center mt-1">${myImgBtn}${instImgBtn}</div>
+                                        ${actionBtns}
+                                     </div>`;
                         }
                     }
                 }
                 container.innerHTML = html || '<p class="text-center text-[13px] font-bold text-slate-500 py-10">ยังไม่มีเคสที่บันทึกไว้ครับ</p>';
             } catch(e) { container.innerHTML = '<p class="text-center text-[13px] font-bold text-red-500 py-10">โหลดข้อมูลล้มเหลว</p>'; }
         }
+
         function editDraft(data, dep, cid) {
             currentEditCaseId = cid; window.tempImageUrl = data.imageUrl; switchMainView('forms'); switchForm(dep); document.getElementById('edit-banner').classList.remove('hidden');
             let pre = dep === 'massage' ? 'msg' : dep === 'midwifery' ? 'mid' : 'med'; document.getElementById(`${pre}_date`).value = data.date; document.getElementById(`${pre}_hn`).value = data.hn; document.getElementById(`${pre}_patientName`).value = data.patientName;
@@ -445,7 +444,22 @@
                 let html = ""; const deps = ['massage', 'midwifery', 'medicine']; let allCases = [];
                 for (let dep of deps) { const res = await fetch(`${FIREBASE_URL}cases/${dep}.json?auth=${FIREBASE_SECRET}`); const cases = await res.json(); for (let cid in cases) { if(cases[cid].status !== 'draft') allCases.push({...cases[cid], depName: dep}); } }
                 allCases.sort((a,b) => b.timestamp - a.timestamp);
-                allCases.forEach(c => { let badge = c.status === 'pending' ? '⏳ รอตรวจ' : c.status === 'returned' ? '⚠️ แก้ไข' : '✅ ผ่าน'; html += `<div class="feed-card bg-white p-5 rounded-[1.5rem] shadow-sm border border-slate-100"><div class="flex justify-between items-start mb-2"><p class="text-[14px] font-extrabold text-slate-900">HN: <span class="search-target">${c.hn}</span></p><span class="text-[10px] font-bold text-slate-500">${badge}</span></div><p class="text-[13px] font-extrabold text-slate-700 search-target">${c.patientName}</p><div class="flex justify-between items-end mt-3"><p class="text-[11px] font-bold text-slate-500 truncate w-2/3 search-target">📌 ${c.diseaseName || 'ผดุงครรภ์'}</p><p class="text-[10px] font-extrabold text-emerald-700 bg-emerald-100 px-3 py-1 rounded-xl">นศ. ${c.studentName.split(' ')[0]}</p></div></div>`; });
+                
+                allCases.forEach(c => { 
+                    let badge = c.status === 'pending' ? '⏳ รอตรวจ' : c.status === 'returned' ? '⚠️ แก้ไข' : '✅ ผ่าน'; 
+                    html += `<div class="feed-card bg-white p-5 rounded-[1.5rem] shadow-sm border border-slate-100">
+                                <div class="flex justify-between items-start mb-2">
+                                    <p class="text-[14px] font-extrabold text-slate-900">HN: <span class="search-target">${c.hn}</span></p>
+                                    <span class="text-[10px] font-bold text-slate-500">${badge}</span>
+                                </div>
+                                <p class="text-[13px] font-extrabold text-slate-700 search-target">${c.patientName}</p>
+                                <p class="text-[10px] text-slate-400 mt-1"><i class="fa-regular fa-clock"></i> ส่งเมื่อ: ${formatTimeThai(c.timestamp)}</p>
+                                <div class="flex justify-between items-end mt-3">
+                                    <p class="text-[11px] font-bold text-slate-500 truncate w-2/3 search-target">📌 ${c.diseaseName || 'ผดุงครรภ์'}</p>
+                                    <p class="text-[10px] font-extrabold text-emerald-700 bg-emerald-100 px-3 py-1 rounded-xl">นศ. ${c.studentName.split(' ')[0]}</p>
+                                </div>
+                             </div>`; 
+                });
                 container.innerHTML = html || '<p class="text-center text-[13px] font-bold text-slate-500 py-10">ยังไม่มีเคสในระบบ</p>';
             } catch(e) {}
         }
@@ -517,8 +531,6 @@
             filtered.forEach(c => {
                 let imageBtn = (c.imageUrl && c.imageUrl !== "-") ? `<a href="${c.imageUrl}" target="_blank" class="inline-block mt-2 text-[11px] font-extrabold bg-slate-800 text-white px-3 py-1.5 rounded-xl hover:bg-slate-700 transition"><i class="fa-solid fa-image"></i> รูปจาก นศ.</a>` : "";
                 let buttons = ""; let remarkTxt = "";
-                
-                // 🌟 เพิ่มปุ่มถังขยะเล็กๆ มุมขวาบน ให้อาจารย์กดลบเคสทิ้งได้
                 let deleteIconBtn = `<button onclick="deleteCaseData('${c.depName}', '${c.caseId}')" class="absolute top-4 right-5 text-slate-300 hover:text-rose-500 transition"><i class="fa-solid fa-trash text-lg"></i></button>`;
                 
                 if (c.status === 'pending') {
@@ -527,14 +539,23 @@
                     remarkTxt = `<p class="text-[11px] text-rose-700 bg-rose-50 p-2.5 rounded-xl border border-rose-200 mt-3"><b>หมายเหตุ:</b> ${c.remark}</p>`;
                 }
                 
-                // สังเกตว่าใส่ class 'relative' เพื่อให้ปุ่มถังขยะไปอยู่มุมขวาบน
                 html += `<div class="bg-white p-5 rounded-[1.5rem] shadow-sm border border-slate-100 mb-4 relative" id="card_${c.caseId}">
                             ${deleteIconBtn}
-                            <div class="flex justify-between items-start mb-3 pr-8"><p class="text-[14px] font-extrabold text-slate-900">${c.studentName}</p><p class="text-[11px] font-bold text-slate-500">HN: ${c.hn}</p></div><div class="bg-slate-50 p-4 rounded-[1.25rem] border border-slate-100 mb-4"><p class="text-[13px] font-extrabold text-slate-700">📌 ${c.diseaseName || 'หมวด: ' + c.depName}</p>${imageBtn}${remarkTxt}</div>${buttons}
+                            <div class="flex justify-between items-start mb-1 pr-8">
+                                <p class="text-[14px] font-extrabold text-slate-900">${c.studentName}</p>
+                                <p class="text-[11px] font-bold text-slate-500">HN: ${c.hn}</p>
+                            </div>
+                            <p class="text-[10px] text-slate-400 mb-3"><i class="fa-regular fa-clock"></i> ส่งเมื่อ: ${formatTimeThai(c.timestamp)}</p>
+                            <div class="bg-slate-50 p-4 rounded-[1.25rem] border border-slate-100 mb-4">
+                                <p class="text-[13px] font-extrabold text-slate-700">📌 ${c.diseaseName || 'หมวด: ' + c.depName}</p>
+                                ${imageBtn}${remarkTxt}
+                            </div>
+                            ${buttons}
                          </div>`;
             });
             container.innerHTML = html || `<p class="text-center text-[13px] font-bold text-slate-500 py-6">ไม่มีข้อมูลในหมวดนี้ครับ</p>`;
         }
+
         let pendingJudgeData = null; 
         function judgeCase(department, caseId, status) {
             pendingJudgeData = { department, caseId, status }; document.getElementById('judge-remark').value = ""; document.getElementById('judge-image').value = ""; document.getElementById('judge-modal').classList.remove('hidden');
@@ -566,6 +587,7 @@
             } catch (err) { Swal.fire({ icon: 'error', title: 'การเชื่อมต่อขัดข้อง', text: 'เกิดข้อผิดพลาดในการบันทึกข้อมูล', confirmButtonColor: '#ef4444' }); } 
             finally { btn.innerHTML = originalText; btn.disabled = false; }
         }
+
         // ================= ฟังก์ชันลบเคส (ล้ำสมัยด้วย SweetAlert2) =================
         async function deleteCaseData(department, caseId) {
             const result = await Swal.fire({
@@ -590,11 +612,9 @@
                     if (resData.success) {
                         Swal.fire({ icon: 'success', title: 'ลบสำเร็จ!', showConfirmButton: false, timer: 1500 });
                         
-                        // ลบการ์ดนั้นออกจากหน้าจอทันที แบบไม่ต้องรีเฟรชหน้า
                         const card1 = document.getElementById(`card_${caseId}`);
                         if(card1) card1.remove();
                         
-                        // โหลดข้อมูลในหน้านั้นๆ ใหม่เพื่อความชัวร์
                         if(!document.getElementById('view-mycases').classList.contains('hidden')) loadMyCases();
                         if(!document.getElementById('view-dashboard').classList.contains('hidden')) loadDashboardData();
                         if(!document.getElementById('view-feed').classList.contains('hidden')) loadGlobalFeed();
