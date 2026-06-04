@@ -9,7 +9,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <!-- ไลบรารี -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script charset="utf-8" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
@@ -137,7 +136,6 @@
 </head>
 <body>
 
-    <!-- Header สไตล์คลีนๆ -->
     <div class="sticky top-0 z-40 px-5 py-4 flex items-center justify-between mb-2 bg-white/80 backdrop-blur-xl border-b border-gray-100">
         <div class="flex items-center gap-3">
             <div class="w-12 h-12 bg-white rounded-2xl shadow-sm border border-gray-100 flex items-center justify-center p-1.5">
@@ -158,13 +156,11 @@
     </div>
 
     <div class="max-w-md mx-auto px-5 mt-4">
-        <!-- Banner โหมดแก้ไข -->
         <div id="edit-banner" class="hidden bg-[#fff8e6] border border-[#ffe082] px-5 py-3 rounded-2xl mb-5 flex justify-between items-center text-[13px] font-semibold text-[#b45309] animate-tab">
             <span class="flex items-center gap-2"><i class="fa-solid fa-pen-to-square text-lg"></i> โหมดแก้ไขข้อมูล</span>
             <button onclick="cancelEdit()" class="text-[#b45309] hover:text-red-600 bg-[#ffe082]/50 w-8 h-8 rounded-full flex items-center justify-center transition"><i class="fa-solid fa-xmark"></i></button>
         </div>
 
-        <!-- ================= VIEW 1: แบบฟอร์มส่งเคส ================= -->
         <div id="view-forms" class="hidden animate-tab">
             <div class="sub-nav">
                 <button onclick="switchForm('massage')" id="sub-massage" class="sub-nav-btn active">นวดไทย</button>
@@ -172,7 +168,6 @@
                 <button onclick="switchForm('medicine')" id="sub-medicine" class="sub-nav-btn">เวชกรรม</button>
             </div>
 
-            <!-- ฟอร์ม: นวดไทย -->
             <div id="form-massage" class="ios-card p-6 block">
                 <form onsubmit="event.preventDefault();" id="formObj-massage" class="space-y-4">
                     <div class="grid grid-cols-2 gap-4">
@@ -203,7 +198,6 @@
                 </form>
             </div>
 
-            <!-- ฟอร์ม: ผดุงครรภ์ -->
             <div id="form-midwifery" class="ios-card p-6 hidden">
                 <form onsubmit="event.preventDefault();" id="formObj-midwifery" class="space-y-4">
                     <div class="grid grid-cols-2 gap-4">
@@ -221,7 +215,6 @@
                 </form>
             </div>
 
-            <!-- ฟอร์ม: เวชกรรม -->
             <div id="form-medicine" class="ios-card p-6 hidden">
                 <form onsubmit="event.preventDefault();" id="formObj-medicine" class="space-y-4">
                     <div class="grid grid-cols-2 gap-4">
@@ -241,7 +234,6 @@
             </div>
         </div>
 
-        <!-- ================= VIEW 2: รายการของฉัน ================= -->
         <div id="view-mycases" class="hidden ios-card p-6 mb-6">
             <h2 class="font-bold text-gray-900 text-[18px] mb-5 flex items-center gap-3">
                 <i class="fa-solid fa-folder-open text-[#007aff] text-xl"></i> เคสของฉัน
@@ -249,7 +241,6 @@
             <div id="mycases-container" class="space-y-4"><p class="text-center text-[13px] text-gray-500 py-10">กำลังโหลดข้อมูล...</p></div>
         </div>
 
-        <!-- ================= VIEW 3: กระดานเคสรวม ================= -->
         <div id="view-feed" class="hidden ios-card p-6 mb-6">
             <h2 class="font-bold text-gray-900 text-[18px] mb-5 flex items-center gap-3">
                 <i class="fa-solid fa-globe text-[#34c759] text-xl"></i> กระดานเคสรวม
@@ -261,9 +252,7 @@
             <div id="feed-container" class="space-y-4"><p class="text-center text-[13px] text-gray-500 py-10">กำลังโหลดข้อมูล...</p></div>
         </div>
 
-        <!-- ================= VIEW 4: แดชบอร์ด (อัปเกรดใหม่ล่าสุด!) ================= -->
         <div id="view-dashboard" class="hidden mb-6 space-y-5">
-            <!-- ส่วนของอาจารย์ (ซ่อนไว้ถ้านศ.เปิด) -->
             <div id="dash-instructor" class="hidden ios-card p-6">
                 <h2 class="font-bold text-gray-900 text-[18px] mb-4 flex items-center gap-3"><i class="fa-solid fa-inbox text-[#ff9500] text-xl"></i> ตรวจประเมิน</h2>
                 <div class="flex gap-2 overflow-x-auto no-scrollbar mb-4 pt-1 pb-2">
@@ -275,13 +264,11 @@
                 <div id="instructor-cases-container" class="space-y-4"><p class="text-center text-[13px] text-gray-500 py-6">ดึงข้อมูลเคส...</p></div>
             </div>
 
-            <!-- สถิตินักศึกษา (เห็นทุกคน) -->
             <div class="ios-card p-6">
                 <h2 class="font-bold text-gray-900 text-[17px] mb-5">📊 สถิตินักศึกษา (ตามการส่งเคส)</h2>
                 <div id="student-stats-container" class="space-y-4"></div>
             </div>
 
-            <!-- อันดับโรคพบบ่อย (เห็นทุกคน โชว์ทุกโรค ไล่สี) -->
             <div class="ios-card p-6">
                 <h2 class="font-bold text-gray-900 text-[17px] mb-5">🏆 อันดับโรคพบบ่อย</h2>
                 <div id="disease-rank-container"></div>
@@ -290,7 +277,6 @@
 
     </div>
 
-    <!-- 🖼️ Modal: อาจารย์ตรวจเคส -->
     <div id="judge-modal" class="fixed inset-0 z-[60] hidden flex items-center justify-center p-5">
         <div class="absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity" onclick="closeJudgeModal()"></div>
         <div class="bg-white w-full max-w-sm rounded-3xl shadow-2xl relative z-10 overflow-hidden animate-tab">
@@ -314,7 +300,6 @@
         </div>
     </div>
 
-    <!-- 🚀 Floating Bottom Navigation Bar (Solid Icons) -->
     <nav class="fixed floating-nav z-50 px-2 py-2 flex justify-between items-center">
         <button onclick="switchMainView('forms')" id="nav-forms" class="nav-item active flex flex-col items-center py-1 w-[24%]">
             <div class="icon-box"><i class="fa-solid fa-square-plus"></i></div><span class="text-[10px] font-semibold">เพิ่มเคส</span>
@@ -338,10 +323,7 @@
 
         let currentUser = null; let instructorList = []; let currentEditCaseId = null;
         let allInstructorCases = []; let currentStatusFilter = 'pending'; let currentStudentFilter = 'all';
-
-        // ตัวแปรสำหรับ Dashboard ใหม่
-        window.allCasesForRank = [];
-        window.studentListForRank = [];
+        window.allCasesForRank = []; window.studentListForRank = [];
 
         window.onload = async () => {
             const today = new Date(); document.getElementById('msg_date').valueAsDate = today; document.getElementById('mid_date').valueAsDate = today; document.getElementById('med_date').valueAsDate = today;
@@ -559,7 +541,7 @@
         }
         function filterFeed() { let input = document.getElementById('feed-search').value.toLowerCase(); let cards = document.getElementsByClassName('feed-card'); for (let i = 0; i < cards.length; i++) cards[i].style.display = cards[i].innerText.toLowerCase().includes(input) ? "" : "none"; }
 
-        // ================= Dashboard ใหม่ (สถิติ และ การประเมิน) =================
+        // ================= Dashboard ใหม่ (เพิ่มหลอดสถานะ 3 สาขา) =================
         async function loadDashboardData() {
             const statsContainer = document.getElementById('student-stats-container');
             const rankContainer = document.getElementById('disease-rank-container');
@@ -567,19 +549,24 @@
             rankContainer.innerHTML = '<p class="text-center text-[13px] text-gray-400 py-6">กำลังจัดอันดับโรค...</p>';
 
             try {
-                // 1. ดึงข้อมูล User (นักศึกษา)
                 const usersRes = await fetch(`${FIREBASE_URL}users.json?auth=${FIREBASE_SECRET}`);
                 const users = await usersRes.json();
                 let students = {};
                 window.studentListForRank = [];
+                
+                // เตรียมกล่องใส่นักศึกษา
                 for (let uid in users) {
                     if (users[uid].role === 'student' && users[uid].isActive) {
-                        students[uid] = { ...users[uid], uid: uid, draft: 0, pending: 0, checked: 0, total: 0 };
+                        students[uid] = { 
+                            ...users[uid], uid: uid, 
+                            draft: 0, pending: 0, checked: 0, total: 0,
+                            msgApproved: 0, midApproved: 0, medApproved: 0 
+                        };
                         window.studentListForRank.push(students[uid]);
                     }
                 }
 
-                // 2. ดึงเคสทั้งหมดเพื่อเอามานับใหม่แบบ Real-time
+                // ดึงเคสทั้งหมด
                 let allCases = [];
                 const deps = ['massage', 'midwifery', 'medicine'];
                 for (let dep of deps) {
@@ -589,9 +576,9 @@
                         allCases.push({ ...casesData[cid], caseId: cid, depName: dep });
                     }
                 }
-                window.allCasesForRank = allCases; // เก็บไว้ฟิลเตอร์อันดับโรค
+                window.allCasesForRank = allCases;
 
-                // 3. คำนวณสถิตินักศึกษา
+                // คำนวณยอด
                 let overallStats = { draft: 0, pending: 0, checked: 0, total: 0 };
                 allCases.forEach(c => {
                     if (students[c.studentUid]) {
@@ -602,58 +589,86 @@
                         } else if (c.status === 'pending') {
                             students[c.studentUid].pending++; overallStats.pending++;
                         } else { 
-                            // approved หรือ returned ถือว่าได้รับการตรวจแล้ว
                             students[c.studentUid].checked++; overallStats.checked++;
+                            // นับยอดเฉพาะที่ "ผ่านการประเมินแล้ว (Approved)" ไว้โชว์ในหลอด 3 สาขา
+                            if (c.status === 'approved') {
+                                if (c.depName === 'massage') students[c.studentUid].msgApproved++;
+                                else if (c.depName === 'midwifery') students[c.studentUid].midApproved++;
+                                else if (c.depName === 'medicine') students[c.studentUid].medApproved++;
+                            }
                         }
                     }
                 });
 
-                // วาด HTML สถิตินักศึกษา
+                // วาด HTML (กล่องภาพรวมสีฟ้า)
                 let statsHtml = `
-                    <div class="bg-gradient-to-br from-[#007aff] to-[#005bb5] p-5 rounded-3xl shadow-md text-white mb-5">
+                    <div class="bg-[#007aff] p-5 rounded-[24px] shadow-sm text-white mb-5">
                         <h3 class="font-bold text-[15px] mb-3 flex items-center gap-2"><i class="fa-solid fa-users"></i> ภาพรวมนักศึกษาทั้งหมด</h3>
                         <div class="grid grid-cols-4 gap-2">
-                            <div class="bg-white/20 p-2 rounded-2xl text-center backdrop-blur-sm border border-white/10">
+                            <div class="bg-white/20 p-2.5 rounded-2xl text-center backdrop-blur-sm border border-white/10">
                                 <p class="text-[10px] font-medium mb-0.5 opacity-90">เคสรวม</p>
-                                <p class="text-[18px] font-bold">${overallStats.total}</p>
+                                <p class="text-[17px] font-bold">${overallStats.total}</p>
                             </div>
-                            <div class="bg-white/20 p-2 rounded-2xl text-center backdrop-blur-sm border border-white/10">
+                            <div class="bg-white/20 p-2.5 rounded-2xl text-center backdrop-blur-sm border border-white/10">
                                 <p class="text-[10px] font-medium mb-0.5 opacity-90">ยังไม่ส่ง</p>
                                 <p class="text-[15px] font-semibold">${overallStats.draft}</p>
                             </div>
-                            <div class="bg-white/20 p-2 rounded-2xl text-center backdrop-blur-sm border border-white/10">
+                            <div class="bg-white/20 p-2.5 rounded-2xl text-center backdrop-blur-sm border border-white/10">
                                 <p class="text-[10px] font-medium mb-0.5 opacity-90">ส่งแล้ว</p>
                                 <p class="text-[15px] font-semibold">${overallStats.pending}</p>
                             </div>
-                            <div class="bg-white/20 p-2 rounded-2xl text-center backdrop-blur-sm border border-white/10">
+                            <div class="bg-white/20 p-2.5 rounded-2xl text-center backdrop-blur-sm border border-white/10">
                                 <p class="text-[10px] font-medium mb-0.5 opacity-90">ตรวจแล้ว</p>
                                 <p class="text-[15px] font-semibold">${overallStats.checked}</p>
                             </div>
                         </div>
                     </div>
-                    <div class="space-y-4">
+                    <div class="space-y-5">
                 `;
                 
+                // วาด HTML (รายบุคคล พร้อม 3 สาขา)
                 window.studentListForRank.forEach(s => {
                     statsHtml += `
-                        <div class="bg-gray-50 p-4 rounded-3xl border border-gray-100">
+                        <div class="bg-gray-50 p-4 rounded-[24px] border border-gray-100 shadow-sm">
                             <div class="flex items-center gap-3 mb-3">
                                 <img src="${s.picUrl}" class="w-10 h-10 rounded-full border border-gray-200 object-cover">
                                 <p class="text-[14px] font-bold text-gray-900 flex-1">${s.fullName}</p>
-                                <span class="text-[11px] font-bold text-white bg-[#1d1d1f] px-2.5 py-1 rounded-lg shadow-sm">รวม ${s.total}</span>
+                                <span class="text-[11px] font-bold text-white bg-[#1d1d1f] px-2.5 py-1 rounded-lg">รวม ${s.total}</span>
                             </div>
-                            <div class="grid grid-cols-3 gap-2">
-                                <div class="bg-white p-2.5 rounded-2xl border border-gray-100 text-center shadow-sm">
+                            
+                            <div class="grid grid-cols-3 gap-2 mb-4">
+                                <div class="bg-white p-2.5 rounded-xl border border-gray-100 text-center">
                                     <p class="text-[10px] text-gray-400 font-semibold mb-0.5">ยังไม่ส่ง (ร่าง)</p>
                                     <p class="text-[15px] font-bold text-gray-700">${s.draft}</p>
                                 </div>
-                                <div class="bg-white p-2.5 rounded-2xl border border-[#fff8e6] text-center shadow-sm">
+                                <div class="bg-white p-2.5 rounded-xl border border-[#fff8e6] text-center">
                                     <p class="text-[10px] text-[#ff9500] font-semibold mb-0.5">ส่งแล้ว (รอตรวจ)</p>
                                     <p class="text-[15px] font-bold text-[#b45309]">${s.pending}</p>
                                 </div>
-                                <div class="bg-white p-2.5 rounded-2xl border border-[#eaf8ed] text-center shadow-sm">
+                                <div class="bg-white p-2.5 rounded-xl border border-[#eaf8ed] text-center">
                                     <p class="text-[10px] text-[#34c759] font-semibold mb-0.5">ตรวจประเมินแล้ว</p>
                                     <p class="text-[15px] font-bold text-[#047857]">${s.checked}</p>
+                                </div>
+                            </div>
+
+                            <div class="bg-white p-3.5 rounded-2xl border border-gray-100 space-y-3">
+                                <div>
+                                    <div class="flex justify-between text-[11px] text-gray-500 font-semibold mb-1">
+                                        <span>นวดไทย (เป้า 60)</span><span class="text-[#34c759]">${s.msgApproved}/60</span>
+                                    </div>
+                                    <div class="w-full bg-gray-100 rounded-full h-1.5"><div class="bg-[#34c759] h-1.5 rounded-full transition-all" style="width: ${Math.min((s.msgApproved/60)*100, 100)}%"></div></div>
+                                </div>
+                                <div>
+                                    <div class="flex justify-between text-[11px] text-gray-500 font-semibold mb-1">
+                                        <span>ผดุงครรภ์ (เป้า 10)</span><span class="text-[#ff3b30]">${s.midApproved}/10</span>
+                                    </div>
+                                    <div class="w-full bg-gray-100 rounded-full h-1.5"><div class="bg-[#ff3b30] h-1.5 rounded-full transition-all" style="width: ${Math.min((s.midApproved/10)*100, 100)}%"></div></div>
+                                </div>
+                                <div>
+                                    <div class="flex justify-between text-[11px] text-gray-500 font-semibold mb-1">
+                                        <span>เวชกรรม (เป้า 20)</span><span class="text-[#007aff]">${s.medApproved}/20</span>
+                                    </div>
+                                    <div class="w-full bg-gray-100 rounded-full h-1.5"><div class="bg-[#007aff] h-1.5 rounded-full transition-all" style="width: ${Math.min((s.medApproved/20)*100, 100)}%"></div></div>
                                 </div>
                             </div>
                         </div>
@@ -662,10 +677,8 @@
                 statsHtml += `</div>`;
                 statsContainer.innerHTML = statsHtml;
 
-                // 4. วาดส่วนของ อันดับโรคพบบ่อย (ค่าเริ่มต้นให้โชว์ทุกคน)
                 window.renderDiseaseRank('all');
 
-                // 5. ส่วนของอาจารย์ (ถ้าเป็นอาจารย์ถึงจะทำงาน)
                 if (currentUser.role === 'instructor') {
                     document.getElementById('instructor-cases-container').innerHTML = '<p class="text-center text-[13px] text-gray-400 py-6">ดึงข้อมูลเคส...</p>';
                     allInstructorCases = []; let instStudentSet = new Set();
@@ -683,16 +696,13 @@
                 }
 
             } catch (e) {
-                console.error(e);
                 statsContainer.innerHTML = '<p class="text-center text-[13px] text-red-400 py-6">โหลดข้อมูลล้มเหลว</p>';
             }
         }
 
-        // ================= ฟังก์ชันคำนวณและวาด "อันดับโรคพบบ่อย" =================
         window.renderDiseaseRank = function(studentUid) {
             const container = document.getElementById('disease-rank-container');
             
-            // 1. สร้างปุ่ม Filter นักศึกษา
             let filterHtml = `<div class="flex gap-2 overflow-x-auto no-scrollbar mb-5 pb-2">`;
             filterHtml += `<button class="px-4 py-1.5 rounded-full text-[12px] font-semibold whitespace-nowrap ${studentUid === 'all' ? 'bg-gradient-to-r from-[#34c759] to-[#30b551] text-white shadow-md' : 'bg-gray-100 text-gray-600 border border-gray-200'}" onclick="renderDiseaseRank('all')">รวมทั้งหมด</button>`;
             if (window.studentListForRank) {
@@ -702,11 +712,9 @@
             }
             filterHtml += `</div>`;
 
-            // 2. คำนวณอันดับโรค
             let diseaseCount = {};
             let maxCount = 0;
             window.allCasesForRank.forEach(c => {
-                // นับเฉพาะเคสที่ถูกส่งมาแล้ว (ไม่นับ Draft) ที่มีชื่อโรค
                 if (c.status !== 'draft' && c.diseaseName) {
                     if (studentUid === 'all' || c.studentUid === studentUid) {
                         diseaseCount[c.diseaseName] = (diseaseCount[c.diseaseName] || 0) + 1;
@@ -715,23 +723,17 @@
                 }
             });
 
-            // เอามาเรียงลำดับจาก มาก ไป น้อย
             const sortedRank = Object.entries(diseaseCount).sort((a, b) => b[1] - a[1]);
             
-            // 3. วาดรายการโรคลงบนหน้าจอ
             let rankListHtml = '<div class="space-y-3 max-h-[450px] overflow-y-auto no-scrollbar pr-1">';
             if (sortedRank.length > 0) {
                 sortedRank.forEach((item, index) => {
                     let m = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `<span class="text-gray-400 text-[13px] font-bold w-6 text-center inline-block">${index+1}</span>`;
-                    
-                    // คำนวณเปอร์เซ็นต์ความกว้างของแถบสี (อ้างอิงจากโรคที่เจอเยอะสุด)
                     let pct = (item[1] / maxCount) * 100;
                     
                     rankListHtml += `
                     <div class="relative bg-white rounded-2xl overflow-hidden border border-gray-100 p-3 flex justify-between items-center shadow-sm z-0">
-                        <!-- แถบสีพื้นหลังแบบไล่สี (Gradient Bar) โชว์เป็น % -->
                         <div class="absolute left-0 top-0 bottom-0 bg-gradient-to-r from-[#34c759] to-[#30b551] opacity-20 transition-all duration-500 rounded-r-xl -z-10" style="width: ${pct}%"></div>
-                        
                         <div class="flex items-center gap-3 w-[85%] z-10">
                             <span class="text-lg drop-shadow-sm flex-shrink-0">${m}</span>
                             <span class="truncate font-semibold text-gray-800 text-[13px]">${item[0]}</span>
