@@ -2,248 +2,325 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>TTMED STUDY - รพ.สะเดา</title>
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script charset="utf-8" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
 
     <style>
-        :root { --app-bg: #eefdf6; --glass-bg: rgba(255, 255, 255, 0.85); }
+        :root { 
+            /* โทนสีแบบ Apple iOS */
+            --bg-body: #f5f5f7; 
+            --card-bg: #ffffff;
+            --text-main: #1d1d1f;
+            --text-muted: #86868b;
+            --ios-blue: #007aff;
+            --ios-green: #34c759;
+            --ios-red: #ff3b30;
+            --ios-orange: #ff9500;
+            --ios-gray-bg: #f2f2f7;
+        }
+        
         body { 
-            font-family: 'Prompt', sans-serif; background-color: var(--app-bg);
-            background-image: 
-                radial-gradient(at 10% 10%, hsla(153, 100%, 80%, 0.5) 0px, transparent 50%), 
-                radial-gradient(at 90% 10%, hsla(199, 100%, 80%, 0.5) 0px, transparent 50%), 
-                radial-gradient(at 50% 90%, hsla(43, 100%, 82%, 0.5) 0px, transparent 50%);
-            background-attachment: fixed; min-height: 100vh; overflow-x: hidden; -webkit-tap-highlight-color: transparent;
-            color: #0f172a; 
+            font-family: 'Prompt', sans-serif; 
+            background-color: var(--bg-body);
+            color: var(--text-main); 
+            min-height: 100vh; 
+            overflow-x: hidden; 
+            -webkit-tap-highlight-color: transparent;
+            padding-bottom: 100px;
         }
 
-        .glass-card { 
-            background: var(--glass-bg); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); 
-            border: 1px solid rgba(255, 255, 255, 1); box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.08); border-radius: 2rem; 
+        /* 📱 สไตล์การ์ดแบบ iOS */
+        .ios-card { 
+            background: var(--card-bg); 
+            border-radius: 24px; 
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.04); 
+            border: none;
         }
         
-        .sub-nav { display: flex; background: rgba(255,255,255,0.8); padding: 6px; border-radius: 999px; box-shadow: inset 0 2px 5px rgba(0,0,0,0.05); margin-bottom: 24px;}
-        .sub-nav-btn { flex: 1; text-align: center; font-size: 12px; font-weight: 800; padding: 12px 0; border-radius: 999px; color: #64748b; transition: all 0.3s; }
-        .sub-nav-btn.active { background: white; color: #059669; box-shadow: 0 4px 15px rgba(0,0,0,0.08); transform: scale(1.02); }
-        .sub-nav-btn.active-mid { color: #e11d48; } .sub-nav-btn.active-med { color: #2563eb; }
+        /* 📱 สไตล์ปุ่มกดสลับโหมด (Segmented Control) */
+        .sub-nav { 
+            display: flex; 
+            background: var(--ios-gray-bg); 
+            padding: 4px; 
+            border-radius: 999px; 
+            margin-bottom: 24px;
+        }
+        .sub-nav-btn { 
+            flex: 1; 
+            text-align: center; 
+            font-size: 13px; 
+            font-weight: 600; 
+            padding: 10px 0; 
+            border-radius: 999px; 
+            color: var(--text-muted); 
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
+        }
+        .sub-nav-btn.active { 
+            background: white; 
+            color: var(--text-main); 
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06); 
+        }
 
-        .filter-pill { padding: 8px 16px; border-radius: 999px; font-size: 12px; font-weight: 800; color: #475569; background: white; border: 1.5px solid #cbd5e1; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); white-space: nowrap; cursor: pointer;}
-        .filter-pill.active-pending { background: #fffbeb; color: #b45309; border-color: #fbbf24; box-shadow: 0 6px 12px -2px rgba(245,158,11,0.25); transform: translateY(-3px);}
-        .filter-pill.active-approved { background: #ecfdf5; color: #047857; border-color: #34d399; box-shadow: 0 6px 12px -2px rgba(16,185,129,0.25); transform: translateY(-3px);}
-        .filter-pill.active-returned { background: #fef2f2; color: #be123c; border-color: #fb7185; box-shadow: 0 6px 12px -2px rgba(225,29,72,0.25); transform: translateY(-3px);}
-        .filter-pill.active-std { background: linear-gradient(135deg, #e0e7ff, #c7d2fe); color: #3730a3; border-color: #818cf8; box-shadow: 0 6px 12px -2px rgba(79, 70, 229, 0.25); transform: translateY(-3px);}
-
-        .input-wow { background-color: rgba(255, 255, 255, 0.95); border: 2px solid #e2e8f0; transition: all 0.3s; border-radius: 1.25rem; font-weight: 600; color: #1e293b;}
-        .input-wow:focus { transform: translateY(-2px); border-color: #10b981; box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.15); outline: none; }
+        /* 📱 สไตล์ช่องกรอกข้อมูล */
+        .input-wow { 
+            background-color: var(--ios-gray-bg); 
+            border: 1.5px solid transparent; 
+            transition: all 0.3s; 
+            border-radius: 14px; 
+            font-weight: 500; 
+            color: var(--text-main);
+        }
+        .input-wow:focus { 
+            background-color: #ffffff; 
+            border-color: var(--ios-blue); 
+            box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.15); 
+            outline: none; 
+        }
         
-        .floating-nav { bottom: 20px; width: calc(100% - 32px); left: 16px; border-radius: 999px; background: rgba(255, 255, 255, 0.95); box-shadow: 0 20px 50px rgba(0,0,0,0.15), inset 0 2px 0 rgba(255,255,255,1); border: 1px solid #f1f5f9; }
-        .nav-item { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); } .nav-item.active { transform: translateY(-6px); color: #059669; }
-        .nav-item .icon-box { transition: all 0.3s ease; } .nav-item.active .icon-box { transform: scale(1.2); }
+        /* 📱 แถบเมนูด้านล่าง (Frosted Glass แบบ iOS) */
+        .floating-nav { 
+            bottom: 0; 
+            width: 100%; 
+            left: 0; 
+            background: rgba(255, 255, 255, 0.85); 
+            backdrop-filter: saturate(180%) blur(20px); 
+            -webkit-backdrop-filter: saturate(180%) blur(20px);
+            border-top: 1px solid rgba(0,0,0,0.08);
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+        .nav-item { transition: all 0.3s; color: var(--text-muted); } 
+        .nav-item.active { color: var(--ios-blue); }
+        .nav-item .icon-box { transition: transform 0.2s; font-size: 22px; margin-bottom: 4px; } 
+        .nav-item.active .icon-box { transform: scale(1.15); }
         
-        .btn-glow { transition: all 0.2s; border-radius: 999px; position: relative; overflow: hidden; }
-        .btn-glow:active { transform: scale(0.95); }
-        .btn-primary { background: linear-gradient(135deg, #059669, #047857); box-shadow: 0 8px 25px -5px rgba(5, 150, 105, 0.5); color: white;}
-        .btn-outline { background: white; border: 2.5px solid #059669; color: #059669; }
+        /* 📱 ปุ่มกดแบบ Solid สะอาดตา */
+        .btn-ios { transition: all 0.2s; border-radius: 999px; font-weight: 600; display: flex; justify-content: center; align-items: center; gap: 8px;}
+        .btn-ios:active { transform: scale(0.96); }
+        .btn-primary { background: var(--ios-blue); color: white; box-shadow: 0 4px 14px rgba(0, 122, 255, 0.25);}
+        .btn-success { background: var(--ios-green); color: white; box-shadow: 0 4px 14px rgba(52, 199, 89, 0.25);}
+        .btn-outline { background: white; border: 2px solid var(--ios-blue); color: var(--ios-blue); }
 
-        .instructor-radio:checked + label { background-color: #ffffff; transform: translateY(-4px) scale(1.03); box-shadow: 0 12px 25px -5px rgba(0,0,0,0.15); border-color: #34d399;}
-        .instructor-radio:checked + label .avatar-ring { background: linear-gradient(45deg, #10b981, #059669); padding: 4px; }
-        .instructor-radio:checked + label .check-icon { transform: scale(1); opacity: 1; }
+        /* เลือกอาจารย์ */
+        .instructor-radio:checked + label { 
+            background-color: white; 
+            transform: translateY(-2px); 
+            box-shadow: 0 8px 20px rgba(0,0,0,0.08); 
+            border-color: var(--ios-blue);
+        }
+        .instructor-radio:checked + label .avatar-ring { border: 3px solid var(--ios-blue); padding: 2px; }
         .check-icon { transition: all 0.3s; transform: scale(0); opacity: 0; }
-        .avatar-ring { transition: all 0.3s; padding: 0px; border-radius: 50%; }
+        .instructor-radio:checked + label .check-icon { transform: scale(1); opacity: 1; }
+        .avatar-ring { transition: all 0.3s; padding: 2px; border-radius: 50%; border: 3px solid transparent; }
         
-        @keyframes slideUp { 0% { opacity: 0; transform: translateY(20px); } 100% { opacity: 1; transform: translateY(0); } }
-        .animate-tab { animation: slideUp 0.4s ease forwards; }
+        @keyframes fadeIn { 0% { opacity: 0; transform: translateY(10px); } 100% { opacity: 1; transform: translateY(0); } }
+        .animate-tab { animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
         
-        .badge { padding: 4px 10px; border-radius: 999px; font-size: 10px; font-weight: 800; letter-spacing: 0.5px;}
-        .badge-draft { background: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; }
-        .badge-pending { background: #fef3c7; color: #b45309; border: 1px solid #fcd34d; }
-        .badge-returned { background: #ffe4e6; color: #be123c; border: 1px solid #fda4af; }
-        .badge-approved { background: #d1fae5; color: #047857; border: 1px solid #6ee7b7; }
+        /* ป้ายสถานะแบบมินิมอล */
+        .badge { padding: 4px 10px; border-radius: 8px; font-size: 11px; font-weight: 600;}
+        .badge-draft { background: var(--ios-gray-bg); color: var(--text-muted); }
+        .badge-pending { background: #fff8e6; color: var(--ios-orange); }
+        .badge-returned { background: #ffeceb; color: var(--ios-red); }
+        .badge-approved { background: #eaf8ed; color: var(--ios-green); }
         
         .no-scrollbar::-webkit-scrollbar { display: none; } .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-        div:where(.swal2-container) div:where(.swal2-popup) { border-radius: 1.5rem !important; font-family: 'Prompt', sans-serif !important; }
+        div:where(.swal2-container) div:where(.swal2-popup) { border-radius: 24px !important; font-family: 'Prompt', sans-serif !important; }
+
+        /* ปรับแต่ง Choices.js ให้เข้ากับ iOS */
+        .choices__inner { border-radius: 14px !important; border: 1.5px solid transparent !important; background-color: var(--ios-gray-bg) !important; padding: 8px 16px !important; font-size: 14px; font-weight: 500; color: var(--text-main);}
+        .choices.is-focused .choices__inner { background-color: #ffffff !important; border-color: var(--ios-blue) !important; box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.15) !important; }
+        .choices__list--dropdown { border-radius: 16px !important; border: 1px solid rgba(0,0,0,0.05) !important; box-shadow: 0 10px 30px rgba(0,0,0,0.1) !important; z-index: 100 !important; overflow: hidden; }
+        .choices__input { background-color: var(--ios-gray-bg) !important; border-radius: 10px !important; margin-bottom: 5px !important; }
+        .choices__item--choice { font-size: 13px !important; border-bottom: 1px solid var(--ios-gray-bg); }
+        .choices__item--choice.is-highlighted { background-color: #f0f7ff !important; color: var(--ios-blue) !important; }
     </style>
 </head>
-<body class="pb-32">
+<body>
 
-    <div class="sticky top-0 z-40 px-4 py-4 flex items-center justify-between mb-4">
+    <div class="sticky top-0 z-40 px-5 py-4 flex items-center justify-between mb-2 bg-white/80 backdrop-blur-xl border-b border-gray-100">
         <div class="flex items-center gap-3">
-            <div class="w-14 h-14 bg-white rounded-[1.2rem] shadow-md border border-gray-100 flex items-center justify-center overflow-hidden p-2 transform hover:scale-105 transition">
+            <div class="w-12 h-12 bg-white rounded-2xl shadow-sm border border-gray-100 flex items-center justify-center p-1.5">
                 <img src="https://github.com/TTMSADAO/ttmed-sadao-queue/blob/PIC/%E0%B9%82%E0%B8%A5%E0%B9%82%E0%B8%81%E0%B9%89%E0%B9%81%E0%B8%9C%E0%B8%99%E0%B8%81%E0%B8%B2%E0%B8%A3%E0%B8%B8%E0%B9%88%E0%B8%99%E0%B8%A1%E0%B8%AB%E0%B8%B2%E0%B9%80%E0%B8%AA%E0%B8%99%E0%B9%88%E0%B8%AB%E0%B9%8C.png?raw=true" class="w-full h-full object-contain">
             </div>
             <div>
-                <h1 class="text-[18px] font-extrabold text-slate-900 leading-none mb-1 tracking-tight">TTMED <span class="text-emerald-600">STUDY</span></h1>
-                <p class="text-[10px] font-extrabold text-slate-500 uppercase tracking-widest">Sadao Hospital</p>
+                <h1 class="text-[17px] font-bold text-gray-900 leading-none mb-0.5 tracking-tight">TTMED STUDY</h1>
+                <p class="text-[11px] font-medium text-gray-500 uppercase tracking-wide">Sadao Hospital</p>
             </div>
         </div>
-        <div class="flex items-center gap-2 bg-white/90 backdrop-blur-md p-1.5 rounded-full shadow-md border border-white">
-            <div class="text-right pl-3 hidden sm:block">
-                <p id="userName" class="text-[13px] font-extrabold text-slate-900">กำลังโหลด...</p>
+        <div class="flex items-center gap-2">
+            <div class="text-right hidden sm:block">
+                <p id="userName" class="text-[13px] font-bold text-gray-900">กำลังโหลด...</p>
                 <div id="userRoleContainer"></div>
             </div>
-            <img id="userImg" src="https://ui-avatars.com/api/?name=U" class="w-10 h-10 rounded-full border-2 border-white shadow-sm object-cover">
+            <img id="userImg" src="https://ui-avatars.com/api/?name=U" class="w-10 h-10 rounded-full border border-gray-200 object-cover shadow-sm">
         </div>
     </div>
 
-    <div class="max-w-md mx-auto px-4">
-        <div id="edit-banner" class="hidden bg-amber-100 border border-amber-300 text-amber-900 px-5 py-3 rounded-2xl mb-5 flex justify-between items-center text-[13px] font-extrabold animate-tab shadow-sm">
-            <span class="flex items-center gap-2"><i class="fa-solid fa-pen-to-square text-amber-600 text-lg"></i> โหมดแก้ไขเคส (Draft / ส่งแก้)</span>
-            <button onclick="cancelEdit()" class="text-amber-600 hover:text-red-600 bg-amber-200/50 w-8 h-8 rounded-full flex items-center justify-center transition"><i class="fa-solid fa-xmark"></i></button>
+    <div class="max-w-md mx-auto px-5 mt-4">
+        <div id="edit-banner" class="hidden bg-[#fff8e6] border border-[#ffe082] px-5 py-3 rounded-2xl mb-5 flex justify-between items-center text-[13px] font-semibold text-[#b45309] animate-tab">
+            <span class="flex items-center gap-2"><i class="fa-solid fa-pen-to-square text-lg"></i> โหมดแก้ไขข้อมูล</span>
+            <button onclick="cancelEdit()" class="text-[#b45309] hover:text-red-600 bg-[#ffe082]/50 w-8 h-8 rounded-full flex items-center justify-center transition"><i class="fa-solid fa-xmark"></i></button>
         </div>
 
         <div id="view-forms" class="hidden animate-tab">
             <div class="sub-nav">
-                <button onclick="switchForm('massage')" id="sub-massage" class="sub-nav-btn active">🌿 นวดไทย</button>
-                <button onclick="switchForm('midwifery')" id="sub-midwifery" class="sub-nav-btn">🤱 ผดุงครรภ์</button>
-                <button onclick="switchForm('medicine')" id="sub-medicine" class="sub-nav-btn">🩺 เวชกรรม</button>
+                <button onclick="switchForm('massage')" id="sub-massage" class="sub-nav-btn active">นวดไทย</button>
+                <button onclick="switchForm('midwifery')" id="sub-midwifery" class="sub-nav-btn">ผดุงครรภ์</button>
+                <button onclick="switchForm('medicine')" id="sub-medicine" class="sub-nav-btn">เวชกรรม</button>
             </div>
 
-            <div id="form-massage" class="glass-card p-6 block">
-                <form onsubmit="event.preventDefault();" id="formObj-massage" class="space-y-5">
+            <div id="form-massage" class="ios-card p-6 block">
+                <form onsubmit="event.preventDefault();" id="formObj-massage" class="space-y-4">
                     <div class="grid grid-cols-2 gap-4">
-                        <div><label class="block text-[11px] font-extrabold text-slate-700 uppercase ml-2 mb-1.5 tracking-wide">📅 วันที่</label><input type="date" id="msg_date" required class="input-wow w-full text-[14px] px-4 py-3.5"></div>
-                        <div><label class="block text-[11px] font-extrabold text-slate-700 uppercase ml-2 mb-1.5 tracking-wide">🆔 รหัส HN</label><input type="text" id="msg_hn" placeholder="ระบุ HN" required class="input-wow w-full text-[14px] px-4 py-3.5"></div>
+                        <div><label class="block text-[12px] font-semibold text-gray-500 mb-1.5 ml-1">วันที่</label><input type="date" id="msg_date" required class="input-wow w-full text-[14px] px-4 py-3"></div>
+                        <div><label class="block text-[12px] font-semibold text-gray-500 mb-1.5 ml-1">รหัส HN</label><input type="text" id="msg_hn" placeholder="ระบุ HN" required class="input-wow w-full text-[14px] px-4 py-3"></div>
                     </div>
-                    <div><label class="block text-[11px] font-extrabold text-slate-700 uppercase ml-2 mb-1.5 tracking-wide">👤 ชื่อ-สกุล ผู้ป่วย</label><input type="text" id="msg_patientName" placeholder="ระบุชื่อและนามสกุล" required class="input-wow w-full text-[14px] px-4 py-3.5"></div>
+                    <div><label class="block text-[12px] font-semibold text-gray-500 mb-1.5 ml-1">ชื่อ-สกุล ผู้ป่วย</label><input type="text" id="msg_patientName" placeholder="ระบุชื่อผู้ป่วย" required class="input-wow w-full text-[14px] px-4 py-3"></div>
                     
-                    <div class="p-5 bg-white/60 rounded-[1.5rem] border border-white shadow-sm space-y-4">
+                    <div class="p-4 bg-gray-50 rounded-2xl border border-gray-100 space-y-4">
                         <div class="grid grid-cols-2 gap-4">
-                            <div><label class="block text-[11px] font-extrabold text-slate-700 uppercase ml-2 mb-1.5 tracking-wide">รูปแบบ</label><select id="msg_caseType" class="input-wow w-full text-[13px] px-3 py-3.5 cursor-pointer"><option value="New">✨ เคสใหม่</option><option value="FollowUp">🔄 ติดตามผล</option></select></div>
-                            <div><label class="block text-[11px] font-extrabold text-slate-700 uppercase ml-2 mb-1.5 tracking-wide">กลุ่มโรค</label><select id="msg_diseaseCategory" class="input-wow w-full text-[13px] px-3 py-3.5 cursor-pointer"><option value="โรคทางหัตถเวชกรรมไทย">หัตถเวชกรรม</option><option value="กลุ่มโรคไม่ติดต่อเรื้อรัง (NCDs)">NCDs</option></select></div>
+                            <div><label class="block text-[12px] font-semibold text-gray-500 mb-1.5 ml-1">รูปแบบ</label><select id="msg_caseType" class="input-wow w-full text-[14px] px-3 py-3"><option value="New">เคสใหม่</option><option value="FollowUp">ติดตามผล</option></select></div>
+                            <div><label class="block text-[12px] font-semibold text-gray-500 mb-1.5 ml-1">กลุ่มโรค</label><select id="msg_diseaseCategory" class="input-wow w-full text-[14px] px-3 py-3"><option value="โรคทางหัตถเวชกรรมไทย">หัตถเวชกรรม</option><option value="กลุ่มโรคไม่ติดต่อเรื้อรัง (NCDs)">NCDs</option></select></div>
                         </div>
-                        <div><label class="block text-[11px] font-extrabold text-slate-700 uppercase ml-2 mb-1.5 tracking-wide">ชื่อโรค / อาการ</label><select id="msg_diseaseName" required class="input-wow w-full text-[14px] px-3 py-3.5 cursor-pointer"><option value="">-- โหลดข้อมูล... --</option></select></div>
+                        <div><label class="block text-[12px] font-semibold text-gray-500 mb-1.5 ml-1">วินิจฉัยโรค</label><select id="msg_diseaseName" required class="input-wow w-full text-[14px] px-3 py-3"><option value="">-- โหลดข้อมูล... --</option></select></div>
                     </div>
                     
-                    <div><label class="block text-[11px] font-extrabold text-slate-700 uppercase ml-2 mb-1.5 tracking-wide">📸 แนบรูปหลักฐาน (ถ้ามี)</label><input type="file" id="msg_image" accept="image/*" class="w-full text-[13px] text-slate-600 file:mr-4 file:py-2.5 file:px-5 file:rounded-full file:border-0 file:text-[12px] file:font-extrabold file:bg-emerald-100 file:text-emerald-800 hover:file:bg-emerald-200 transition cursor-pointer input-wow py-1.5 px-1.5"></div>
+                    <div><label class="block text-[12px] font-semibold text-gray-500 mb-1.5 ml-1">แนบรูปหลักฐาน (ถ้ามี)</label><input type="file" id="msg_image" accept="image/*" class="w-full text-[13px] text-gray-600 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-[12px] file:font-medium file:bg-[#f0f7ff] file:text-[#007aff] input-wow py-1 px-1"></div>
                     
-                    <div class="pt-2">
-                        <label class="block text-[12px] font-extrabold text-slate-800 uppercase ml-2 mb-3 text-center tracking-wide">👨‍🏫 เลือกอาจารย์ผู้ตรวจ</label>
+                    <div class="pt-3">
+                        <label class="block text-[13px] font-semibold text-gray-800 mb-3 text-center">เลือกอาจารย์ผู้ตรวจ</label>
                         <div id="instructors_massage" class="grid grid-cols-3 gap-3"></div>
                     </div>
                     
-                    <div class="flex gap-3 pt-4">
-                        <button type="button" onclick="submitCaseAction('massage', true)" class="btn-glow btn-outline flex-1 text-[13px] font-extrabold py-4 rounded-full flex justify-center items-center gap-2"><i class="fa-solid fa-floppy-disk text-lg"></i> บันทึกร่าง</button>
-                        <button type="button" onclick="submitCaseAction('massage', false)" class="btn-glow btn-primary flex-1 text-[13px] font-extrabold py-4 rounded-full flex justify-center items-center gap-2"><i class="fa-solid fa-paper-plane text-lg"></i> ส่งตรวจทันที</button>
+                    <div class="flex gap-3 pt-5">
+                        <button type="button" onclick="submitCaseAction('massage', true)" class="btn-ios btn-outline flex-1 py-3.5 text-[14px]"><i class="fa-regular fa-bookmark"></i> บันทึกร่าง</button>
+                        <button type="button" onclick="submitCaseAction('massage', false)" class="btn-ios btn-primary flex-1 py-3.5 text-[14px]"><i class="fa-regular fa-paper-plane"></i> ส่งตรวจ</button>
                     </div>
                 </form>
             </div>
 
-            <div id="form-midwifery" class="glass-card p-6 hidden">
-                <form onsubmit="event.preventDefault();" id="formObj-midwifery" class="space-y-5">
+            <div id="form-midwifery" class="ios-card p-6 hidden">
+                <form onsubmit="event.preventDefault();" id="formObj-midwifery" class="space-y-4">
                     <div class="grid grid-cols-2 gap-4">
-                        <div><label class="block text-[11px] font-extrabold text-slate-700 uppercase ml-2 mb-1.5 tracking-wide">📅 วันที่</label><input type="date" id="mid_date" required class="input-wow w-full text-[14px] px-4 py-3.5"></div>
-                        <div><label class="block text-[11px] font-extrabold text-slate-700 uppercase ml-2 mb-1.5 tracking-wide">🆔 HN มารดา</label><input type="text" id="mid_hn" required class="input-wow w-full text-[14px] px-4 py-3.5"></div>
+                        <div><label class="block text-[12px] font-semibold text-gray-500 mb-1.5 ml-1">วันที่</label><input type="date" id="mid_date" required class="input-wow w-full text-[14px] px-4 py-3"></div>
+                        <div><label class="block text-[12px] font-semibold text-gray-500 mb-1.5 ml-1">HN มารดา</label><input type="text" id="mid_hn" required class="input-wow w-full text-[14px] px-4 py-3"></div>
                     </div>
-                    <div><label class="block text-[11px] font-extrabold text-slate-700 uppercase ml-2 mb-1.5 tracking-wide">👤 ชื่อ-สกุล มารดา</label><input type="text" id="mid_patientName" required class="input-wow w-full text-[14px] px-4 py-3.5"></div>
-                    <div><label class="block text-[11px] font-extrabold text-slate-700 uppercase ml-2 mb-1.5 tracking-wide">📸 แนบรูปหลักฐาน (ถ้ามี)</label><input type="file" id="mid_image" accept="image/*" class="w-full text-[13px] text-slate-600 file:mr-4 file:py-2.5 file:px-5 file:rounded-full file:border-0 file:text-[12px] file:font-extrabold file:bg-rose-100 file:text-rose-800 hover:file:bg-rose-200 transition cursor-pointer input-wow py-1.5 px-1.5"></div>
-                    <div class="pt-2"><label class="block text-[12px] font-extrabold text-slate-800 uppercase ml-2 mb-3 text-center tracking-wide">👨‍🏫 เลือกอาจารย์ผู้ตรวจ</label><div id="instructors_midwifery" class="grid grid-cols-3 gap-3"></div></div>
+                    <div><label class="block text-[12px] font-semibold text-gray-500 mb-1.5 ml-1">ชื่อ-สกุล มารดา</label><input type="text" id="mid_patientName" required class="input-wow w-full text-[14px] px-4 py-3"></div>
+                    <div><label class="block text-[12px] font-semibold text-gray-500 mb-1.5 ml-1">แนบรูปหลักฐาน (ถ้ามี)</label><input type="file" id="mid_image" accept="image/*" class="w-full text-[13px] text-gray-600 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-[12px] file:font-medium file:bg-[#f0f7ff] file:text-[#007aff] input-wow py-1 px-1"></div>
+                    <div class="pt-3"><label class="block text-[13px] font-semibold text-gray-800 mb-3 text-center">เลือกอาจารย์ผู้ตรวจ</label><div id="instructors_midwifery" class="grid grid-cols-3 gap-3"></div></div>
                     
-                    <div class="flex gap-3 pt-4">
-                        <button type="button" onclick="submitCaseAction('midwifery', true)" class="btn-glow bg-white border-[2.5px] border-rose-600 text-rose-600 flex-1 text-[13px] font-extrabold py-4 rounded-full flex justify-center items-center gap-2"><i class="fa-solid fa-floppy-disk text-lg"></i> บันทึกร่าง</button>
-                        <button type="button" onclick="submitCaseAction('midwifery', false)" class="btn-glow bg-gradient-to-r from-rose-600 to-pink-700 text-white flex-1 text-[13px] font-extrabold py-4 rounded-full flex justify-center items-center gap-2 shadow-lg shadow-rose-600/30"><i class="fa-solid fa-paper-plane text-lg"></i> ส่งตรวจทันที</button>
+                    <div class="flex gap-3 pt-5">
+                        <button type="button" onclick="submitCaseAction('midwifery', true)" class="btn-ios btn-outline flex-1 py-3.5 text-[14px]"><i class="fa-regular fa-bookmark"></i> บันทึกร่าง</button>
+                        <button type="button" onclick="submitCaseAction('midwifery', false)" class="btn-ios btn-primary flex-1 py-3.5 text-[14px]"><i class="fa-regular fa-paper-plane"></i> ส่งตรวจ</button>
                     </div>
                 </form>
             </div>
 
-            <div id="form-medicine" class="glass-card p-6 hidden">
-                <form onsubmit="event.preventDefault();" id="formObj-medicine" class="space-y-5">
+            <div id="form-medicine" class="ios-card p-6 hidden">
+                <form onsubmit="event.preventDefault();" id="formObj-medicine" class="space-y-4">
                     <div class="grid grid-cols-2 gap-4">
-                        <div><label class="block text-[11px] font-extrabold text-slate-700 uppercase ml-2 mb-1.5 tracking-wide">📅 วันที่</label><input type="date" id="med_date" required class="input-wow w-full text-[14px] px-4 py-3.5"></div>
-                        <div><label class="block text-[11px] font-extrabold text-slate-700 uppercase ml-2 mb-1.5 tracking-wide">🆔 รหัส HN</label><input type="text" id="med_hn" required class="input-wow w-full text-[14px] px-4 py-3.5"></div>
+                        <div><label class="block text-[12px] font-semibold text-gray-500 mb-1.5 ml-1">วันที่</label><input type="date" id="med_date" required class="input-wow w-full text-[14px] px-4 py-3"></div>
+                        <div><label class="block text-[12px] font-semibold text-gray-500 mb-1.5 ml-1">รหัส HN</label><input type="text" id="med_hn" required class="input-wow w-full text-[14px] px-4 py-3"></div>
                     </div>
-                    <div><label class="block text-[11px] font-extrabold text-slate-700 uppercase ml-2 mb-1.5 tracking-wide">👤 ชื่อ-สกุล ผู้ป่วย</label><input type="text" id="med_patientName" required class="input-wow w-full text-[14px] px-4 py-3.5"></div>
-                    <div class="p-5 bg-white/60 rounded-[1.5rem] border border-white shadow-sm"><label class="block text-[11px] font-extrabold text-slate-700 uppercase ml-2 mb-1.5 tracking-wide">วินิจฉัยโรคแผนไทย</label><select id="med_diseaseName" required class="input-wow w-full text-[14px] px-3 py-3.5 cursor-pointer"><option value="">-- โหลดข้อมูล... --</option></select></div>
-                    <div><label class="block text-[11px] font-extrabold text-slate-700 uppercase ml-2 mb-1.5 tracking-wide">📸 แนบรูปหลักฐาน (ถ้ามี)</label><input type="file" id="med_image" accept="image/*" class="w-full text-[13px] text-slate-600 file:mr-4 file:py-2.5 file:px-5 file:rounded-full file:border-0 file:text-[12px] file:font-extrabold file:bg-blue-100 file:text-blue-800 hover:file:bg-blue-200 transition cursor-pointer input-wow py-1.5 px-1.5"></div>
-                    <div class="pt-2"><label class="block text-[12px] font-extrabold text-slate-800 uppercase ml-2 mb-3 text-center tracking-wide">👨‍🏫 เลือกอาจารย์ผู้ตรวจ</label><div id="instructors_medicine" class="grid grid-cols-3 gap-3"></div></div>
+                    <div><label class="block text-[12px] font-semibold text-gray-500 mb-1.5 ml-1">ชื่อ-สกุล ผู้ป่วย</label><input type="text" id="med_patientName" required class="input-wow w-full text-[14px] px-4 py-3"></div>
+                    <div class="p-4 bg-gray-50 rounded-2xl border border-gray-100"><label class="block text-[12px] font-semibold text-gray-500 mb-1.5 ml-1">วินิจฉัยโรค</label><select id="med_diseaseName" required class="input-wow w-full text-[14px] px-3 py-3"><option value="">-- โหลดข้อมูล... --</option></select></div>
+                    <div><label class="block text-[12px] font-semibold text-gray-500 mb-1.5 ml-1">แนบรูปหลักฐาน (ถ้ามี)</label><input type="file" id="med_image" accept="image/*" class="w-full text-[13px] text-gray-600 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-[12px] file:font-medium file:bg-[#f0f7ff] file:text-[#007aff] input-wow py-1 px-1"></div>
+                    <div class="pt-3"><label class="block text-[13px] font-semibold text-gray-800 mb-3 text-center">เลือกอาจารย์ผู้ตรวจ</label><div id="instructors_medicine" class="grid grid-cols-3 gap-3"></div></div>
                     
-                    <div class="flex gap-3 pt-4">
-                        <button type="button" onclick="submitCaseAction('medicine', true)" class="btn-glow bg-white border-[2.5px] border-blue-600 text-blue-600 flex-1 text-[13px] font-extrabold py-4 rounded-full flex justify-center items-center gap-2"><i class="fa-solid fa-floppy-disk text-lg"></i> บันทึกร่าง</button>
-                        <button type="button" onclick="submitCaseAction('medicine', false)" class="btn-glow bg-gradient-to-r from-blue-600 to-indigo-700 text-white flex-1 text-[13px] font-extrabold py-4 rounded-full flex justify-center items-center gap-2 shadow-lg shadow-blue-600/30"><i class="fa-solid fa-paper-plane text-lg"></i> ส่งตรวจทันที</button>
+                    <div class="flex gap-3 pt-5">
+                        <button type="button" onclick="submitCaseAction('medicine', true)" class="btn-ios btn-outline flex-1 py-3.5 text-[14px]"><i class="fa-regular fa-bookmark"></i> บันทึกร่าง</button>
+                        <button type="button" onclick="submitCaseAction('medicine', false)" class="btn-ios btn-primary flex-1 py-3.5 text-[14px]"><i class="fa-regular fa-paper-plane"></i> ส่งตรวจ</button>
                     </div>
                 </form>
             </div>
         </div>
 
-        <div id="view-mycases" class="hidden glass-card p-6 mb-6">
-            <h2 class="font-extrabold text-slate-900 text-[18px] mb-5 flex items-center gap-3"><div class="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600"><i class="fa-solid fa-folder-open"></i></div> เคสของฉัน</h2>
-            <div id="mycases-container" class="space-y-4"><p class="text-center text-[13px] font-bold text-slate-500 py-10"><i class="fa-solid fa-spinner fa-spin text-xl mb-2 block"></i> กำลังโหลดข้อมูล...</p></div>
+        <div id="view-mycases" class="hidden ios-card p-6 mb-6">
+            <h2 class="font-bold text-gray-900 text-[18px] mb-5 flex items-center gap-3">
+                <i class="fa-solid fa-folder-open text-[#007aff] text-xl"></i> เคสของฉัน
+            </h2>
+            <div id="mycases-container" class="space-y-4"><p class="text-center text-[13px] text-gray-500 py-10">กำลังโหลดข้อมูล...</p></div>
         </div>
 
-        <div id="view-feed" class="hidden glass-card p-6 mb-6">
-            <h2 class="font-extrabold text-slate-900 text-[18px] mb-5 flex items-center gap-3"><div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600"><i class="fa-solid fa-globe"></i></div> กระดานเคสรวม</h2>
+        <div id="view-feed" class="hidden ios-card p-6 mb-6">
+            <h2 class="font-bold text-gray-900 text-[18px] mb-5 flex items-center gap-3">
+                <i class="fa-solid fa-globe text-[#34c759] text-xl"></i> กระดานเคสรวม
+            </h2>
             <div class="relative mb-6">
-                <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 transform -translate-y-1/2 text-slate-400 text-lg"></i>
-                <input type="text" id="feed-search" placeholder="พิมพ์ HN หรือ ชื่อโรค เพื่อค้นหา..." class="input-wow w-full text-[14px] pl-12 pr-4 py-4" onkeyup="filterFeed()">
+                <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                <input type="text" id="feed-search" placeholder="ค้นหา HN หรือ ชื่อโรค..." class="input-wow w-full text-[14px] pl-10 pr-4 py-3" onkeyup="filterFeed()">
             </div>
-            <div id="feed-container" class="space-y-4"><p class="text-center text-[13px] font-bold text-slate-500 py-10"><i class="fa-solid fa-spinner fa-spin text-xl mb-2 block"></i> กำลังโหลดข้อมูล...</p></div>
+            <div id="feed-container" class="space-y-4"><p class="text-center text-[13px] text-gray-500 py-10">กำลังโหลดข้อมูล...</p></div>
         </div>
 
-        <div id="view-dashboard" class="hidden glass-card p-6 mb-6">
-            <div id="dash-instructor" class="hidden mb-10 border-b-2 border-slate-100 pb-8">
-                <h2 class="font-extrabold text-slate-900 text-[20px] mb-5 flex items-center gap-3"><div class="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center text-orange-600"><i class="fa-solid fa-inbox text-lg"></i></div> ระบบตรวจประเมิน</h2>
-                
-                <div class="flex gap-2 overflow-x-auto no-scrollbar mb-4 pt-2 pb-3 px-1 -mx-1" id="filter-students">
-                    <button class="filter-pill active-std" onclick="setStudentFilter('all')" id="btn-std-all">รวมทุกคน</button>
+        <div id="view-dashboard" class="hidden mb-6 space-y-5">
+            <div id="dash-instructor" class="hidden ios-card p-6">
+                <h2 class="font-bold text-gray-900 text-[18px] mb-4 flex items-center gap-3"><i class="fa-solid fa-inbox text-[#ff9500] text-xl"></i> ตรวจประเมิน</h2>
+                <div class="flex gap-2 overflow-x-auto no-scrollbar mb-4 pt-1 pb-2">
+                    <button class="filter-pill active-pending px-4 py-1.5 rounded-full text-[12px] font-semibold bg-[#fff8e6] text-[#b45309]" onclick="setStatusFilter('pending')" id="btn-stat-pending">รอตรวจ</button>
+                    <button class="filter-pill px-4 py-1.5 rounded-full text-[12px] font-semibold bg-gray-100 text-gray-600" onclick="setStatusFilter('approved')" id="btn-stat-approved">ตรวจแล้ว</button>
+                    <button class="filter-pill px-4 py-1.5 rounded-full text-[12px] font-semibold bg-gray-100 text-gray-600" onclick="setStatusFilter('returned')" id="btn-stat-returned">ส่งแก้</button>
                 </div>
-                <div class="flex gap-2 overflow-x-auto no-scrollbar mb-6 pt-2 pb-3 px-1 -mx-1">
-                    <button class="filter-pill active-pending" onclick="setStatusFilter('pending')" id="btn-stat-pending">⏳ รอตรวจ</button>
-                    <button class="filter-pill" onclick="setStatusFilter('approved')" id="btn-stat-approved">✅ ตรวจแล้ว</button>
-                    <button class="filter-pill" onclick="setStatusFilter('returned')" id="btn-stat-returned">⚠️ ส่งแก้</button>
-                </div>
-                
-                <div id="instructor-cases-container" class="space-y-4"><p class="text-center text-[13px] font-bold text-slate-500 py-6"><i class="fa-solid fa-spinner fa-spin text-xl mb-2 block"></i> ดึงข้อมูลเคส...</p></div>
+                <div class="flex gap-2 overflow-x-auto no-scrollbar mb-5 pb-2" id="filter-students"></div>
+                <div id="instructor-cases-container" class="space-y-4"><p class="text-center text-[13px] text-gray-500 py-6">ดึงข้อมูลเคส...</p></div>
             </div>
 
-            <h2 class="font-extrabold text-indigo-700 text-[18px] mb-5 flex items-center gap-3"><div class="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600"><i class="fa-solid fa-chart-pie"></i></div> ความคืบหน้านักศึกษา</h2>
-            <div id="student-stats-container" class="space-y-5 mb-10"></div>
+            <div class="ios-card p-6">
+                <h2 class="font-bold text-gray-900 text-[17px] mb-5">📊 สถิตินักศึกษา</h2>
+                <div id="student-stats-container" class="space-y-4"></div>
+            </div>
 
-            <h2 class="font-extrabold text-teal-700 text-[18px] mb-5 flex items-center gap-3"><div class="w-10 h-10 rounded-full bg-teal-100 flex items-center justify-center text-teal-600"><i class="fa-solid fa-ranking-star"></i></div> อันดับโรคยอดฮิต</h2>
-            <div id="disease-rank-container" class="bg-white/80 rounded-[1.5rem] p-5 border border-white shadow-sm"></div>
+            <div class="ios-card p-6">
+                <h2 class="font-bold text-gray-900 text-[17px] mb-5">🏆 5 อันดับโรคพบบ่อย</h2>
+                <div id="disease-rank-container"></div>
+            </div>
         </div>
 
     </div>
 
-    <div id="judge-modal" class="fixed inset-0 z-[60] hidden flex items-center justify-center p-4">
-        <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity" onclick="closeJudgeModal()"></div>
-        <div class="bg-white w-full max-w-sm rounded-[2rem] shadow-2xl relative z-10 overflow-hidden animate-tab">
-            <div class="bg-gradient-to-r from-orange-500 to-amber-500 p-5 text-center">
-                <h3 class="text-white font-extrabold text-[16px] tracking-wide" id="judge-title">📝 ยืนยันการตรวจเคส</h3>
+    <div id="judge-modal" class="fixed inset-0 z-[60] hidden flex items-center justify-center p-5">
+        <div class="absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity" onclick="closeJudgeModal()"></div>
+        <div class="bg-white w-full max-w-sm rounded-3xl shadow-2xl relative z-10 overflow-hidden animate-tab">
+            <div class="bg-gray-50 border-b border-gray-100 p-4 text-center">
+                <h3 class="text-gray-900 font-bold text-[16px]" id="judge-title">ยืนยันการประเมิน</h3>
             </div>
             <div class="p-6 space-y-5">
                 <div>
-                    <label class="block text-[12px] font-extrabold text-slate-700 uppercase mb-2 tracking-wide">หมายเหตุ / คำแนะนำ</label>
-                    <textarea id="judge-remark" rows="3" placeholder="ระบุข้อความเพื่อแจ้งเตือนกลับไปยังนักศึกษา..." class="input-wow w-full text-[14px] px-4 py-3 bg-slate-50"></textarea>
+                    <label class="block text-[13px] font-semibold text-gray-700 mb-2">คำแนะนำ (ถ้ามี)</label>
+                    <textarea id="judge-remark" rows="3" placeholder="ระบุข้อความถึงนักศึกษา..." class="input-wow w-full text-[14px] px-4 py-3"></textarea>
                 </div>
-                <div class="bg-orange-50/80 p-5 rounded-[1.5rem] border border-orange-200">
-                    <label class="block text-[12px] font-extrabold text-slate-700 uppercase mb-3 tracking-wide">📸 ถ่ายรูปกระดาษเคส (ถ้ามี)</label>
-                    <input type="file" id="judge-image" accept="image/*" capture="environment" class="w-full text-[13px] text-slate-600 file:mr-4 file:py-2.5 file:px-5 file:rounded-full file:border-0 file:text-[12px] file:font-extrabold file:bg-orange-100 file:text-orange-800 cursor-pointer">
+                <div class="bg-gray-50 p-4 rounded-2xl border border-gray-100">
+                    <label class="block text-[13px] font-semibold text-gray-700 mb-2">แนบรูปกลับไป (ถ้ามี)</label>
+                    <input type="file" id="judge-image" accept="image/*" capture="environment" class="w-full text-[13px] text-gray-600 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-[12px] file:font-medium file:bg-[#f0f7ff] file:text-[#007aff]">
                 </div>
-                <div class="flex gap-4 pt-3">
-                    <button onclick="closeJudgeModal()" class="flex-1 py-3.5 text-slate-600 font-extrabold text-[13px] bg-slate-100 rounded-full hover:bg-slate-200 transition">ยกเลิก</button>
-                    <button id="judge-submit-btn" class="flex-1 py-3.5 text-white font-extrabold text-[13px] bg-gradient-to-r from-orange-500 to-amber-500 rounded-full shadow-lg shadow-orange-500/40 btn-glow">ยืนยันบันทึก</button>
+                <div class="flex gap-3 pt-2">
+                    <button onclick="closeJudgeModal()" class="flex-1 py-3 text-gray-600 font-semibold text-[14px] bg-gray-100 rounded-full hover:bg-gray-200 transition">ยกเลิก</button>
+                    <button id="judge-submit-btn" class="flex-1 py-3 text-white font-semibold text-[14px] rounded-full btn-ios">ยืนยัน</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <nav class="fixed floating-nav z-50 backdrop-blur-xl px-2 py-2 flex justify-between items-center">
-        <button onclick="switchMainView('forms')" id="nav-forms" class="nav-item active text-emerald-600 flex flex-col items-center p-2 w-[24%] relative">
-            <div class="icon-box text-[22px] mb-1"><i class="fa-solid fa-plus-circle"></i></div><span class="text-[10px] font-extrabold tracking-wide">เพิ่มเคส</span>
+    <nav class="fixed floating-nav z-50 px-2 py-2 flex justify-between items-center">
+        <button onclick="switchMainView('forms')" id="nav-forms" class="nav-item active flex flex-col items-center py-1 w-[24%]">
+            <div class="icon-box"><i class="fa-solid fa-square-plus"></i></div><span class="text-[10px] font-semibold">เพิ่มเคส</span>
         </button>
-        <button onclick="switchMainView('mycases'); loadMyCases();" id="nav-mycases" class="nav-item text-slate-500 flex flex-col items-center p-2 w-[24%] relative">
-            <div class="icon-box text-[22px] mb-1"><i class="fa-solid fa-folder-open"></i></div><span class="text-[10px] font-extrabold tracking-wide">ของฉัน</span>
+        <button onclick="switchMainView('mycases'); loadMyCases();" id="nav-mycases" class="nav-item flex flex-col items-center py-1 w-[24%]">
+            <div class="icon-box"><i class="fa-solid fa-folder-closed"></i></div><span class="text-[10px] font-semibold">ของฉัน</span>
         </button>
-        <button onclick="switchMainView('feed'); loadGlobalFeed();" id="nav-feed" class="nav-item text-slate-500 flex flex-col items-center p-2 w-[24%] relative">
-            <div class="icon-box text-[22px] mb-1"><i class="fa-solid fa-globe"></i></div><span class="text-[10px] font-extrabold tracking-wide">เคสรวม</span>
+        <button onclick="switchMainView('feed'); loadGlobalFeed();" id="nav-feed" class="nav-item flex flex-col items-center py-1 w-[24%]">
+            <div class="icon-box"><i class="fa-solid fa-globe"></i></div><span class="text-[10px] font-semibold">เคสรวม</span>
         </button>
-        <button onclick="switchMainView('dashboard'); loadDashboardData();" id="nav-dashboard" class="nav-item text-slate-500 flex flex-col items-center p-2 w-[24%] relative">
-            <div class="icon-box text-[22px] mb-1"><i class="fa-solid fa-chart-pie"></i></div><span class="text-[10px] font-extrabold tracking-wide">สถิติ/ตรวจ</span>
+        <button onclick="switchMainView('dashboard'); loadDashboardData();" id="nav-dashboard" class="nav-item flex flex-col items-center py-1 w-[24%]">
+            <div class="icon-box"><i class="fa-solid fa-chart-pie"></i></div><span class="text-[10px] font-semibold">แดชบอร์ด</span>
         </button>
     </nav>
 
@@ -251,8 +328,6 @@
         const FIREBASE_URL = 'https://ttmedstudy-default-rtdb.asia-southeast1.firebasedatabase.app/';
         const FIREBASE_SECRET = '9iKYKSmC8ssrUXvEdh2OOqS4JCeyEwcaCGr83WkG';
         const LIFF_ID = "2010280091-6e8mWiGV";
-        
-        // ⚠️ ลิงก์ Web App ล่าสุดของอาจารย์ครับ
         const GAS_WEBAPP_URL = "https://script.google.com/macros/s/AKfycbxFeZxtiaQ_TgT6Hzd0bDo19rbM8SjmGVMMid9BQanch9pyEtOB2ivlXtF6tB9xQGuKKQ/exec";
 
         let currentUser = null; let instructorList = []; let currentEditCaseId = null;
@@ -263,7 +338,6 @@
             await loadDropdownConfigs(); await fetchUsersAndRenderInstructors(); await initializeLiff();
         };
 
-        // ================= ฟังก์ชันแปลงเวลาให้เป็นภาษาไทย =================
         function formatTimeThai(timestamp) {
             if (!timestamp) return "-";
             const d = new Date(timestamp);
@@ -273,14 +347,24 @@
 
         async function loadDropdownConfigs() {
             try {
-                const res = await fetch(`${FIREBASE_URL}configs.json?auth=${FIREBASE_SECRET}`); const configs = await res.json();
+                const res = await fetch(`${FIREBASE_URL}configs.json?auth=${FIREBASE_SECRET}`); 
+                const configs = await res.json();
+                
                 if (configs?.diseases_massage) {
-                    const msgSelect = document.getElementById('msg_diseaseName'); msgSelect.innerHTML = '<option value="">-- เลือกโรค/อาการ --</option>';
-                    for (const [code, name] of Object.entries(configs.diseases_massage)) msgSelect.innerHTML += `<option value="${name}" class="font-semibold text-slate-700">${code}: ${name}</option>`;
+                    const msgSelect = document.getElementById('msg_diseaseName'); 
+                    msgSelect.innerHTML = '<option value="">-- พิมพ์ค้นหา --</option>';
+                    for (const [code, name] of Object.entries(configs.diseases_massage)) {
+                        msgSelect.innerHTML += `<option value="${code}: ${name}">${code}: ${name}</option>`;
+                    }
+                    new Choices('#msg_diseaseName', { searchEnabled: true, itemSelectText: '', noResultsText: 'ไม่พบข้อมูล' });
                 }
                 if (configs?.diseases_medicine) {
-                    const medSelect = document.getElementById('med_diseaseName'); medSelect.innerHTML = '<option value="">-- เลือกการวินิจฉัย --</option>';
-                    for (const [code, obj] of Object.entries(configs.diseases_medicine)) medSelect.innerHTML += `<option value="${obj.name}" data-category="${obj.type}" class="font-semibold text-slate-700">${code}: ${obj.name}</option>`;
+                    const medSelect = document.getElementById('med_diseaseName'); 
+                    medSelect.innerHTML = '<option value="">-- พิมพ์ค้นหา --</option>';
+                    for (const [code, obj] of Object.entries(configs.diseases_medicine)) {
+                        medSelect.innerHTML += `<option value="${obj.name}" data-category="${obj.type}">${code}: ${obj.name}</option>`;
+                    }
+                    new Choices('#med_diseaseName', { searchEnabled: true, itemSelectText: '', noResultsText: 'ไม่พบข้อมูล' });
                 }
             } catch (e) {}
         }
@@ -291,7 +375,7 @@
                 for (const uid in users) if (users[uid].role === 'instructor' && users[uid].isActive) instructorList.push({ uid: uid, name: users[uid].fullName, picUrl: users[uid].picUrl });
                 ['massage', 'midwifery', 'medicine'].forEach(dep => {
                     const container = document.getElementById(`instructors_${dep}`);
-                    if(container) container.innerHTML = instructorList.map((inst, index) => `<div class="relative"><input type="radio" name="instructor_${dep}" id="inst_${dep}_${index}" value="${inst.uid}" class="instructor-radio hidden" required><label for="inst_${dep}_${index}" class="cursor-pointer border-2 border-transparent bg-white/70 rounded-[1.2rem] p-2 flex flex-col items-center gap-1.5 transition-all relative shadow-sm hover:bg-white"><div class="avatar-ring"><img src="${inst.picUrl}" class="w-10 h-10 rounded-full object-cover border border-white"></div><span class="text-[11px] font-extrabold text-slate-700 text-center truncate w-full">${inst.name.split(' ')[0]}</span><div class="check-icon absolute -top-1 -right-1 bg-emerald-500 text-white w-6 h-6 rounded-full flex items-center justify-center shadow-md"><i class="fa-solid fa-check text-[10px]"></i></div></label></div>`).join('');
+                    if(container) container.innerHTML = instructorList.map((inst, index) => `<div class="relative"><input type="radio" name="instructor_${dep}" id="inst_${dep}_${index}" value="${inst.uid}" class="instructor-radio hidden" required><label for="inst_${dep}_${index}" class="cursor-pointer bg-[#f2f2f7] rounded-[18px] p-2.5 flex flex-col items-center gap-1.5 transition-all relative border-2 border-transparent"><div class="avatar-ring"><img src="${inst.picUrl}" class="w-11 h-11 rounded-full object-cover"></div><span class="text-[12px] font-semibold text-gray-700 text-center truncate w-full">${inst.name.split(' ')[0]}</span><div class="check-icon absolute -top-1.5 -right-1.5 bg-[#007aff] text-white w-6 h-6 rounded-full flex items-center justify-center shadow-sm"><i class="fa-solid fa-check text-[10px]"></i></div></label></div>`).join('');
                 });
             } catch (e) {}
         }
@@ -300,9 +384,7 @@
             try { 
                 await liff.init({ liffId: LIFF_ID }); 
                 if (liff.isLoggedIn()) checkUserPermission(await liff.getProfile()); else liff.login(); 
-            } catch (err) { 
-                Swal.fire({icon: 'error', title: 'ข้อผิดพลาด', text: 'ไม่สามารถโหลดระบบ LINE ได้ครับ', confirmButtonColor: '#ef4444'}); 
-            } 
+            } catch (err) { Swal.fire('ข้อผิดพลาด', 'ไม่สามารถโหลดระบบ LINE ได้', 'error'); } 
         }
 
         async function checkUserPermission(profile) {
@@ -316,59 +398,58 @@
                 const roleContainer = document.getElementById('userRoleContainer');
                 if (userData && userData.isActive) {
                     currentUser = { uid: profile.userId, ...userData };
-                    
                     if (userData.role === 'instructor') { 
-                        roleContainer.innerHTML = '<span class="text-[10px] font-extrabold text-white bg-gradient-to-r from-orange-500 to-amber-500 px-3 py-1 rounded-full mt-1 inline-block shadow-sm">⭐ อาจารย์แพทย์</span>';
+                        roleContainer.innerHTML = '<span class="text-[10px] font-semibold text-white bg-[#ff9500] px-2 py-0.5 rounded text-xs mt-1 inline-block">อาจารย์แพทย์</span>';
                         document.getElementById('dash-instructor').classList.remove('hidden'); 
-                        
                         document.getElementById('nav-forms').style.display = 'none';
                         document.getElementById('nav-mycases').style.display = 'none';
                         document.getElementById('nav-feed').classList.replace('w-[24%]', 'w-[48%]');
                         document.getElementById('nav-dashboard').classList.replace('w-[24%]', 'w-[48%]');
-                        
-                        switchMainView('dashboard'); 
-                        loadDashboardData();
+                        switchMainView('dashboard'); loadDashboardData();
                     } else { 
-                        roleContainer.innerHTML = '<span class="text-[10px] font-extrabold text-white bg-gradient-to-r from-emerald-500 to-teal-500 px-3 py-1 rounded-full mt-1 inline-block shadow-sm">🎓 นศ.แพทย์แผนไทย</span>';
+                        roleContainer.innerHTML = '<span class="text-[10px] font-semibold text-white bg-[#34c759] px-2 py-0.5 rounded text-xs mt-1 inline-block">นศ.แพทย์แผนไทย</span>';
                         switchMainView('forms');
                     }
                 } else { 
                     document.getElementById('userName').innerText = "Access Denied"; 
-                    roleContainer.innerHTML = '<span class="text-[10px] font-extrabold text-white bg-slate-500 px-3 py-1 rounded-full mt-1 inline-block shadow-sm">ไม่มีสิทธิ์ใช้งาน</span>';
+                    roleContainer.innerHTML = '<span class="text-[10px] font-semibold text-white bg-gray-400 px-2 py-0.5 rounded mt-1 inline-block">ไม่มีสิทธิ์ใช้งาน</span>';
                 }
-            } catch (e) { console.error("Permission Check Error", e); }
+            } catch (e) {}
         }
 
         function switchMainView(viewId) {
-            ['forms', 'mycases', 'feed', 'dashboard'].forEach(id => { document.getElementById(`view-${id}`).classList.add('hidden'); document.getElementById(`view-${id}`).classList.remove('animate-tab'); document.getElementById(`nav-${id}`).classList.remove('active', 'text-emerald-600'); document.getElementById(`nav-${id}`).classList.add('text-slate-500'); });
+            ['forms', 'mycases', 'feed', 'dashboard'].forEach(id => { document.getElementById(`view-${id}`).classList.add('hidden'); document.getElementById(`view-${id}`).classList.remove('animate-tab'); document.getElementById(`nav-${id}`).classList.remove('active'); document.getElementById(`nav-${id}`).querySelector('i').classList.replace('fa-solid', 'fa-regular') || document.getElementById(`nav-${id}`).querySelector('i').classList.replace('fa-folder-open', 'fa-folder-closed'); });
             const v = document.getElementById(`view-${viewId}`); v.classList.remove('hidden'); void v.offsetWidth; v.classList.add('animate-tab');
-            const n = document.getElementById(`nav-${viewId}`); n.classList.remove('text-slate-500'); n.classList.add('active', 'text-emerald-600');
+            const n = document.getElementById(`nav-${viewId}`); n.classList.add('active');
+            
+            // สลับไอคอนเมื่อ Active แบบ iOS
+            if(viewId === 'forms') n.querySelector('i').classList.replace('fa-regular', 'fa-solid');
+            if(viewId === 'mycases') n.querySelector('i').classList.replace('fa-folder-closed', 'fa-folder-open');
+            if(viewId === 'feed') n.querySelector('i').classList.replace('fa-regular', 'fa-solid');
+            if(viewId === 'dashboard') n.querySelector('i').classList.replace('fa-regular', 'fa-solid');
         }
 
         function switchForm(dep) {
-            ['massage', 'midwifery', 'medicine'].forEach(id => { document.getElementById(`form-${id}`).classList.add('hidden'); document.getElementById(`sub-${id}`).classList.remove('active', 'active-mid', 'active-med'); });
+            ['massage', 'midwifery', 'medicine'].forEach(id => { document.getElementById(`form-${id}`).classList.add('hidden'); document.getElementById(`sub-${id}`).classList.remove('active'); });
             document.getElementById(`form-${dep}`).classList.remove('hidden');
-            const btn = document.getElementById(`sub-${dep}`); btn.classList.add('active');
-            if(dep === 'midwifery') btn.classList.add('active-mid'); if(dep === 'medicine') btn.classList.add('active-med');
+            document.getElementById(`sub-${dep}`).classList.add('active');
         }
 
         async function submitCaseAction(department, isDraft) {
-            if (!currentUser) return Swal.fire({icon: 'info', title: 'รอสักครู่', text: 'กำลังดึงข้อมูลเข้าระบบ กรุณารอสักครู่ครับ', confirmButtonColor: '#3b82f6'});
-            
+            if (!currentUser) return;
             const formObj = document.getElementById(`formObj-${department}`); 
             if (!formObj.checkValidity()) { formObj.reportValidity(); return; }
-            
             const selectedInstructor = document.querySelector(`input[name="instructor_${department}"]:checked`); 
-            if (!selectedInstructor) return Swal.fire({icon: 'warning', title: 'ลืมเลือกอาจารย์!', text: 'กรุณาเลือกอาจารย์ผู้ตรวจประเมินก่อนกดบันทึกครับ', confirmButtonColor: '#f59e0b'});
+            if (!selectedInstructor) return Swal.fire({icon: 'warning', title: 'แจ้งเตือน', text: 'กรุณาเลือกอาจารย์ผู้ตรวจครับ', confirmButtonColor: '#007aff'});
 
             const btnPrimary = document.querySelector(`#form-${department} .btn-primary`); const btnOutline = document.querySelector(`#form-${department} .btn-outline`);
             btnPrimary.disabled = true; btnOutline.disabled = true; const originalText = isDraft ? btnOutline.innerHTML : btnPrimary.innerHTML;
-            if(isDraft) btnOutline.innerHTML = `<i class="fa-solid fa-spinner fa-spin text-lg"></i> บันทึก...`; else btnPrimary.innerHTML = `<i class="fa-solid fa-spinner fa-spin text-lg"></i> ส่ง...`;
+            if(isDraft) btnOutline.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i>`; else btnPrimary.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i>`;
 
             try {
                 let base64String = ""; let mimeType = ""; let fileName = ""; const fileInput = document.getElementById(`${department === 'massage' ? 'msg' : department === 'midwifery' ? 'mid' : 'med'}_image`);
-                if (fileInput && fileInput.files.length > 0) { const file = fileInput.files[0]; if (file.size > 5 * 1024 * 1024) { Swal.fire({icon: 'error', title: 'ไฟล์ใหญ่เกินไป', text: 'กรุณาอัปโหลดรูปขนาดไม่เกิน 5MB ครับ', confirmButtonColor: '#ef4444'}); throw new Error("Size"); } fileName = department + "_" + Date.now() + "_" + file.name; mimeType = file.type; base64String = await new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(r.result.split(',')[1]); r.onerror = e => rej(e); r.readAsDataURL(file); }); }
-
+                if (fileInput && fileInput.files.length > 0) { const file = fileInput.files[0]; if (file.size > 5 * 1024 * 1024) throw new Error("Size"); fileName = department + "_" + Date.now() + "_" + file.name; mimeType = file.type; base64String = await new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(r.result.split(',')[1]); r.onerror = e => rej(e); r.readAsDataURL(file); }); }
+                
                 let payload = { action: "saveCaseData", department: department, studentUid: currentUser.uid, studentName: currentUser.fullName, instructorUid: selectedInstructor.value, status: isDraft ? 'draft' : 'pending', imageB64: base64String, imageMimeType: mimeType, imageName: fileName, caseId: currentEditCaseId, existingImageUrl: window.tempImageUrl || null };
                 
                 if (department === 'massage') { payload.date = document.getElementById('msg_date').value; payload.hn = document.getElementById('msg_hn').value; payload.patientName = document.getElementById('msg_patientName').value; payload.caseType = document.getElementById('msg_caseType').value; payload.diseaseCategory = document.getElementById('msg_diseaseCategory').value; payload.diseaseName = document.getElementById('msg_diseaseName').value; } 
@@ -377,15 +458,16 @@
 
                 const res = await fetch(GAS_WEBAPP_URL, { method: 'POST', body: JSON.stringify(payload) }); const result = await res.json(); 
                 
-                Swal.fire({ icon: result.success ? 'success' : 'error', title: result.success ? 'สำเร็จ!' : 'ข้อผิดพลาด', text: result.message, showConfirmButton: !result.success, confirmButtonColor: '#10b981', timer: result.success ? 2000 : undefined });
-                
-                if (result.success) { formObj.reset(); cancelEdit(); document.getElementById(department === 'massage' ? 'msg_date' : department === 'midwifery' ? 'mid_date' : 'med_date').valueAsDate = new Date(); if(isDraft) { switchMainView('mycases'); loadMyCases(); } }
-            } catch (err) { if(err.message !== "Size") Swal.fire({icon: 'error', title: 'การเชื่อมต่อขัดข้อง', text: 'เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์ กรุณาลองใหม่ครับ', confirmButtonColor: '#ef4444'}); } 
+                if (result.success) { 
+                    Swal.fire({ icon: 'success', title: 'สำเร็จ', showConfirmButton: false, timer: 1500 });
+                    formObj.reset(); cancelEdit(); document.getElementById(department === 'massage' ? 'msg_date' : department === 'midwifery' ? 'mid_date' : 'med_date').valueAsDate = new Date(); if(isDraft) { switchMainView('mycases'); loadMyCases(); } 
+                } else Swal.fire('ข้อผิดพลาด', result.message, 'error');
+            } catch (err) { if(err.message === "Size") Swal.fire('ไฟล์ใหญ่เกินไป', 'รูปขนาดไม่เกิน 5MB', 'error'); else Swal.fire('เกิดข้อผิดพลาด', 'กรุณาลองใหม่', 'error'); } 
             finally { btnPrimary.disabled = false; btnOutline.disabled = false; if(isDraft) btnOutline.innerHTML = originalText; else btnPrimary.innerHTML = originalText; }
         }
 
         async function loadMyCases() {
-            const container = document.getElementById('mycases-container'); container.innerHTML = '<p class="text-center text-[13px] font-bold text-slate-500 py-10"><i class="fa-solid fa-spinner fa-spin text-xl mb-2 block"></i> กำลังโหลดเคสของคุณ...</p>';
+            const container = document.getElementById('mycases-container'); container.innerHTML = '<p class="text-center text-[13px] text-gray-400 py-10">กำลังโหลด...</p>';
             try {
                 let html = ""; const deps = ['massage', 'midwifery', 'medicine'];
                 for (let dep of deps) {
@@ -393,29 +475,31 @@
                     for (let cid in cases) {
                         const c = cases[cid];
                         if (c.studentUid === currentUser.uid) {
-                            let badge = c.status === 'draft' ? '<span class="badge badge-draft">📝 ร่าง</span>' : c.status === 'pending' ? '<span class="badge badge-pending">⏳ รอตรวจ</span>' : c.status === 'returned' ? '<span class="badge badge-returned">⚠️ ส่งแก้</span>' : '<span class="badge badge-approved">✅ ผ่านแล้ว</span>';
+                            let badge = c.status === 'draft' ? '<span class="badge badge-draft">ร่าง</span>' : c.status === 'pending' ? '<span class="badge badge-pending">รอตรวจ</span>' : c.status === 'returned' ? '<span class="badge badge-returned">ส่งแก้</span>' : '<span class="badge badge-approved">ผ่าน</span>';
                             
                             let actionBtns = "";
                             if (c.status === 'draft' || c.status === 'returned') {
                                 actionBtns = `
-                                <div class="flex gap-2 mt-4">
-                                    <button onclick='editDraft(${JSON.stringify(c)}, "${dep}", "${cid}")' class="flex-1 text-[11px] font-extrabold text-blue-600 bg-blue-50 px-4 py-2.5 rounded-xl border border-blue-200 hover:bg-blue-100 transition"><i class="fa-solid fa-pen"></i> แก้ไข & ส่งตรวจ</button>
-                                    <button onclick='deleteCaseData("${dep}", "${cid}")' class="text-[11px] font-extrabold text-rose-600 bg-rose-50 px-4 py-2.5 rounded-xl border border-rose-200 hover:bg-rose-100 transition shadow-sm"><i class="fa-solid fa-trash"></i> ลบ</button>
+                                <div class="flex gap-2 mt-4 pt-4 border-t border-gray-100">
+                                    <button onclick='editDraft(${JSON.stringify(c)}, "${dep}", "${cid}")' class="flex-1 text-[13px] font-semibold text-[#007aff] bg-[#f0f7ff] py-2 rounded-xl"><i class="fa-solid fa-pen"></i> แก้ไข</button>
+                                    <button onclick='deleteCaseData("${dep}", "${cid}")' class="text-[13px] font-semibold text-[#ff3b30] bg-[#ffeceb] px-4 py-2 rounded-xl"><i class="fa-solid fa-trash"></i></button>
                                 </div>`;
                             }
                             
-                            let remarkAlert = c.status === 'returned' && c.remark ? `<div class="mt-3 text-[11px] text-rose-700 bg-rose-50 p-2.5 rounded-xl border border-rose-200"><b>หมายเหตุ:</b> ${c.remark}</div>` : "";
-                            let instImgBtn = (c.instructorImageUrl && c.instructorImageUrl !== "-") ? `<a href="${c.instructorImageUrl}" target="_blank" class="mt-3 ml-2 inline-block text-[11px] font-extrabold text-orange-600 bg-orange-50 px-3 py-2 rounded-xl border border-orange-200 hover:bg-orange-100 transition"><i class="fa-solid fa-image"></i> รูปจากอาจารย์</a>` : "";
-                            let myImgBtn = (c.imageUrl && c.imageUrl !== "-") ? `<a href="${c.imageUrl}" target="_blank" class="mt-3 inline-block text-[11px] font-extrabold text-emerald-600 bg-emerald-50 px-3 py-2 rounded-xl border border-emerald-200 hover:bg-emerald-100 transition"><i class="fa-solid fa-image"></i> รูปของคุณ</a>` : "";
+                            let remarkAlert = c.status === 'returned' && c.remark ? `<div class="mt-3 text-[13px] text-[#ff3b30] bg-[#ffeceb] p-3 rounded-xl"><b>คำแนะนำ:</b> ${c.remark}</div>` : "";
+                            let instImgBtn = (c.instructorImageUrl && c.instructorImageUrl !== "-") ? `<a href="${c.instructorImageUrl}" target="_blank" class="mt-3 ml-2 inline-block text-[12px] font-semibold text-[#ff9500] bg-[#fff6e5] px-3 py-1.5 rounded-lg"><i class="fa-solid fa-image"></i> จากอาจารย์</a>` : "";
+                            let myImgBtn = (c.imageUrl && c.imageUrl !== "-") ? `<a href="${c.imageUrl}" target="_blank" class="mt-3 inline-block text-[12px] font-semibold text-gray-600 bg-gray-100 px-3 py-1.5 rounded-lg"><i class="fa-solid fa-image"></i> รูปของคุณ</a>` : "";
 
-                            html += `<div class="bg-white p-5 rounded-[1.5rem] shadow-sm border border-slate-100" id="card_${cid}">
+                            html += `<div class="bg-white p-5 rounded-3xl shadow-sm border border-gray-100" id="card_${cid}">
                                         <div class="flex justify-between items-start mb-2">
-                                            <p class="text-[14px] font-extrabold text-slate-900">HN: ${c.hn}</p>
+                                            <p class="text-[15px] font-bold text-gray-900">HN ${c.hn}</p>
                                             ${badge}
                                         </div>
-                                        <p class="text-[13px] font-extrabold text-slate-700">${c.patientName}</p>
-                                        <p class="text-[10px] text-slate-400 mt-1"><i class="fa-regular fa-clock"></i> อัปเดตล่าสุด: ${formatTimeThai(c.timestamp)}</p>
-                                        <p class="text-[11px] font-bold text-slate-500 mt-2 truncate">📌 ${c.diseaseName || 'ผดุงครรภ์'}</p>
+                                        <p class="text-[14px] font-medium text-gray-700 mb-1">${c.patientName}</p>
+                                        <p class="text-[12px] text-gray-400 mb-3">${formatTimeThai(c.timestamp)}</p>
+                                        <div class="bg-[#f5f5f7] p-3 rounded-xl">
+                                            <p class="text-[13px] font-medium text-gray-800 truncate">${c.diseaseName || 'หมวด: ผดุงครรภ์'}</p>
+                                        </div>
                                         ${remarkAlert}
                                         <div class="flex flex-wrap items-center mt-1">${myImgBtn}${instImgBtn}</div>
                                         ${actionBtns}
@@ -423,15 +507,14 @@
                         }
                     }
                 }
-                container.innerHTML = html || '<p class="text-center text-[13px] font-bold text-slate-500 py-10">ยังไม่มีเคสที่บันทึกไว้ครับ</p>';
-            } catch(e) { container.innerHTML = '<p class="text-center text-[13px] font-bold text-red-500 py-10">โหลดข้อมูลล้มเหลว</p>'; }
+                container.innerHTML = html || '<p class="text-center text-[13px] text-gray-400 py-10">ยังไม่มีข้อมูล</p>';
+            } catch(e) { container.innerHTML = '<p class="text-center text-[13px] text-red-400 py-10">โหลดไม่สำเร็จ</p>'; }
         }
 
         function editDraft(data, dep, cid) {
             currentEditCaseId = cid; window.tempImageUrl = data.imageUrl; switchMainView('forms'); switchForm(dep); document.getElementById('edit-banner').classList.remove('hidden');
             let pre = dep === 'massage' ? 'msg' : dep === 'midwifery' ? 'mid' : 'med'; document.getElementById(`${pre}_date`).value = data.date; document.getElementById(`${pre}_hn`).value = data.hn; document.getElementById(`${pre}_patientName`).value = data.patientName;
-            if(dep === 'massage') { document.getElementById('msg_caseType').value = data.caseType; document.getElementById('msg_diseaseCategory').value = data.diseaseCategory; document.getElementById('msg_diseaseName').value = data.diseaseName; }
-            if(dep === 'medicine') { document.getElementById('med_diseaseName').value = data.diseaseName; }
+            if(dep === 'massage') { document.getElementById('msg_caseType').value = data.caseType; document.getElementById('msg_diseaseCategory').value = data.diseaseCategory; }
             const radios = document.getElementsByName(`instructor_${dep}`); for(let i=0; i<radios.length; i++) if(radios[i].value === data.instructorUid) radios[i].checked = true;
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
@@ -439,28 +522,28 @@
         function cancelEdit() { currentEditCaseId = null; window.tempImageUrl = null; document.getElementById('edit-banner').classList.add('hidden'); document.getElementById('formObj-massage').reset(); document.getElementById('formObj-midwifery').reset(); document.getElementById('formObj-medicine').reset(); const today = new Date(); document.getElementById('msg_date').valueAsDate = today; document.getElementById('mid_date').valueAsDate = today; document.getElementById('med_date').valueAsDate = today; }
 
         async function loadGlobalFeed() {
-            const container = document.getElementById('feed-container'); container.innerHTML = '<p class="text-center text-[13px] font-bold text-slate-500 py-10"><i class="fa-solid fa-spinner fa-spin text-xl mb-2 block"></i> กำลังโหลดเคสรวม...</p>';
+            const container = document.getElementById('feed-container'); container.innerHTML = '<p class="text-center text-[13px] text-gray-400 py-10">กำลังโหลด...</p>';
             try {
                 let html = ""; const deps = ['massage', 'midwifery', 'medicine']; let allCases = [];
                 for (let dep of deps) { const res = await fetch(`${FIREBASE_URL}cases/${dep}.json?auth=${FIREBASE_SECRET}`); const cases = await res.json(); for (let cid in cases) { if(cases[cid].status !== 'draft') allCases.push({...cases[cid], depName: dep}); } }
                 allCases.sort((a,b) => b.timestamp - a.timestamp);
                 
                 allCases.forEach(c => { 
-                    let badge = c.status === 'pending' ? '⏳ รอตรวจ' : c.status === 'returned' ? '⚠️ แก้ไข' : '✅ ผ่าน'; 
-                    html += `<div class="feed-card bg-white p-5 rounded-[1.5rem] shadow-sm border border-slate-100">
-                                <div class="flex justify-between items-start mb-2">
-                                    <p class="text-[14px] font-extrabold text-slate-900">HN: <span class="search-target">${c.hn}</span></p>
-                                    <span class="text-[10px] font-bold text-slate-500">${badge}</span>
+                    let badge = c.status === 'pending' ? 'รอตรวจ' : c.status === 'returned' ? 'แก้ไข' : 'ผ่าน'; 
+                    html += `<div class="feed-card bg-white p-5 rounded-3xl shadow-sm border border-gray-100">
+                                <div class="flex justify-between items-start mb-1">
+                                    <p class="text-[15px] font-bold text-gray-900">HN <span class="search-target">${c.hn}</span></p>
+                                    <span class="text-[12px] font-medium text-gray-400">${badge}</span>
                                 </div>
-                                <p class="text-[13px] font-extrabold text-slate-700 search-target">${c.patientName}</p>
-                                <p class="text-[10px] text-slate-400 mt-1"><i class="fa-regular fa-clock"></i> ส่งเมื่อ: ${formatTimeThai(c.timestamp)}</p>
-                                <div class="flex justify-between items-end mt-3">
-                                    <p class="text-[11px] font-bold text-slate-500 truncate w-2/3 search-target">📌 ${c.diseaseName || 'ผดุงครรภ์'}</p>
-                                    <p class="text-[10px] font-extrabold text-emerald-700 bg-emerald-100 px-3 py-1 rounded-xl">นศ. ${c.studentName.split(' ')[0]}</p>
+                                <p class="text-[14px] text-gray-700 search-target">${c.patientName}</p>
+                                <p class="text-[11px] text-gray-400 mt-1">${formatTimeThai(c.timestamp)}</p>
+                                <div class="flex justify-between items-center mt-3 pt-3 border-t border-gray-100">
+                                    <p class="text-[12px] font-medium text-gray-600 truncate w-2/3 search-target">${c.diseaseName || 'ผดุงครรภ์'}</p>
+                                    <p class="text-[11px] font-semibold text-[#007aff] bg-[#f0f7ff] px-2.5 py-1 rounded-md">นศ. ${c.studentName.split(' ')[0]}</p>
                                 </div>
                              </div>`; 
                 });
-                container.innerHTML = html || '<p class="text-center text-[13px] font-bold text-slate-500 py-10">ยังไม่มีเคสในระบบ</p>';
+                container.innerHTML = html || '<p class="text-center text-[13px] text-gray-400 py-10">ไม่มีข้อมูล</p>';
             } catch(e) {}
         }
         function filterFeed() { let input = document.getElementById('feed-search').value.toLowerCase(); let cards = document.getElementsByClassName('feed-card'); for (let i = 0; i < cards.length; i++) cards[i].style.display = cards[i].innerText.toLowerCase().includes(input) ? "" : "none"; }
@@ -468,11 +551,10 @@
         // ================= Dashboard อาจารย์ =================
         async function loadDashboardData() {
             const statsContainer = document.getElementById('student-stats-container'); const rankContainer = document.getElementById('disease-rank-container');
-            statsContainer.innerHTML = '<p class="text-center text-[13px] font-bold text-slate-500 py-6"><i class="fa-solid fa-spinner fa-spin text-xl mb-2 block"></i> กำลังโหลดข้อมูล...</p>';
             
             try {
                 if (currentUser.role === 'instructor') {
-                    document.getElementById('instructor-cases-container').innerHTML = '<p class="text-center text-[13px] font-bold text-slate-500 py-6"><i class="fa-solid fa-spinner fa-spin text-xl mb-2 block"></i> ดึงข้อมูลเคส...</p>';
+                    document.getElementById('instructor-cases-container').innerHTML = '<p class="text-center text-[13px] text-gray-400 py-6">ดึงข้อมูลเคส...</p>';
                     allInstructorCases = []; const deps = ['massage', 'midwifery', 'medicine']; let studentSet = new Set();
                     
                     for (let dep of deps) {
@@ -486,8 +568,8 @@
                     }
                     allInstructorCases.sort((a,b) => b.timestamp - a.timestamp); 
 
-                    let stdHtml = `<button class="filter-pill ${currentStudentFilter === 'all' ? 'active-std' : ''}" onclick="setStudentFilter('all')" id="btn-std-all">รวมทุกคน</button>`;
-                    Array.from(studentSet).forEach(sStr => { const s = JSON.parse(sStr); stdHtml += `<button class="filter-pill ${currentStudentFilter === s.uid ? 'active-std' : ''}" onclick="setStudentFilter('${s.uid}')" id="btn-std-${s.uid}">นศ. ${s.name}</button>`; });
+                    let stdHtml = `<button class="px-4 py-1.5 rounded-full text-[12px] font-semibold ${currentStudentFilter === 'all' ? 'bg-[#007aff] text-white' : 'bg-gray-100 text-gray-600'}" onclick="setStudentFilter('all')" id="btn-std-all">ทุกคน</button>`;
+                    Array.from(studentSet).forEach(sStr => { const s = JSON.parse(sStr); stdHtml += `<button class="px-4 py-1.5 rounded-full text-[12px] font-semibold whitespace-nowrap ${currentStudentFilter === s.uid ? 'bg-[#007aff] text-white' : 'bg-gray-100 text-gray-600'}" onclick="setStudentFilter('${s.uid}')" id="btn-std-${s.uid}">${s.name}</button>`; });
                     document.getElementById('filter-students').innerHTML = stdHtml;
                     renderInstructorCases();
                 }
@@ -497,30 +579,29 @@
                 for (const uid in users) {
                     if (users[uid].role === 'student' && users[uid].isActive) {
                         const st = users[uid].stats || {}; const msgTotal = (st.massage_new || 0) + (st.massage_followup || 0); const midTotal = (st.midwifery || 0); const medTotal = (st.medicine_general || 0) + (st.medicine_ncd || 0);
-                        let isMe = uid === currentUser.uid ? 'border-[2.5px] border-indigo-400 bg-indigo-50/50 shadow-md' : 'border border-slate-100 bg-white shadow-sm';
-                        statsHtml += `<div class="${isMe} p-5 rounded-[1.5rem]"><div class="flex items-center gap-3 mb-4"><img src="${users[uid].picUrl}" class="w-10 h-10 rounded-full border border-slate-200"><p class="text-[14px] font-extrabold text-slate-900">${users[uid].fullName}</p></div><div class="space-y-4"><div><div class="flex justify-between text-[11px] text-slate-600 font-extrabold mb-1.5 uppercase tracking-wide"><span>นวดไทย (60)</span><span class="text-emerald-600">${msgTotal}/60</span></div><div class="w-full bg-slate-100 rounded-full h-2 shadow-inner"><div class="bg-gradient-to-r from-emerald-400 to-emerald-600 h-2 rounded-full shadow-sm" style="width: ${Math.min((msgTotal/60)*100, 100)}%"></div></div></div><div><div class="flex justify-between text-[11px] text-slate-600 font-extrabold mb-1.5 uppercase tracking-wide"><span>ผดุงครรภ์ (10)</span><span class="text-rose-600">${midTotal}/10</span></div><div class="w-full bg-slate-100 rounded-full h-2 shadow-inner"><div class="bg-gradient-to-r from-rose-400 to-rose-600 h-2 rounded-full shadow-sm" style="width: ${Math.min((midTotal/10)*100, 100)}%"></div></div></div><div><div class="flex justify-between text-[11px] text-slate-600 font-extrabold mb-1.5 uppercase tracking-wide"><span>เวชกรรม (20)</span><span class="text-blue-600">${medTotal}/20</span></div><div class="w-full bg-slate-100 rounded-full h-2 shadow-inner"><div class="bg-gradient-to-r from-blue-400 to-blue-600 h-2 rounded-full shadow-sm" style="width: ${Math.min((medTotal/20)*100, 100)}%"></div></div></div></div></div>`;
+                        statsHtml += `<div class="bg-gray-50 p-4 rounded-3xl border border-gray-100"><div class="flex items-center gap-3 mb-4"><img src="${users[uid].picUrl}" class="w-10 h-10 rounded-full border border-gray-200"><p class="text-[14px] font-bold text-gray-900">${users[uid].fullName}</p></div><div class="space-y-3"><div><div class="flex justify-between text-[11px] text-gray-500 font-semibold mb-1"><span>นวดไทย (60)</span><span class="text-[#34c759]">${msgTotal}/60</span></div><div class="w-full bg-gray-200 rounded-full h-1.5"><div class="bg-[#34c759] h-1.5 rounded-full" style="width: ${Math.min((msgTotal/60)*100, 100)}%"></div></div></div><div><div class="flex justify-between text-[11px] text-gray-500 font-semibold mb-1"><span>ผดุงครรภ์ (10)</span><span class="text-[#ff3b30]">${midTotal}/10</span></div><div class="w-full bg-gray-200 rounded-full h-1.5"><div class="bg-[#ff3b30] h-1.5 rounded-full" style="width: ${Math.min((midTotal/10)*100, 100)}%"></div></div></div><div><div class="flex justify-between text-[11px] text-gray-500 font-semibold mb-1"><span>เวชกรรม (20)</span><span class="text-[#007aff]">${medTotal}/20</span></div><div class="w-full bg-gray-200 rounded-full h-1.5"><div class="bg-[#007aff] h-1.5 rounded-full" style="width: ${Math.min((medTotal/20)*100, 100)}%"></div></div></div></div></div>`;
                     }
                 }
-                statsContainer.innerHTML = statsHtml || '<p class="text-center text-[13px] font-bold text-slate-500 py-6">ยังไม่มีข้อมูล</p>';
+                statsContainer.innerHTML = statsHtml || '<p class="text-center text-[13px] text-gray-400 py-6">ไม่มีข้อมูล</p>';
                 
                 let diseaseCount = {}; for (let dep of ['massage', 'medicine']) { const caseRes = await fetch(`${FIREBASE_URL}cases/${dep}.json?auth=${FIREBASE_SECRET}`); const allCases = await caseRes.json(); for (let cid in allCases) if (allCases[cid].status === 'approved' && allCases[cid].diseaseName) diseaseCount[allCases[cid].diseaseName] = (diseaseCount[allCases[cid].diseaseName] || 0) + 1; }
                 const sortedRank = Object.entries(diseaseCount).sort((a, b) => b[1] - a[1]).slice(0, 5);
-                if (sortedRank.length > 0) { let rankHtml = '<ul class="space-y-4">'; sortedRank.forEach((item, index) => { let m = index === 0 ? '<span class="text-2xl drop-shadow-md">🥇</span>' : index === 1 ? '<span class="text-2xl drop-shadow-md">🥈</span>' : index === 2 ? '<span class="text-2xl drop-shadow-md">🥉</span>' : `<span class="w-8 h-8 flex items-center justify-center bg-slate-100 rounded-full text-[12px] font-extrabold text-slate-500 shadow-inner">${index+1}</span>`; rankHtml += `<li class="flex justify-between items-center text-[13px] border-b border-slate-100 pb-3 last:border-0 last:pb-0"><div class="flex items-center gap-3 truncate w-3/4">${m}<span class="truncate font-extrabold text-slate-800">${item[0]}</span></div><span class="font-extrabold text-teal-700 bg-teal-50 px-3 py-1.5 rounded-xl border border-teal-100">${item[1]}</span></li>`; }); rankContainer.innerHTML = rankHtml + '</ul>'; } else rankContainer.innerHTML = '<p class="text-center text-[13px] font-bold text-slate-500 py-6">ยังไม่มีข้อมูล</p>';
+                if (sortedRank.length > 0) { let rankHtml = '<div class="space-y-3">'; sortedRank.forEach((item, index) => { let m = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `<span class="text-gray-400 text-sm pl-1">${index+1}</span>`; rankHtml += `<div class="flex justify-between items-center text-[13px] bg-gray-50 p-3 rounded-2xl"><div class="flex items-center gap-3 w-3/4"><span class="text-lg">${m}</span><span class="truncate font-semibold text-gray-800">${item[0]}</span></div><span class="font-bold text-[#007aff] bg-[#f0f7ff] px-2 py-1 rounded-lg">${item[1]}</span></div>`; }); rankContainer.innerHTML = rankHtml + '</div>'; } else rankContainer.innerHTML = '<p class="text-center text-[13px] text-gray-400 py-6">ไม่มีข้อมูล</p>';
             } catch(e) {}
         }
 
         function setStatusFilter(status) {
             currentStatusFilter = status;
-            document.getElementById('btn-stat-pending').className = `filter-pill ${status === 'pending' ? 'active-pending' : ''}`;
-            document.getElementById('btn-stat-approved').className = `filter-pill ${status === 'approved' ? 'active-approved' : ''}`;
-            document.getElementById('btn-stat-returned').className = `filter-pill ${status === 'returned' ? 'active-returned' : ''}`;
+            document.getElementById('btn-stat-pending').className = `filter-pill px-4 py-1.5 rounded-full text-[12px] font-semibold ${status === 'pending' ? 'bg-[#fff8e6] text-[#b45309]' : 'bg-gray-100 text-gray-600'}`;
+            document.getElementById('btn-stat-approved').className = `filter-pill px-4 py-1.5 rounded-full text-[12px] font-semibold ${status === 'approved' ? 'bg-[#eaf8ed] text-[#34c759]' : 'bg-gray-100 text-gray-600'}`;
+            document.getElementById('btn-stat-returned').className = `filter-pill px-4 py-1.5 rounded-full text-[12px] font-semibold ${status === 'returned' ? 'bg-[#ffeceb] text-[#ff3b30]' : 'bg-gray-100 text-gray-600'}`;
             renderInstructorCases();
         }
 
         function setStudentFilter(uid) {
             currentStudentFilter = uid;
-            document.querySelectorAll('#filter-students .filter-pill').forEach(btn => btn.classList.remove('active-std'));
-            document.getElementById(`btn-std-${uid}`).classList.add('active-std');
+            Array.from(document.getElementById('filter-students').children).forEach(btn => btn.className = `px-4 py-1.5 rounded-full text-[12px] font-semibold whitespace-nowrap bg-gray-100 text-gray-600`);
+            document.getElementById(`btn-std-${uid}`).className = `px-4 py-1.5 rounded-full text-[12px] font-semibold whitespace-nowrap bg-[#007aff] text-white`;
             renderInstructorCases();
         }
 
@@ -529,96 +610,92 @@
             const filtered = allInstructorCases.filter(c => c.status === currentStatusFilter && (currentStudentFilter === 'all' || c.studentUid === currentStudentFilter));
             
             filtered.forEach(c => {
-                let imageBtn = (c.imageUrl && c.imageUrl !== "-") ? `<a href="${c.imageUrl}" target="_blank" class="inline-block mt-2 text-[11px] font-extrabold bg-slate-800 text-white px-3 py-1.5 rounded-xl hover:bg-slate-700 transition"><i class="fa-solid fa-image"></i> รูปจาก นศ.</a>` : "";
+                let imageBtn = (c.imageUrl && c.imageUrl !== "-") ? `<a href="${c.imageUrl}" target="_blank" class="inline-block mt-3 text-[12px] font-semibold bg-white border border-gray-200 text-gray-700 px-3 py-1.5 rounded-lg"><i class="fa-solid fa-image text-gray-400"></i> ดูรูป</a>` : "";
                 let buttons = ""; let remarkTxt = "";
-                let deleteIconBtn = `<button onclick="deleteCaseData('${c.depName}', '${c.caseId}')" class="absolute top-4 right-5 text-slate-300 hover:text-rose-500 transition"><i class="fa-solid fa-trash text-lg"></i></button>`;
+                let deleteIconBtn = `<button onclick="deleteCaseData('${c.depName}', '${c.caseId}')" class="absolute top-5 right-5 text-gray-300 hover:text-red-500 transition"><i class="fa-solid fa-trash"></i></button>`;
                 
                 if (c.status === 'pending') {
-                    buttons = `<div class="flex gap-3"><button onclick="judgeCase('${c.depName}', '${c.caseId}', 'approved')" class="btn-glow bg-emerald-500 text-white flex-1 text-[12px] font-extrabold py-3 rounded-xl shadow-lg shadow-emerald-500/30"><i class="fa-solid fa-check text-lg mb-1 block"></i> ผ่าน</button><button onclick="judgeCase('${c.depName}', '${c.caseId}', 'returned')" class="btn-glow bg-amber-500 text-white flex-1 text-[12px] font-extrabold py-3 rounded-xl shadow-lg shadow-amber-500/30"><i class="fa-solid fa-rotate-left text-lg mb-1 block"></i> ส่งแก้</button><button onclick="judgeCase('${c.depName}', '${c.caseId}', 'rejected')" class="btn-glow bg-rose-600 text-white flex-1 text-[12px] font-extrabold py-3 rounded-xl shadow-lg shadow-rose-600/30"><i class="fa-solid fa-xmark text-lg mb-1 block"></i> ปฏิเสธ</button></div>`;
+                    buttons = `<div class="flex gap-2 mt-2"><button onclick="judgeCase('${c.depName}', '${c.caseId}', 'approved')" class="btn-ios flex-1 py-3 text-[13px] bg-[#34c759] text-white"><i class="fa-solid fa-check"></i> ผ่าน</button><button onclick="judgeCase('${c.depName}', '${c.caseId}', 'returned')" class="btn-ios flex-1 py-3 text-[13px] bg-[#ff9500] text-white"><i class="fa-solid fa-rotate-left"></i> แก้</button><button onclick="judgeCase('${c.depName}', '${c.caseId}', 'rejected')" class="btn-ios flex-1 py-3 text-[13px] bg-[#ff3b30] text-white"><i class="fa-solid fa-xmark"></i> ตก</button></div>`;
                 } else if (c.status === 'returned' && c.remark) {
-                    remarkTxt = `<p class="text-[11px] text-rose-700 bg-rose-50 p-2.5 rounded-xl border border-rose-200 mt-3"><b>หมายเหตุ:</b> ${c.remark}</p>`;
+                    remarkTxt = `<p class="text-[12px] text-[#ff3b30] bg-[#ffeceb] p-3 rounded-xl mt-3"><b>คำแนะนำ:</b> ${c.remark}</p>`;
                 }
                 
-                html += `<div class="bg-white p-5 rounded-[1.5rem] shadow-sm border border-slate-100 mb-4 relative" id="card_${c.caseId}">
+                html += `<div class="bg-gray-50 p-5 rounded-3xl border border-gray-100 relative" id="card_${c.caseId}">
                             ${deleteIconBtn}
                             <div class="flex justify-between items-start mb-1 pr-8">
-                                <p class="text-[14px] font-extrabold text-slate-900">${c.studentName}</p>
-                                <p class="text-[11px] font-bold text-slate-500">HN: ${c.hn}</p>
+                                <p class="text-[15px] font-bold text-gray-900">${c.studentName}</p>
                             </div>
-                            <p class="text-[10px] text-slate-400 mb-3"><i class="fa-regular fa-clock"></i> ส่งเมื่อ: ${formatTimeThai(c.timestamp)}</p>
-                            <div class="bg-slate-50 p-4 rounded-[1.25rem] border border-slate-100 mb-4">
-                                <p class="text-[13px] font-extrabold text-slate-700">📌 ${c.diseaseName || 'หมวด: ' + c.depName}</p>
+                            <p class="text-[13px] font-medium text-gray-600">HN ${c.hn}</p>
+                            <p class="text-[11px] text-gray-400 mb-4">${formatTimeThai(c.timestamp)}</p>
+                            <div class="bg-white p-4 rounded-2xl shadow-sm mb-4">
+                                <p class="text-[13px] font-medium text-gray-800">${c.diseaseName || 'หมวด: ' + c.depName}</p>
                                 ${imageBtn}${remarkTxt}
                             </div>
                             ${buttons}
                          </div>`;
             });
-            container.innerHTML = html || `<p class="text-center text-[13px] font-bold text-slate-500 py-6">ไม่มีข้อมูลในหมวดนี้ครับ</p>`;
+            container.innerHTML = html || `<p class="text-center text-[13px] text-gray-400 py-6">ไม่มีข้อมูล</p>`;
         }
 
         let pendingJudgeData = null; 
         function judgeCase(department, caseId, status) {
             pendingJudgeData = { department, caseId, status }; document.getElementById('judge-remark').value = ""; document.getElementById('judge-image').value = ""; document.getElementById('judge-modal').classList.remove('hidden');
             const title = document.getElementById('judge-title');
-            if(status === 'approved') { title.innerHTML = '<i class="fa-solid fa-check-circle text-xl align-middle"></i> อนุมัติผ่านเคสนี้'; title.parentElement.className = 'bg-gradient-to-r from-emerald-500 to-teal-600 p-5 text-center'; }
-            else if(status === 'returned') { title.innerHTML = '<i class="fa-solid fa-rotate-left text-xl align-middle"></i> ส่งกลับให้แก้ไข'; title.parentElement.className = 'bg-gradient-to-r from-amber-500 to-orange-500 p-5 text-center'; }
-            else { title.innerHTML = '<i class="fa-solid fa-xmark-circle text-xl align-middle"></i> ปฏิเสธเคสนี้'; title.parentElement.className = 'bg-gradient-to-r from-red-600 to-rose-700 p-5 text-center'; }
-            document.getElementById('judge-submit-btn').onclick = submitJudgeResult;
+            if(status === 'approved') { title.innerHTML = '✅ อนุมัติผ่านเคสนี้'; title.className = 'text-[#34c759] font-bold text-[16px]'; }
+            else if(status === 'returned') { title.innerHTML = '⚠️ ส่งกลับให้แก้ไข'; title.className = 'text-[#ff9500] font-bold text-[16px]'; }
+            else { title.innerHTML = '❌ ปฏิเสธเคสนี้'; title.className = 'text-[#ff3b30] font-bold text-[16px]'; }
+            let submitBtn = document.getElementById('judge-submit-btn');
+            submitBtn.className = `flex-1 py-3 text-white font-semibold text-[14px] rounded-full btn-ios ${status === 'approved' ? 'bg-[#34c759]' : status === 'returned' ? 'bg-[#ff9500]' : 'bg-[#ff3b30]'}`;
+            submitBtn.onclick = submitJudgeResult;
         }
 
         function closeJudgeModal() { document.getElementById('judge-modal').classList.add('hidden'); pendingJudgeData = null; }
 
         async function submitJudgeResult() {
             if (!pendingJudgeData) return; const { department, caseId, status } = pendingJudgeData; const remark = document.getElementById('judge-remark').value; const fileInput = document.getElementById('judge-image');
-            const btn = document.getElementById('judge-submit-btn'); const originalText = btn.innerHTML; btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin text-lg"></i> กำลังบันทึก...`; btn.disabled = true;
+            const btn = document.getElementById('judge-submit-btn'); const originalText = btn.innerHTML; btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i>`; btn.disabled = true;
             try {
                 let base64String = ""; let mimeType = ""; let fileName = "";
-                if (fileInput.files.length > 0) { const file = fileInput.files[0]; if (file.size > 5 * 1024 * 1024) { Swal.fire({icon: 'error', title: 'ไฟล์ใหญ่เกินไป', text: 'กรุณาอัปโหลดรูปขนาดไม่เกิน 5MB ครับ', confirmButtonColor: '#ef4444'}); btn.innerHTML = originalText; btn.disabled = false; return; } fileName = `INSTRUCTOR_${department}_${Date.now()}_${file.name}`; mimeType = file.type; base64String = await new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(r.result.split(',')[1]); r.onerror = e => rej(e); r.readAsDataURL(file); }); }
+                if (fileInput.files.length > 0) { const file = fileInput.files[0]; if (file.size > 5 * 1024 * 1024) throw new Error("Size"); fileName = `INSTRUCTOR_${department}_${Date.now()}_${file.name}`; mimeType = file.type; base64String = await new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(r.result.split(',')[1]); r.onerror = e => rej(e); r.readAsDataURL(file); }); }
                 const payload = { action: "updateCaseStatus", department: department, caseId: caseId, status: status, remark: remark, instructorUid: currentUser.uid, imageB64: base64String, imageMimeType: mimeType, imageName: fileName };
                 const res = await fetch(GAS_WEBAPP_URL, { method: 'POST', body: JSON.stringify(payload) }); const result = await res.json();
                 
                 if (result.success) { 
-                    Swal.fire({ icon: 'success', title: 'บันทึกสำเร็จ', text: 'ระบบได้ส่งแจ้งเตือนให้นักศึกษาแล้วครับ', showConfirmButton: false, timer: 1500 });
+                    Swal.fire({ icon: 'success', title: 'บันทึกสำเร็จ', showConfirmButton: false, timer: 1500 });
                     closeJudgeModal(); 
                     const caseIndex = allInstructorCases.findIndex(c => c.caseId === caseId);
                     if(caseIndex > -1) { allInstructorCases[caseIndex].status = status; allInstructorCases[caseIndex].remark = remark; }
                     renderInstructorCases(); 
-                } else Swal.fire({ icon: 'error', title: 'ข้อผิดพลาด', text: result.message, confirmButtonColor: '#ef4444' });
-            } catch (err) { Swal.fire({ icon: 'error', title: 'การเชื่อมต่อขัดข้อง', text: 'เกิดข้อผิดพลาดในการบันทึกข้อมูล', confirmButtonColor: '#ef4444' }); } 
+                } else Swal.fire('ข้อผิดพลาด', result.message, 'error');
+            } catch (err) { Swal.fire('เกิดข้อผิดพลาด', 'กรุณาลองใหม่', 'error'); } 
             finally { btn.innerHTML = originalText; btn.disabled = false; }
         }
 
-        // ================= ฟังก์ชันลบเคส (ล้ำสมัยด้วย SweetAlert2) =================
         async function deleteCaseData(department, caseId) {
             const result = await Swal.fire({
-                title: 'ยืนยันการลบเคส?',
-                text: "หากลบแล้ว ข้อมูลนี้จะหายไปจากระบบทันที!",
+                title: 'ยืนยันการลบ',
+                text: "ลบแล้วไม่สามารถกู้คืนได้",
                 icon: 'warning',
                 showCancelButton: true,
-                confirmButtonColor: '#ef4444',
-                cancelButtonColor: '#94a3b8',
-                confirmButtonText: '<i class="fa-solid fa-trash"></i> ใช่, ลบเลย!',
-                cancelButtonText: 'ยกเลิก',
-                reverseButtons: true
+                confirmButtonColor: '#ff3b30',
+                cancelButtonColor: '#e5e5ea',
+                cancelButtonText: '<span style="color:#1d1d1f">ยกเลิก</span>',
+                confirmButtonText: 'ลบข้อมูล'
             });
 
             if (result.isConfirmed) {
-                Swal.fire({ title: 'กำลังลบข้อมูล...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); }});
+                Swal.fire({ title: 'กำลังลบ...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); }});
                 try {
                     const payload = { action: "deleteCase", department: department, caseId: caseId };
                     const res = await fetch(GAS_WEBAPP_URL, { method: 'POST', body: JSON.stringify(payload) });
                     const resData = await res.json();
                     
                     if (resData.success) {
-                        Swal.fire({ icon: 'success', title: 'ลบสำเร็จ!', showConfirmButton: false, timer: 1500 });
-                        
-                        const card1 = document.getElementById(`card_${caseId}`);
-                        if(card1) card1.remove();
-                        
+                        Swal.fire({ icon: 'success', title: 'ลบสำเร็จ', showConfirmButton: false, timer: 1500 });
+                        const card1 = document.getElementById(`card_${caseId}`); if(card1) card1.remove();
                         if(!document.getElementById('view-mycases').classList.contains('hidden')) loadMyCases();
                         if(!document.getElementById('view-dashboard').classList.contains('hidden')) loadDashboardData();
                         if(!document.getElementById('view-feed').classList.contains('hidden')) loadGlobalFeed();
-                        
                     } else { Swal.fire('ข้อผิดพลาด', resData.message, 'error'); }
                 } catch(e) { Swal.fire('ข้อผิดพลาด', 'ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์', 'error'); }
             }
