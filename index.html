@@ -314,7 +314,7 @@
             <div class="icon-box"><i class="fa-solid fa-square-plus"></i></div><span class="text-[10px] font-semibold">เพิ่มเคส</span>
         </button>
         <button onclick="switchMainView('mycases'); loadMyCases();" id="nav-mycases" class="nav-item flex flex-col items-center py-1 w-[24%]">
-            <div class="icon-box"><i class="fa-solid fa-folder-closed"></i></div><span class="text-[10px] font-semibold">ของฉัน</span>
+            <div class="icon-box"><i class="fa-solid fa-folder"></i></div><span class="text-[10px] font-semibold">ของฉัน</span>
         </button>
         <button onclick="switchMainView('feed'); loadGlobalFeed();" id="nav-feed" class="nav-item flex flex-col items-center py-1 w-[24%]">
             <div class="icon-box"><i class="fa-solid fa-globe"></i></div><span class="text-[10px] font-semibold">เคสรวม</span>
@@ -417,16 +417,18 @@
             } catch (e) {}
         }
 
+        // อัปเดตฟังก์ชันนี้ ลบการสลับไอคอนแบบ Regular/Solid ออก
         function switchMainView(viewId) {
-            ['forms', 'mycases', 'feed', 'dashboard'].forEach(id => { document.getElementById(`view-${id}`).classList.add('hidden'); document.getElementById(`view-${id}`).classList.remove('animate-tab'); document.getElementById(`nav-${id}`).classList.remove('active'); document.getElementById(`nav-${id}`).querySelector('i').classList.replace('fa-solid', 'fa-regular') || document.getElementById(`nav-${id}`).querySelector('i').classList.replace('fa-folder-open', 'fa-folder-closed'); });
-            const v = document.getElementById(`view-${viewId}`); v.classList.remove('hidden'); void v.offsetWidth; v.classList.add('animate-tab');
-            const n = document.getElementById(`nav-${viewId}`); n.classList.add('active');
-            
-            // สลับไอคอนเมื่อ Active แบบ iOS
-            if(viewId === 'forms') n.querySelector('i').classList.replace('fa-regular', 'fa-solid');
-            if(viewId === 'mycases') n.querySelector('i').classList.replace('fa-folder-closed', 'fa-folder-open');
-            if(viewId === 'feed') n.querySelector('i').classList.replace('fa-regular', 'fa-solid');
-            if(viewId === 'dashboard') n.querySelector('i').classList.replace('fa-regular', 'fa-solid');
+            ['forms', 'mycases', 'feed', 'dashboard'].forEach(id => { 
+                document.getElementById(`view-${id}`).classList.add('hidden'); 
+                document.getElementById(`view-${id}`).classList.remove('animate-tab'); 
+                document.getElementById(`nav-${id}`).classList.remove('active'); 
+            });
+            const v = document.getElementById(`view-${viewId}`); 
+            v.classList.remove('hidden'); 
+            void v.offsetWidth; 
+            v.classList.add('animate-tab');
+            document.getElementById(`nav-${viewId}`).classList.add('active');
         }
 
         function switchForm(dep) {
