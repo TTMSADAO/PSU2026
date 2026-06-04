@@ -7,19 +7,21 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- 🌟 เพิ่ม SweetAlert2 สำหรับ Pop-up ล้ำสมัย -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script charset="utf-8" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
 
     <style>
         :root { --app-bg: #eefdf6; --glass-bg: rgba(255, 255, 255, 0.85); }
         body { 
             font-family: 'Prompt', sans-serif; background-color: var(--app-bg);
-            /* พื้นหลัง Mesh Gradient แบบสดใสและมีมิติ */
             background-image: 
                 radial-gradient(at 10% 10%, hsla(153, 100%, 80%, 0.5) 0px, transparent 50%), 
                 radial-gradient(at 90% 10%, hsla(199, 100%, 80%, 0.5) 0px, transparent 50%), 
                 radial-gradient(at 50% 90%, hsla(43, 100%, 82%, 0.5) 0px, transparent 50%);
             background-attachment: fixed; min-height: 100vh; overflow-x: hidden; -webkit-tap-highlight-color: transparent;
-            color: #0f172a; /* ตั้งค่าสีข้อความหลักให้คมชัด */
+            color: #0f172a; 
         }
 
         .glass-card { 
@@ -27,46 +29,40 @@
             border: 1px solid rgba(255, 255, 255, 1); box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.08); border-radius: 2rem; 
         }
         
-        /* เมนูด้านบนของฟอร์ม */
         .sub-nav { display: flex; background: rgba(255,255,255,0.8); padding: 6px; border-radius: 999px; box-shadow: inset 0 2px 5px rgba(0,0,0,0.05); margin-bottom: 24px;}
         .sub-nav-btn { flex: 1; text-align: center; font-size: 12px; font-weight: 800; padding: 12px 0; border-radius: 999px; color: #64748b; transition: all 0.3s; }
         .sub-nav-btn.active { background: white; color: #059669; box-shadow: 0 4px 15px rgba(0,0,0,0.08); transform: scale(1.02); }
         .sub-nav-btn.active-mid { color: #e11d48; } .sub-nav-btn.active-med { color: #2563eb; }
 
-        /* แถบกรองอาจารย์ */
-        .filter-pill { padding: 8px 16px; border-radius: 999px; font-size: 12px; font-weight: 800; color: #475569; background: white; border: 1.5px solid #cbd5e1; transition: all 0.3s; white-space: nowrap; cursor: pointer;}
-        .filter-pill.active-pending { background: #fffbeb; color: #b45309; border-color: #fbbf24; box-shadow: 0 4px 12px rgba(245,158,11,0.2); transform: translateY(-2px);}
-        .filter-pill.active-approved { background: #ecfdf5; color: #047857; border-color: #34d399; box-shadow: 0 4px 12px rgba(16,185,129,0.2); transform: translateY(-2px);}
-        .filter-pill.active-returned { background: #fef2f2; color: #be123c; border-color: #fb7185; box-shadow: 0 4px 12px rgba(225,29,72,0.2); transform: translateY(-2px);}
-        .filter-pill.active-std { background: #f1f5f9; color: #0f172a; border-color: #94a3b8; box-shadow: 0 4px 12px rgba(0,0,0,0.1); transform: translateY(-2px);}
+        /* 🎨 ปรับปรุงแถบตัวกรอง แก้ปัญหาขอบตัดและสีกลืน */
+        .filter-pill { padding: 8px 16px; border-radius: 999px; font-size: 12px; font-weight: 800; color: #475569; background: white; border: 1.5px solid #cbd5e1; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); white-space: nowrap; cursor: pointer;}
+        .filter-pill.active-pending { background: #fffbeb; color: #b45309; border-color: #fbbf24; box-shadow: 0 6px 12px -2px rgba(245,158,11,0.25); transform: translateY(-3px);}
+        .filter-pill.active-approved { background: #ecfdf5; color: #047857; border-color: #34d399; box-shadow: 0 6px 12px -2px rgba(16,185,129,0.25); transform: translateY(-3px);}
+        .filter-pill.active-returned { background: #fef2f2; color: #be123c; border-color: #fb7185; box-shadow: 0 6px 12px -2px rgba(225,29,72,0.25); transform: translateY(-3px);}
+        /* 🟣 เปลี่ยนสีปุ่ม นศ. ให้เป็นสี Indigo สว่างๆ จะได้ไม่กลืนกับพื้น */
+        .filter-pill.active-std { background: linear-gradient(135deg, #e0e7ff, #c7d2fe); color: #3730a3; border-color: #818cf8; box-shadow: 0 6px 12px -2px rgba(79, 70, 229, 0.25); transform: translateY(-3px);}
 
-        /* Input Fields ให้ขอบชัดเจนเมื่อกด */
         .input-wow { background-color: rgba(255, 255, 255, 0.95); border: 2px solid #e2e8f0; transition: all 0.3s; border-radius: 1.25rem; font-weight: 600; color: #1e293b;}
         .input-wow:focus { transform: translateY(-2px); border-color: #10b981; box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.15); outline: none; }
         
-        /* Floating Bottom Nav */
         .floating-nav { bottom: 20px; width: calc(100% - 32px); left: 16px; border-radius: 999px; background: rgba(255, 255, 255, 0.95); box-shadow: 0 20px 50px rgba(0,0,0,0.15), inset 0 2px 0 rgba(255,255,255,1); border: 1px solid #f1f5f9; }
         .nav-item { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); } .nav-item.active { transform: translateY(-6px); color: #059669; }
         .nav-item .icon-box { transition: all 0.3s ease; } .nav-item.active .icon-box { transform: scale(1.2); }
         
-        /* Buttons */
         .btn-glow { transition: all 0.2s; border-radius: 999px; position: relative; overflow: hidden; }
         .btn-glow:active { transform: scale(0.95); }
         .btn-primary { background: linear-gradient(135deg, #059669, #047857); box-shadow: 0 8px 25px -5px rgba(5, 150, 105, 0.5); color: white;}
         .btn-outline { background: white; border: 2.5px solid #059669; color: #059669; }
 
-        /* Instructor Selectors */
         .instructor-radio:checked + label { background-color: #ffffff; transform: translateY(-4px) scale(1.03); box-shadow: 0 12px 25px -5px rgba(0,0,0,0.15); border-color: #34d399;}
         .instructor-radio:checked + label .avatar-ring { background: linear-gradient(45deg, #10b981, #059669); padding: 4px; }
         .instructor-radio:checked + label .check-icon { transform: scale(1); opacity: 1; }
         .check-icon { transition: all 0.3s; transform: scale(0); opacity: 0; }
         .avatar-ring { transition: all 0.3s; padding: 0px; border-radius: 50%; }
         
-        /* Animations */
         @keyframes slideUp { 0% { opacity: 0; transform: translateY(20px); } 100% { opacity: 1; transform: translateY(0); } }
         .animate-tab { animation: slideUp 0.4s ease forwards; }
         
-        /* Badges */
         .badge { padding: 4px 10px; border-radius: 999px; font-size: 10px; font-weight: 800; letter-spacing: 0.5px;}
         .badge-draft { background: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; }
         .badge-pending { background: #fef3c7; color: #b45309; border: 1px solid #fcd34d; }
@@ -74,10 +70,14 @@
         .badge-approved { background: #d1fae5; color: #047857; border: 1px solid #6ee7b7; }
         
         .no-scrollbar::-webkit-scrollbar { display: none; } .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        /* สไตล์สำหรับ SweetAlert2 ให้ขอบมนเข้ากับแอป */
+        div:where(.swal2-container) div:where(.swal2-popup) { border-radius: 1.5rem !important; font-family: 'Prompt', sans-serif !important; }
     </style>
 </head>
 <body class="pb-32">
 
+    <!-- Header -->
     <div class="sticky top-0 z-40 px-4 py-4 flex items-center justify-between mb-4">
         <div class="flex items-center gap-3">
             <div class="w-14 h-14 bg-white rounded-[1.2rem] shadow-md border border-gray-100 flex items-center justify-center overflow-hidden p-2 transform hover:scale-105 transition">
@@ -98,11 +98,13 @@
     </div>
 
     <div class="max-w-md mx-auto px-4">
+        <!-- Banner โหมดแก้ไข -->
         <div id="edit-banner" class="hidden bg-amber-100 border border-amber-300 text-amber-900 px-5 py-3 rounded-2xl mb-5 flex justify-between items-center text-[13px] font-extrabold animate-tab shadow-sm">
             <span class="flex items-center gap-2"><i class="fa-solid fa-pen-to-square text-amber-600 text-lg"></i> โหมดแก้ไขเคส (Draft / ส่งแก้)</span>
             <button onclick="cancelEdit()" class="text-amber-600 hover:text-red-600 bg-amber-200/50 w-8 h-8 rounded-full flex items-center justify-center transition"><i class="fa-solid fa-xmark"></i></button>
         </div>
 
+        <!-- ================= VIEW 1: แบบฟอร์มส่งเคส ================= -->
         <div id="view-forms" class="hidden animate-tab">
             <div class="sub-nav">
                 <button onclick="switchForm('massage')" id="sub-massage" class="sub-nav-btn active">🌿 นวดไทย</button>
@@ -110,6 +112,7 @@
                 <button onclick="switchForm('medicine')" id="sub-medicine" class="sub-nav-btn">🩺 เวชกรรม</button>
             </div>
 
+            <!-- ฟอร์ม: นวดไทย -->
             <div id="form-massage" class="glass-card p-6 block">
                 <form onsubmit="event.preventDefault();" id="formObj-massage" class="space-y-5">
                     <div class="grid grid-cols-2 gap-4">
@@ -140,6 +143,7 @@
                 </form>
             </div>
 
+            <!-- ฟอร์ม: ผดุงครรภ์ -->
             <div id="form-midwifery" class="glass-card p-6 hidden">
                 <form onsubmit="event.preventDefault();" id="formObj-midwifery" class="space-y-5">
                     <div class="grid grid-cols-2 gap-4">
@@ -157,6 +161,7 @@
                 </form>
             </div>
 
+            <!-- ฟอร์ม: เวชกรรม -->
             <div id="form-medicine" class="glass-card p-6 hidden">
                 <form onsubmit="event.preventDefault();" id="formObj-medicine" class="space-y-5">
                     <div class="grid grid-cols-2 gap-4">
@@ -176,11 +181,13 @@
             </div>
         </div>
 
+        <!-- ================= VIEW 2: รายการของฉัน ================= -->
         <div id="view-mycases" class="hidden glass-card p-6 mb-6">
             <h2 class="font-extrabold text-slate-900 text-[18px] mb-5 flex items-center gap-3"><div class="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600"><i class="fa-solid fa-folder-open"></i></div> เคสของฉัน</h2>
             <div id="mycases-container" class="space-y-4"><p class="text-center text-[13px] font-bold text-slate-500 py-10"><i class="fa-solid fa-spinner fa-spin text-xl mb-2 block"></i> กำลังโหลดข้อมูล...</p></div>
         </div>
 
+        <!-- ================= VIEW 3: กระดานเคสรวม ================= -->
         <div id="view-feed" class="hidden glass-card p-6 mb-6">
             <h2 class="font-extrabold text-slate-900 text-[18px] mb-5 flex items-center gap-3"><div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600"><i class="fa-solid fa-globe"></i></div> กระดานเคสรวม</h2>
             <div class="relative mb-6">
@@ -190,14 +197,17 @@
             <div id="feed-container" class="space-y-4"><p class="text-center text-[13px] font-bold text-slate-500 py-10"><i class="fa-solid fa-spinner fa-spin text-xl mb-2 block"></i> กำลังโหลดข้อมูล...</p></div>
         </div>
 
+        <!-- ================= VIEW 4: แดชบอร์ด (สถิติ/ตรวจเคส) ================= -->
         <div id="view-dashboard" class="hidden glass-card p-6 mb-6">
+            <!-- ส่วนของอาจารย์ (มีระบบฟิลเตอร์) -->
             <div id="dash-instructor" class="hidden mb-10 border-b-2 border-slate-100 pb-8">
                 <h2 class="font-extrabold text-slate-900 text-[20px] mb-5 flex items-center gap-3"><div class="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center text-orange-600"><i class="fa-solid fa-inbox text-lg"></i></div> ระบบตรวจประเมิน</h2>
                 
-                <div class="flex gap-2 overflow-x-auto no-scrollbar mb-4 pb-2" id="filter-students">
+                <!-- 🛠️ เพิ่ม pt-2 และ px-1 ป้องกันขอบเงาและเส้นขอบตัดหายไปเวลาเด้ง -->
+                <div class="flex gap-2 overflow-x-auto no-scrollbar mb-4 pt-2 pb-3 px-1 -mx-1" id="filter-students">
                     <button class="filter-pill active-std" onclick="setStudentFilter('all')" id="btn-std-all">รวมทุกคน</button>
                 </div>
-                <div class="flex gap-2 overflow-x-auto no-scrollbar mb-6 pb-2">
+                <div class="flex gap-2 overflow-x-auto no-scrollbar mb-6 pt-2 pb-3 px-1 -mx-1">
                     <button class="filter-pill active-pending" onclick="setStatusFilter('pending')" id="btn-stat-pending">⏳ รอตรวจ</button>
                     <button class="filter-pill" onclick="setStatusFilter('approved')" id="btn-stat-approved">✅ ตรวจแล้ว</button>
                     <button class="filter-pill" onclick="setStatusFilter('returned')" id="btn-stat-returned">⚠️ ส่งแก้</button>
@@ -206,6 +216,7 @@
                 <div id="instructor-cases-container" class="space-y-4"><p class="text-center text-[13px] font-bold text-slate-500 py-6"><i class="fa-solid fa-spinner fa-spin text-xl mb-2 block"></i> ดึงข้อมูลเคส...</p></div>
             </div>
 
+            <!-- สถิติ (เห็นทุกคน) -->
             <h2 class="font-extrabold text-indigo-700 text-[18px] mb-5 flex items-center gap-3"><div class="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600"><i class="fa-solid fa-chart-pie"></i></div> ความคืบหน้านักศึกษา</h2>
             <div id="student-stats-container" class="space-y-5 mb-10"></div>
 
@@ -215,6 +226,7 @@
 
     </div>
 
+    <!-- 🖼️ Modal: สำหรับอาจารย์ตรวจเคสและแนบรูป -->
     <div id="judge-modal" class="fixed inset-0 z-[60] hidden flex items-center justify-center p-4">
         <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity" onclick="closeJudgeModal()"></div>
         <div class="bg-white w-full max-w-sm rounded-[2rem] shadow-2xl relative z-10 overflow-hidden animate-tab">
@@ -238,6 +250,7 @@
         </div>
     </div>
 
+    <!-- 🚀 Floating Bottom Navigation Bar -->
     <nav class="fixed floating-nav z-50 backdrop-blur-xl px-2 py-2 flex justify-between items-center">
         <button onclick="switchMainView('forms')" id="nav-forms" class="nav-item active text-emerald-600 flex flex-col items-center p-2 w-[24%] relative">
             <div class="icon-box text-[22px] mb-1"><i class="fa-solid fa-plus-circle"></i></div><span class="text-[10px] font-extrabold tracking-wide">เพิ่มเคส</span>
@@ -263,7 +276,6 @@
 
         let currentUser = null; let instructorList = []; let currentEditCaseId = null;
 
-        // ตัวแปรสำหรับ Dashboard อาจารย์
         let allInstructorCases = []; let currentStatusFilter = 'pending'; let currentStudentFilter = 'all';
 
         window.onload = async () => {
@@ -296,9 +308,15 @@
             } catch (e) {}
         }
 
-        async function initializeLiff() { try { await liff.init({ liffId: LIFF_ID }); if (liff.isLoggedIn()) checkUserPermission(await liff.getProfile()); else liff.login(); } catch (err) { alert("LIFF Error"); } }
+        async function initializeLiff() { 
+            try { 
+                await liff.init({ liffId: LIFF_ID }); 
+                if (liff.isLoggedIn()) checkUserPermission(await liff.getProfile()); else liff.login(); 
+            } catch (err) { 
+                Swal.fire({icon: 'error', title: 'ข้อผิดพลาด', text: 'ไม่สามารถโหลดระบบ LINE ได้ครับ', confirmButtonColor: '#ef4444'}); 
+            } 
+        }
 
-        // ================= ควบคุมสิทธิ์ และปรับหน้าจอ =================
         async function checkUserPermission(profile) {
             try {
                 const res = await fetch(`${FIREBASE_URL}users/${profile.userId}.json?auth=${FIREBASE_SECRET}`); 
@@ -315,7 +333,6 @@
                         roleContainer.innerHTML = '<span class="text-[10px] font-extrabold text-white bg-gradient-to-r from-orange-500 to-amber-500 px-3 py-1 rounded-full mt-1 inline-block shadow-sm">⭐ อาจารย์แพทย์</span>';
                         document.getElementById('dash-instructor').classList.remove('hidden'); 
                         
-                        // อาจารย์: ซ่อนแท็บที่ไม่ใช้ + ขยายแท็บที่เหลือ + บังคับเปิด Dashboard
                         document.getElementById('nav-forms').style.display = 'none';
                         document.getElementById('nav-mycases').style.display = 'none';
                         document.getElementById('nav-feed').classList.replace('w-[24%]', 'w-[48%]');
@@ -348,9 +365,13 @@
         }
 
         async function submitCaseAction(department, isDraft) {
-            if (!currentUser) return alert("รอระบบโหลดข้อมูลสักครู่ครับ");
-            const formObj = document.getElementById(`formObj-${department}`); if (!formObj.checkValidity()) { formObj.reportValidity(); return; }
-            const selectedInstructor = document.querySelector(`input[name="instructor_${department}"]:checked`); if (!selectedInstructor) return alert("⚠️ กรุณาเลือกอาจารย์ผู้ตรวจประเมินก่อนกดบันทึกครับ");
+            if (!currentUser) return Swal.fire({icon: 'info', title: 'รอสักครู่', text: 'กำลังดึงข้อมูลเข้าระบบ กรุณารอสักครู่ครับ', confirmButtonColor: '#3b82f6'});
+            
+            const formObj = document.getElementById(`formObj-${department}`); 
+            if (!formObj.checkValidity()) { formObj.reportValidity(); return; }
+            
+            const selectedInstructor = document.querySelector(`input[name="instructor_${department}"]:checked`); 
+            if (!selectedInstructor) return Swal.fire({icon: 'warning', title: 'ลืมเลือกอาจารย์!', text: 'กรุณาเลือกอาจารย์ผู้ตรวจประเมินก่อนกดบันทึกครับ', confirmButtonColor: '#f59e0b'});
 
             const btnPrimary = document.querySelector(`#form-${department} .btn-primary`); const btnOutline = document.querySelector(`#form-${department} .btn-outline`);
             btnPrimary.disabled = true; btnOutline.disabled = true; const originalText = isDraft ? btnOutline.innerHTML : btnPrimary.innerHTML;
@@ -358,7 +379,7 @@
 
             try {
                 let base64String = ""; let mimeType = ""; let fileName = ""; const fileInput = document.getElementById(`${department === 'massage' ? 'msg' : department === 'midwifery' ? 'mid' : 'med'}_image`);
-                if (fileInput && fileInput.files.length > 0) { const file = fileInput.files[0]; if (file.size > 5 * 1024 * 1024) { alert("⚠️ ไฟล์รูปใหญ่เกิน 5MB"); throw new Error("Size"); } fileName = department + "_" + Date.now() + "_" + file.name; mimeType = file.type; base64String = await new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(r.result.split(',')[1]); r.onerror = e => rej(e); r.readAsDataURL(file); }); }
+                if (fileInput && fileInput.files.length > 0) { const file = fileInput.files[0]; if (file.size > 5 * 1024 * 1024) { Swal.fire({icon: 'error', title: 'ไฟล์ใหญ่เกินไป', text: 'กรุณาอัปโหลดรูปขนาดไม่เกิน 5MB ครับ', confirmButtonColor: '#ef4444'}); throw new Error("Size"); } fileName = department + "_" + Date.now() + "_" + file.name; mimeType = file.type; base64String = await new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(r.result.split(',')[1]); r.onerror = e => rej(e); r.readAsDataURL(file); }); }
 
                 let payload = { action: "saveCaseData", department: department, studentUid: currentUser.uid, studentName: currentUser.fullName, instructorUid: selectedInstructor.value, status: isDraft ? 'draft' : 'pending', imageB64: base64String, imageMimeType: mimeType, imageName: fileName, caseId: currentEditCaseId, existingImageUrl: window.tempImageUrl || null };
                 
@@ -366,9 +387,12 @@
                 else if (department === 'midwifery') { payload.date = document.getElementById('mid_date').value; payload.hn = document.getElementById('mid_hn').value; payload.patientName = document.getElementById('mid_patientName').value; } 
                 else if (department === 'medicine') { payload.date = document.getElementById('med_date').value; payload.hn = document.getElementById('med_hn').value; payload.patientName = document.getElementById('med_patientName').value; const medSelect = document.getElementById('med_diseaseName'); payload.diseaseName = medSelect.value; payload.diseaseCategory = medSelect.options[medSelect.selectedIndex] ? medSelect.options[medSelect.selectedIndex].getAttribute('data-category') : 'โรคทั่วไป'; payload.caseType = 'New'; }
 
-                const res = await fetch(GAS_WEBAPP_URL, { method: 'POST', body: JSON.stringify(payload) }); const result = await res.json(); alert(result.message);
+                const res = await fetch(GAS_WEBAPP_URL, { method: 'POST', body: JSON.stringify(payload) }); const result = await res.json(); 
+                
+                Swal.fire({ icon: result.success ? 'success' : 'error', title: result.success ? 'สำเร็จ!' : 'ข้อผิดพลาด', text: result.message, showConfirmButton: !result.success, confirmButtonColor: '#10b981', timer: result.success ? 2000 : undefined });
+                
                 if (result.success) { formObj.reset(); cancelEdit(); document.getElementById(department === 'massage' ? 'msg_date' : department === 'midwifery' ? 'mid_date' : 'med_date').valueAsDate = new Date(); if(isDraft) { switchMainView('mycases'); loadMyCases(); } }
-            } catch (err) { if(err.message !== "Size") alert("เกิดข้อผิดพลาดในการเชื่อมต่อ"); } 
+            } catch (err) { if(err.message !== "Size") Swal.fire({icon: 'error', title: 'การเชื่อมต่อขัดข้อง', text: 'เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์ กรุณาลองใหม่ครับ', confirmButtonColor: '#ef4444'}); } 
             finally { btnPrimary.disabled = false; btnOutline.disabled = false; if(isDraft) btnOutline.innerHTML = originalText; else btnPrimary.innerHTML = originalText; }
         }
 
@@ -418,7 +442,7 @@
         }
         function filterFeed() { let input = document.getElementById('feed-search').value.toLowerCase(); let cards = document.getElementsByClassName('feed-card'); for (let i = 0; i < cards.length; i++) cards[i].style.display = cards[i].innerText.toLowerCase().includes(input) ? "" : "none"; }
 
-        // ================= Dashboard อาจารย์ (มี Filter) =================
+        // ================= Dashboard อาจารย์ =================
         async function loadDashboardData() {
             const statsContainer = document.getElementById('student-stats-container'); const rankContainer = document.getElementById('disease-rank-container');
             statsContainer.innerHTML = '<p class="text-center text-[13px] font-bold text-slate-500 py-6"><i class="fa-solid fa-spinner fa-spin text-xl mb-2 block"></i> กำลังโหลดข้อมูล...</p>';
@@ -513,16 +537,19 @@
             const btn = document.getElementById('judge-submit-btn'); const originalText = btn.innerHTML; btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin text-lg"></i> กำลังบันทึก...`; btn.disabled = true;
             try {
                 let base64String = ""; let mimeType = ""; let fileName = "";
-                if (fileInput.files.length > 0) { const file = fileInput.files[0]; if (file.size > 5 * 1024 * 1024) { alert("⚠️ รูปใหญ่เกิน 5MB"); btn.innerHTML = originalText; btn.disabled = false; return; } fileName = `INSTRUCTOR_${department}_${Date.now()}_${file.name}`; mimeType = file.type; base64String = await new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(r.result.split(',')[1]); r.onerror = e => rej(e); r.readAsDataURL(file); }); }
+                if (fileInput.files.length > 0) { const file = fileInput.files[0]; if (file.size > 5 * 1024 * 1024) { Swal.fire({icon: 'error', title: 'ไฟล์ใหญ่เกินไป', text: 'กรุณาอัปโหลดรูปขนาดไม่เกิน 5MB ครับ', confirmButtonColor: '#ef4444'}); btn.innerHTML = originalText; btn.disabled = false; return; } fileName = `INSTRUCTOR_${department}_${Date.now()}_${file.name}`; mimeType = file.type; base64String = await new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(r.result.split(',')[1]); r.onerror = e => rej(e); r.readAsDataURL(file); }); }
                 const payload = { action: "updateCaseStatus", department: department, caseId: caseId, status: status, remark: remark, instructorUid: currentUser.uid, imageB64: base64String, imageMimeType: mimeType, imageName: fileName };
                 const res = await fetch(GAS_WEBAPP_URL, { method: 'POST', body: JSON.stringify(payload) }); const result = await res.json();
+                
                 if (result.success) { 
+                    Swal.fire({ icon: 'success', title: 'บันทึกสำเร็จ', text: 'ระบบได้ส่งแจ้งเตือนให้นักศึกษาแล้วครับ', showConfirmButton: false, timer: 1500 });
                     closeJudgeModal(); 
                     const caseIndex = allInstructorCases.findIndex(c => c.caseId === caseId);
                     if(caseIndex > -1) { allInstructorCases[caseIndex].status = status; allInstructorCases[caseIndex].remark = remark; }
                     renderInstructorCases(); 
-                } else alert(result.message);
-            } catch (err) { alert("เกิดข้อผิดพลาด"); } finally { btn.innerHTML = originalText; btn.disabled = false; }
+                } else Swal.fire({ icon: 'error', title: 'ข้อผิดพลาด', text: result.message, confirmButtonColor: '#ef4444' });
+            } catch (err) { Swal.fire({ icon: 'error', title: 'การเชื่อมต่อขัดข้อง', text: 'เกิดข้อผิดพลาดในการบันทึกข้อมูล', confirmButtonColor: '#ef4444' }); } 
+            finally { btn.innerHTML = originalText; btn.disabled = false; }
         }
     </script>
 </body>
