@@ -459,47 +459,60 @@
             finally { btnPrimary.disabled = false; btnOutline.disabled = false; if(isDraft) btnOutline.innerHTML = originalText; else btnPrimary.innerHTML = originalText; }
         }
 
+        // ================= อัปเดตล่าสุด: แก้ไขให้ปุ่มลบ/แก้ไข โชว์ในทุกสถานะ และไฮไลท์สีแดงตอนถูกส่งแก้ =================
         async function loadMyCases() {
-            const container = document.getElementById('mycases-container'); container.innerHTML = '<p class="text-center text-[13px] text-gray-400 py-10">กำลังโหลด...</p>';
+            const container = document.getElementById('mycases-container'); 
+            container.innerHTML = '<p class="text-center text-[13px] text-gray-400 py-10">กำลังโหลด...</p>';
             try {
-                let html = ""; const deps = ['massage', 'midwifery', 'medicine'];
+                let myCases = []; const deps = ['massage', 'midwifery', 'medicine'];
                 for (let dep of deps) {
                     const res = await fetch(`${FIREBASE_URL}cases/${dep}.json?auth=${FIREBASE_SECRET}`); const cases = await res.json();
                     for (let cid in cases) {
-                        const c = cases[cid];
-                        if (c.studentUid === currentUser.uid) {
-                            let badge = c.status === 'draft' ? '<span class="badge badge-draft">ร่าง</span>' : c.status === 'pending' ? '<span class="badge badge-pending">รอตรวจ</span>' : c.status === 'returned' ? '<span class="badge badge-returned">ส่งแก้</span>' : '<span class="badge badge-approved">ผ่าน</span>';
-                            
-                            let actionBtns = "";
-                            if (c.status === 'draft' || c.status === 'returned') {
-                                actionBtns = `
-                                <div class="flex gap-2 mt-4 pt-4 border-t border-gray-100">
-                                    <button onclick='editDraft(${JSON.stringify(c)}, "${dep}", "${cid}")' class="flex-1 text-[13px] font-semibold text-[#007aff] bg-[#f0f7ff] py-2 rounded-xl"><i class="fa-solid fa-pen"></i> แก้ไข</button>
-                                    <button onclick='deleteCaseData("${dep}", "${cid}")' class="text-[13px] font-semibold text-[#ff3b30] bg-[#ffeceb] px-4 py-2 rounded-xl"><i class="fa-solid fa-trash"></i></button>
-                                </div>`;
-                            }
-                            
-                            let remarkAlert = c.status === 'returned' && c.remark ? `<div class="mt-3 text-[13px] text-[#ff3b30] bg-[#ffeceb] p-3 rounded-xl"><b>คำแนะนำ:</b> ${c.remark}</div>` : "";
-                            let instImgBtn = (c.instructorImageUrl && c.instructorImageUrl !== "-") ? `<a href="${c.instructorImageUrl}" target="_blank" class="mt-3 ml-2 inline-block text-[12px] font-semibold text-[#ff9500] bg-[#fff6e5] px-3 py-1.5 rounded-lg"><i class="fa-solid fa-image"></i> จากอาจารย์</a>` : "";
-                            let myImgBtn = (c.imageUrl && c.imageUrl !== "-") ? `<a href="${c.imageUrl}" target="_blank" class="mt-3 inline-block text-[12px] font-semibold text-gray-600 bg-gray-100 px-3 py-1.5 rounded-lg"><i class="fa-solid fa-image"></i> รูปของคุณ</a>` : "";
-
-                            html += `<div class="bg-white p-5 rounded-3xl shadow-sm border border-gray-100" id="card_${cid}">
-                                        <div class="flex justify-between items-start mb-2">
-                                            <p class="text-[15px] font-bold text-gray-900">HN ${c.hn}</p>
-                                            ${badge}
-                                        </div>
-                                        <p class="text-[14px] font-medium text-gray-700 mb-1">${c.patientName}</p>
-                                        <p class="text-[12px] text-gray-400 mb-3">${formatTimeThai(c.timestamp)}</p>
-                                        <div class="bg-[#f5f5f7] p-3 rounded-xl">
-                                            <p class="text-[13px] font-medium text-gray-800 truncate">${c.diseaseName || 'หมวด: ผดุงครรภ์'}</p>
-                                        </div>
-                                        ${remarkAlert}
-                                        <div class="flex flex-wrap items-center mt-1">${myImgBtn}${instImgBtn}</div>
-                                        ${actionBtns}
-                                     </div>`;
+                        if (cases[cid].studentUid === currentUser.uid) {
+                            myCases.push({...cases[cid], cid: cid, dep: dep});
                         }
                     }
                 }
+                
+                // ดันเคสที่อาจารย์ส่งคืนแก้ไข (returned) ขึ้นบนสุดเสมอ
+                myCases.sort((a, b) => {
+                    const order = { 'returned': 1, 'pending': 2, 'draft': 3, 'approved': 4 };
+                    return (order[a.status] || 99) - (order[b.status] || 99);
+                });
+
+                let html = "";
+                myCases.forEach(c => {
+                    let badge = c.status === 'draft' ? '<span class="badge badge-draft">ร่าง</span>' : c.status === 'pending' ? '<span class="badge badge-pending">รอตรวจ</span>' : c.status === 'returned' ? '<span class="badge badge-returned animate-pulse">⚠️ ส่งแก้</span>' : '<span class="badge badge-approved">ผ่าน</span>';
+                    
+                    // ปลดล็อกเงื่อนไขสถานะออก เพื่อให้ปุ่มแก้ไขและลบแสดงผลเสมอไม่ว่าสถานะใดก็ตาม
+                    let actionBtns = `
+                    <div class="flex gap-2 mt-4 pt-4 border-t border-gray-100">
+                        <button onclick='editDraft(${JSON.stringify(c)}, "${c.dep}", "${c.cid}")' class="flex-1 text-[13px] font-semibold text-[#007aff] bg-[#f0f7ff] py-2 rounded-xl"><i class="fa-solid fa-pen"></i> แก้ไขข้อมูล</button>
+                        <button onclick='deleteCaseData("${c.dep}", "${c.cid}")' class="text-[13px] font-semibold text-[#ff3b30] bg-[#ffeceb] px-4 py-2 rounded-xl"><i class="fa-solid fa-trash"></i> ลบ</button>
+                    </div>`;
+                    
+                    // ตกแต่งกรอบของการ์ดที่โดนส่งกลับแก้ไขให้เด่นชัดสะดุดตา
+                    let cardBorder = c.status === 'returned' ? 'border-2 border-red-400 bg-red-50/20' : 'border border-gray-100 bg-white';
+                    let remarkAlert = c.status === 'returned' && c.remark ? `<div class="mt-3 text-[13px] font-bold text-[#ff3b30] bg-[#ffeceb] p-3 rounded-xl ring-1 ring-red-300">📢 อาจารย์สั่งแก้ไข: ${c.remark}</div>` : "";
+                    
+                    let instImgBtn = (c.instructorImageUrl && c.instructorImageUrl !== "-") ? `<a href="${c.instructorImageUrl}" target="_blank" class="mt-3 ml-2 inline-block text-[12px] font-semibold text-[#ff9500] bg-[#fff6e5] px-3 py-1.5 rounded-lg"><i class="fa-solid fa-image"></i> จากอาจารย์</a>` : "";
+                    let myImgBtn = (c.imageUrl && c.imageUrl !== "-") ? `<a href="${c.imageUrl}" target="_blank" class="mt-3 inline-block text-[12px] font-semibold text-gray-600 bg-gray-100 px-3 py-1.5 rounded-lg"><i class="fa-solid fa-image"></i> รูปของคุณ</a>` : "";
+
+                    html += `<div class="${cardBorder} p-5 rounded-3xl shadow-sm" id="card_${c.cid}">
+                                <div class="flex justify-between items-start mb-2">
+                                    <p class="text-[15px] font-bold text-gray-900">HN ${c.hn}</p>
+                                    ${badge}
+                                </div>
+                                <p class="text-[14px] font-medium text-gray-700 mb-1">${c.patientName}</p>
+                                <p class="text-[12px] text-gray-400 mb-3">${formatTimeThai(c.timestamp)}</p>
+                                <div class="bg-[#f5f5f7] p-3 rounded-xl">
+                                    <p class="text-[13px] font-medium text-gray-800 truncate">${c.diseaseName || 'หมวด: ผดุงครรภ์'}</p>
+                                </div>
+                                ${remarkAlert}
+                                <div class="flex flex-wrap items-center mt-1">${myImgBtn}${instImgBtn}</div>
+                                ${actionBtns}
+                             </div>`;
+                });
                 container.innerHTML = html || '<p class="text-center text-[13px] text-gray-400 py-10">ยังไม่มีข้อมูล</p>';
             } catch(e) { container.innerHTML = '<p class="text-center text-[13px] text-red-400 py-10">โหลดไม่สำเร็จ</p>'; }
         }
@@ -541,7 +554,7 @@
         }
         function filterFeed() { let input = document.getElementById('feed-search').value.toLowerCase(); let cards = document.getElementsByClassName('feed-card'); for (let i = 0; i < cards.length; i++) cards[i].style.display = cards[i].innerText.toLowerCase().includes(input) ? "" : "none"; }
 
-        // ================= Dashboard ใหม่ (เพิ่มหลอดสถานะ 3 สาขา) =================
+        // ================= Dashboard ใหม่ =================
         async function loadDashboardData() {
             const statsContainer = document.getElementById('student-stats-container');
             const rankContainer = document.getElementById('disease-rank-container');
@@ -554,7 +567,6 @@
                 let students = {};
                 window.studentListForRank = [];
                 
-                // เตรียมกล่องใส่นักศึกษา
                 for (let uid in users) {
                     if (users[uid].role === 'student' && users[uid].isActive) {
                         students[uid] = { 
@@ -566,7 +578,6 @@
                     }
                 }
 
-                // ดึงเคสทั้งหมด
                 let allCases = [];
                 const deps = ['massage', 'midwifery', 'medicine'];
                 for (let dep of deps) {
@@ -578,7 +589,6 @@
                 }
                 window.allCasesForRank = allCases;
 
-                // คำนวณยอด
                 let overallStats = { draft: 0, pending: 0, checked: 0, total: 0 };
                 allCases.forEach(c => {
                     if (students[c.studentUid]) {
@@ -590,7 +600,6 @@
                             students[c.studentUid].pending++; overallStats.pending++;
                         } else { 
                             students[c.studentUid].checked++; overallStats.checked++;
-                            // นับยอดเฉพาะที่ "ผ่านการประเมินแล้ว (Approved)" ไว้โชว์ในหลอด 3 สาขา
                             if (c.status === 'approved') {
                                 if (c.depName === 'massage') students[c.studentUid].msgApproved++;
                                 else if (c.depName === 'midwifery') students[c.studentUid].midApproved++;
@@ -600,7 +609,6 @@
                     }
                 });
 
-                // วาด HTML (กล่องภาพรวมสีฟ้า)
                 let statsHtml = `
                     <div class="bg-[#007aff] p-5 rounded-[24px] shadow-sm text-white mb-5">
                         <h3 class="font-bold text-[15px] mb-3 flex items-center gap-2"><i class="fa-solid fa-users"></i> ภาพรวมนักศึกษาทั้งหมด</h3>
@@ -626,7 +634,6 @@
                     <div class="space-y-5">
                 `;
                 
-                // วาด HTML (รายบุคคล พร้อม 3 สาขา)
                 window.studentListForRank.forEach(s => {
                     statsHtml += `
                         <div class="bg-gray-50 p-4 rounded-[24px] border border-gray-100 shadow-sm">
