@@ -9,7 +9,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <!-- ไลบรารี -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script charset="utf-8" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
@@ -73,7 +72,6 @@
 </head>
 <body>
 
-    <!-- Header สไตล์คลีนๆ -->
     <div class="sticky top-0 z-40 px-5 py-4 flex items-center justify-between mb-2 bg-white/80 backdrop-blur-xl border-b border-gray-100">
         <div class="flex items-center gap-3">
             <div class="w-12 h-12 bg-white rounded-2xl shadow-sm border border-gray-100 flex items-center justify-center p-1.5">
@@ -94,13 +92,11 @@
     </div>
 
     <div class="max-w-md mx-auto px-5 mt-4">
-        <!-- Banner โหมดแก้ไข -->
         <div id="edit-banner" class="hidden bg-[#fff8e6] border border-[#ffe082] px-5 py-3 rounded-2xl mb-5 flex justify-between items-center text-[13px] font-semibold text-[#b45309] animate-tab">
             <span class="flex items-center gap-2"><i class="fa-solid fa-pen-to-square text-lg"></i> โหมดแก้ไขข้อมูล</span>
             <button onclick="cancelEdit()" class="text-[#b45309] hover:text-red-600 bg-[#ffe082]/50 w-8 h-8 rounded-full flex items-center justify-center transition"><i class="fa-solid fa-xmark"></i></button>
         </div>
 
-        <!-- ================= VIEW 1: แบบฟอร์มส่งเคส ================= -->
         <div id="view-forms" class="hidden animate-tab">
             <div class="sub-nav">
                 <button onclick="switchForm('massage')" id="sub-massage" class="sub-nav-btn active">นวดไทย</button>
@@ -108,7 +104,6 @@
                 <button onclick="switchForm('medicine')" id="sub-medicine" class="sub-nav-btn">เวชกรรม</button>
             </div>
 
-            <!-- ฟอร์ม: นวดไทย -->
             <div id="form-massage" class="ios-card p-6 block">
                 <form onsubmit="event.preventDefault();" id="formObj-massage" class="space-y-4">
                     <div class="grid grid-cols-2 gap-4">
@@ -132,7 +127,6 @@
                 </form>
             </div>
 
-            <!-- ฟอร์ม: ผดุงครรภ์ -->
             <div id="form-midwifery" class="ios-card p-6 hidden">
                 <form onsubmit="event.preventDefault();" id="formObj-midwifery" class="space-y-4">
                     <div class="grid grid-cols-2 gap-4">
@@ -149,7 +143,6 @@
                 </form>
             </div>
 
-            <!-- ฟอร์ม: เวชกรรม -->
             <div id="form-medicine" class="ios-card p-6 hidden">
                 <form onsubmit="event.preventDefault();" id="formObj-medicine" class="space-y-4">
                     <div class="grid grid-cols-2 gap-4">
@@ -168,7 +161,6 @@
             </div>
         </div>
 
-        <!-- ================= VIEW 2: รายการของฉัน ================= -->
         <div id="view-mycases" class="hidden ios-card p-6 mb-6">
             <h2 class="font-bold text-gray-900 text-[18px] mb-4 flex items-center gap-3">
                 <i class="fa-solid fa-folder-open text-[#007aff] text-xl"></i> เคสของฉัน
@@ -182,7 +174,6 @@
             <div id="mycases-container" class="space-y-4"><p class="text-center text-[13px] text-gray-500 py-10">กำลังโหลดข้อมูล...</p></div>
         </div>
 
-        <!-- ================= VIEW 3: กระดานเคสรวม ================= -->
         <div id="view-feed" class="hidden ios-card p-6 mb-6">
             <h2 class="font-bold text-gray-900 text-[18px] mb-4 flex items-center gap-3">
                 <i class="fa-solid fa-globe text-[#34c759] text-xl"></i> กระดานเคสรวม
@@ -195,9 +186,7 @@
             <div id="feed-container" class="space-y-4"><p class="text-center text-[13px] text-gray-500 py-10">กำลังโหลดข้อมูล...</p></div>
         </div>
 
-        <!-- ================= VIEW 4: แดชบอร์ด (เพิ่มไทม์ไลน์) ================= -->
         <div id="view-dashboard" class="hidden mb-6 space-y-5">
-            <!-- ส่วนของอาจารย์ -->
             <div id="dash-instructor" class="hidden ios-card p-6">
                 <h2 class="font-bold text-gray-900 text-[18px] mb-4 flex items-center gap-3"><i class="fa-solid fa-inbox text-[#ff9500] text-xl"></i> ตรวจประเมิน</h2>
                 <div class="flex gap-2 overflow-x-auto no-scrollbar mb-4 pt-1 pb-2">
@@ -206,28 +195,25 @@
                     <button class="filter-pill px-4 py-1.5 rounded-full text-[12px] font-semibold bg-gray-100 text-gray-600" onclick="setStatusFilter('returned')" id="btn-stat-returned">ส่งแก้</button>
                 </div>
                 <div class="flex gap-2 overflow-x-auto no-scrollbar mb-5 pb-2" id="filter-students"></div>
-                
-                <!-- คอนเทนเนอร์แสดงการ์ดตรวจเคส -->
                 <div id="instructor-cases-container" class="space-y-4 mb-6"><p class="text-center text-[13px] text-gray-500 py-6">ดึงข้อมูลเคส...</p></div>
 
-                <!-- 🌟 ไทม์ไลน์ความเคลื่อนไหว (Activity Log) -->
-                <div class="mt-6 pt-5 border-t border-gray-100">
+                <div class="mt-8 pt-6 border-t border-gray-100">
                     <h3 class="font-bold text-gray-900 text-[16px] mb-4 flex items-center gap-2">
                         <i class="fa-solid fa-clock-rotate-left text-[#007aff]"></i> ไทม์ไลน์ล่าสุด
                     </h3>
+                    <div class="flex gap-2 overflow-x-auto no-scrollbar mb-5 pb-2" id="filter-timeline-students"></div>
+
                     <div id="timeline-container" class="space-y-3 max-h-[400px] overflow-y-auto no-scrollbar pr-1">
                         <p class="text-center text-[13px] text-gray-400 py-4">กำลังโหลดประวัติ...</p>
                     </div>
                 </div>
             </div>
 
-            <!-- สถิตินักศึกษา -->
             <div class="ios-card p-6">
                 <h2 class="font-bold text-gray-900 text-[17px] mb-5">📊 สถิตินักศึกษา (ตามการส่งเคส)</h2>
                 <div id="student-stats-container" class="space-y-4"></div>
             </div>
 
-            <!-- อันดับโรคพบบ่อย -->
             <div class="ios-card p-6">
                 <h2 class="font-bold text-gray-900 text-[17px] mb-5">🏆 อันดับโรคพบบ่อย</h2>
                 <div id="disease-rank-container"></div>
@@ -236,7 +222,6 @@
 
     </div>
 
-    <!-- 🖼️ Modal: อาจารย์ตรวจเคส -->
     <div id="judge-modal" class="fixed inset-0 z-[60] hidden flex items-center justify-center p-5">
         <div class="absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity" onclick="closeJudgeModal()"></div>
         <div class="bg-white w-full max-w-sm rounded-3xl shadow-2xl relative z-10 overflow-hidden animate-tab">
@@ -260,7 +245,6 @@
         </div>
     </div>
 
-    <!-- 🚀 Floating Bottom Navigation Bar -->
     <nav class="fixed floating-nav z-50 px-2 py-2 flex justify-between items-center">
         <button onclick="switchMainView('forms')" id="nav-forms" class="nav-item active flex flex-col items-center py-1 w-[24%]">
             <div class="icon-box"><i class="fa-solid fa-square-plus"></i></div><span class="text-[10px] font-semibold">เพิ่มเคส</span>
@@ -284,7 +268,10 @@
         const GAS_WEBAPP_URL = "https://script.google.com/macros/s/AKfycbxFeZxtiaQ_TgT6Hzd0bDo19rbM8SjmGVMMid9BQanch9pyEtOB2ivlXtF6tB9xQGuKKQ/exec";
 
         let currentUser = null; let instructorList = []; let currentEditCaseId = null;
-        let allInstructorCases = []; let currentStatusFilter = 'pending'; let currentStudentFilter = 'all';
+        let allInstructorCases = []; 
+        let currentStatusFilter = 'pending'; 
+        let currentStudentFilter = 'all';
+        let currentTimelineStudentFilter = 'all'; // 🌟 ตัวแปรใหม่สำหรับกรอง Timeline โดยเฉพาะ
         
         window.myAllCases = []; window.feedAllCases = [];
         window.allCasesForRank = []; window.studentListForRank = [];
@@ -299,7 +286,6 @@
             return d.toLocaleDateString('th-TH', { year: '2-digit', month: 'short', day: 'numeric' }) + " เวลา " + d.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' }) + " น.";
         }
         
-        // ฟังก์ชันฟอร์แมตเวลาสำหรับ Timeline
         function formatTimelineTime(timestamp) {
             if (!timestamp) return ""; const d = new Date(timestamp);
             return d.toLocaleDateString('th-TH', { day: 'numeric', month: 'short', year: '2-digit' }) + " " + d.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' });
@@ -582,23 +568,48 @@
                 if (currentUser.role === 'instructor') {
                     document.getElementById('instructor-cases-container').innerHTML = '<p class="text-center text-[13px] text-gray-400 py-6">ดึงข้อมูลเคส...</p>';
                     allInstructorCases = []; let instStudentSet = new Set();
-                    allCases.forEach(c => { if (c.instructorUid === currentUser.uid && c.status !== 'draft') { allInstructorCases.push(c); instStudentSet.add(JSON.stringify({uid: c.studentUid, name: c.studentName.split(' ')[0]})); } });
+                    allCases.forEach(c => { 
+                        if (c.status !== 'draft') {
+                            instStudentSet.add(JSON.stringify({uid: c.studentUid, name: c.studentName.split(' ')[0]}));
+                            if (c.instructorUid === currentUser.uid) { allInstructorCases.push(c); }
+                        }
+                    });
                     
                     let stdHtml = `<button class="px-4 py-1.5 rounded-full text-[12px] font-semibold ${currentStudentFilter === 'all' ? 'bg-[#007aff] text-white' : 'bg-gray-100 text-gray-600'}" onclick="setStudentFilter('all')" id="btn-std-all">ทุกคน</button>`;
                     Array.from(instStudentSet).forEach(sStr => { const s = JSON.parse(sStr); stdHtml += `<button class="px-4 py-1.5 rounded-full text-[12px] font-semibold whitespace-nowrap ${currentStudentFilter === s.uid ? 'bg-[#007aff] text-white' : 'bg-gray-100 text-gray-600'}" onclick="setStudentFilter('${s.uid}')" id="btn-std-${s.uid}">${s.name}</button>`; });
-                    document.getElementById('filter-students').innerHTML = stdHtml; renderInstructorCases(); renderTimeline();
+                    document.getElementById('filter-students').innerHTML = stdHtml; 
+                    
+                    // 🌟 สร้างปุ่มฟิลเตอร์เฉพาะสำหรับ Timeline
+                    let timelineHtml = `<button class="px-4 py-1.5 rounded-full text-[12px] font-semibold ${currentTimelineStudentFilter === 'all' ? 'bg-[#007aff] text-white' : 'bg-gray-100 text-gray-600'}" onclick="setTimelineStudentFilter('all')" id="btn-time-all">ทุกคน</button>`;
+                    Array.from(instStudentSet).forEach(sStr => { const s = JSON.parse(sStr); timelineHtml += `<button class="px-4 py-1.5 rounded-full text-[12px] font-semibold whitespace-nowrap ${currentTimelineStudentFilter === s.uid ? 'bg-[#007aff] text-white' : 'bg-gray-100 text-gray-600'}" onclick="setTimelineStudentFilter('${s.uid}')" id="btn-time-${s.uid}">${s.name}</button>`; });
+                    document.getElementById('filter-timeline-students').innerHTML = timelineHtml;
+                    
+                    renderInstructorCases(); renderTimeline();
                 }
             } catch (e) { statsContainer.innerHTML = '<p class="text-center text-[13px] text-red-400 py-6">โหลดข้อมูลล้มเหลว</p>'; }
         }
 
-        // 🌟 วาด Timeline สำหรับอาจารย์
+        // 🌟 ฟังก์ชันกรองนักศึกษาเฉพาะสำหรับ Timeline
+        function setTimelineStudentFilter(uid) {
+            currentTimelineStudentFilter = uid;
+            Array.from(document.getElementById('filter-timeline-students').children).forEach(btn => btn.className = `px-4 py-1.5 rounded-full text-[12px] font-semibold whitespace-nowrap bg-gray-100 text-gray-600`);
+            document.getElementById(`btn-time-${uid}`).className = `px-4 py-1.5 rounded-full text-[12px] font-semibold whitespace-nowrap bg-[#007aff] text-white`;
+            renderTimeline();
+        }
+
+        // 🌟 วาด Timeline สำหรับอาจารย์ (อัปเกรด: โชว์ภาพรวม แยกปุ่มกรอง)
         window.renderTimeline = function() {
             let events = [];
             window.allCasesForRank.forEach(c => {
-               if (c.instructorUid === currentUser.uid && c.status !== 'draft') {
-                   if (currentStudentFilter === 'all' || c.studentUid === currentStudentFilter) {
-                       events.push({ id: c.caseId + '_s', type: 'submit', time: c.timestamp, hn: c.hn, studentName: c.studentName, dep: c.depName });
-                       if (c.approvedAt) { events.push({ id: c.caseId + '_a', type: c.status, time: c.approvedAt, hn: c.hn, studentName: c.studentName, remark: c.remark }); }
+               if (c.status !== 'draft') {
+                   // ใช้ตัวกรองเฉพาะของไทม์ไลน์
+                   if (currentTimelineStudentFilter === 'all' || c.studentUid === currentTimelineStudentFilter) {
+                       let instName = "อาจารย์";
+                       let instObj = instructorList.find(i => i.uid === c.instructorUid);
+                       if (instObj) instName = instObj.name.split(' ')[0];
+
+                       events.push({ id: c.caseId + '_s', type: 'submit', time: c.timestamp, hn: c.hn, studentName: c.studentName, instName: instName, dep: c.depName });
+                       if (c.approvedAt) { events.push({ id: c.caseId + '_a', type: c.status, time: c.approvedAt, hn: c.hn, studentName: c.studentName, instName: instName, remark: c.remark }); }
                    }
                }
             });
@@ -607,10 +618,10 @@
             let html = '';
             events.forEach(ev => {
                 let icon, iconBg, title, desc;
-                if (ev.type === 'submit') { icon = '<i class="fa-solid fa-paper-plane text-[#007aff]"></i>'; iconBg = 'bg-[#f0f7ff]'; title = `ส่งเคสใหม่ (HN: ${ev.hn})`; desc = `นศ.${ev.studentName.split(' ')[0]} ส่งเคสเข้ามา`; } 
-                else if (ev.type === 'approved') { icon = '<i class="fa-solid fa-check text-[#34c759]"></i>'; iconBg = 'bg-[#eaf8ed]'; title = `อนุมัติผ่าน (HN: ${ev.hn})`; desc = `คุณอนุมัติเคสของ นศ.${ev.studentName.split(' ')[0]}`; } 
-                else if (ev.type === 'returned') { icon = '<i class="fa-solid fa-rotate-left text-[#ff9500]"></i>'; iconBg = 'bg-[#fff6e5]'; title = `ส่งกลับแก้ไข (HN: ${ev.hn})`; desc = `หมายเหตุ: ${ev.remark || 'ให้กลับไปแก้ไข'}`; } 
-                else if (ev.type === 'rejected') { icon = '<i class="fa-solid fa-xmark text-[#ff3b30]"></i>'; iconBg = 'bg-[#ffeceb]'; title = `ปฏิเสธเคส (HN: ${ev.hn})`; desc = `คุณไม่อนุมัติเคสของ นศ.${ev.studentName.split(' ')[0]}`; }
+                if (ev.type === 'submit') { icon = '<i class="fa-solid fa-paper-plane text-[#007aff]"></i>'; iconBg = 'bg-[#f0f7ff]'; title = `ส่งเคสใหม่ (HN: ${ev.hn})`; desc = `นศ.${ev.studentName.split(' ')[0]} ส่งเคสให้ อ.${ev.instName}`; } 
+                else if (ev.type === 'approved') { icon = '<i class="fa-solid fa-check text-[#34c759]"></i>'; iconBg = 'bg-[#eaf8ed]'; title = `อนุมัติผ่าน (HN: ${ev.hn})`; desc = `อ.${ev.instName} อนุมัติเคสของ นศ.${ev.studentName.split(' ')[0]}`; } 
+                else if (ev.type === 'returned') { icon = '<i class="fa-solid fa-rotate-left text-[#ff9500]"></i>'; iconBg = 'bg-[#fff6e5]'; title = `ส่งกลับแก้ไข (HN: ${ev.hn})`; desc = `อ.${ev.instName} สั่งแก้: ${ev.remark || 'ตรวจสอบข้อมูล'}`; } 
+                else if (ev.type === 'rejected') { icon = '<i class="fa-solid fa-xmark text-[#ff3b30]"></i>'; iconBg = 'bg-[#ffeceb]'; title = `ปฏิเสธเคส (HN: ${ev.hn})`; desc = `อ.${ev.instName} ไม่อนุมัติเคสของ นศ.${ev.studentName.split(' ')[0]}`; }
 
                 html += `
                 <div class="flex items-center gap-3 bg-white p-3 rounded-2xl border border-gray-100 shadow-sm">
@@ -649,6 +660,7 @@
             rankListHtml += '</div>'; container.innerHTML = filterHtml + rankListHtml;
         }
 
+        // ================= ตัวกรองของส่วนอาจารย์ตรวจประเมิน =================
         function setStatusFilter(status) {
             currentStatusFilter = status;
             document.getElementById('btn-stat-pending').className = `filter-pill px-4 py-1.5 rounded-full text-[12px] font-semibold ${status === 'pending' ? 'bg-[#fff8e6] text-[#b45309]' : 'bg-gray-100 text-gray-600'}`;
@@ -657,11 +669,12 @@
             renderInstructorCases();
         }
 
+        // 🌟 เปลี่ยนจากการ renderTimeline ออก เพื่อให้ตรวจประเมินทำงานแยกกัน
         function setStudentFilter(uid) {
             currentStudentFilter = uid;
             Array.from(document.getElementById('filter-students').children).forEach(btn => btn.className = `px-4 py-1.5 rounded-full text-[12px] font-semibold whitespace-nowrap bg-gray-100 text-gray-600`);
             document.getElementById(`btn-std-${uid}`).className = `px-4 py-1.5 rounded-full text-[12px] font-semibold whitespace-nowrap bg-[#007aff] text-white`;
-            renderInstructorCases(); renderTimeline();
+            renderInstructorCases(); 
         }
 
         function renderInstructorCases() {
@@ -720,7 +733,7 @@
                     if(caseIndex > -1) { 
                         allInstructorCases[caseIndex].status = status; 
                         allInstructorCases[caseIndex].remark = remark; 
-                        allInstructorCases[caseIndex].approvedAt = new Date().getTime(); // Update timeline immediately
+                        allInstructorCases[caseIndex].approvedAt = new Date().getTime(); 
                     }
                     renderInstructorCases(); renderTimeline(); 
                 } else Swal.fire('ข้อผิดพลาด', result.message, 'error');
