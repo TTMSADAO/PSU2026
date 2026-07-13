@@ -197,6 +197,7 @@
 
         <!-- ================= VIEW 4: แดชบอร์ด ================= -->
         <div id="view-dashboard" class="hidden mb-6 space-y-5">
+            
             <!-- ส่วนของอาจารย์ตรวจประเมิน -->
             <div id="dash-instructor" class="hidden ios-card p-6 mb-5">
                 <h2 class="font-bold text-gray-900 text-[18px] mb-4 flex items-center gap-3"><i class="fa-solid fa-inbox text-[#ff9500] text-xl"></i> ตรวจประเมิน</h2>
@@ -209,13 +210,13 @@
                 <div id="instructor-cases-container" class="space-y-4"><p class="text-center text-[13px] text-gray-500 py-6">ดึงข้อมูลเคส...</p></div>
             </div>
 
-            <!-- 🌟 ไทม์ไลน์ความเคลื่อนไหว -->
-            <div id="dash-timeline" class="ios-card p-6">
+            <!-- 🌟 ไทม์ไลน์ความเคลื่อนไหว (โชว์เฉพาะอาจารย์) -->
+            <div id="dash-timeline" class="hidden ios-card p-6">
                 <h2 class="font-bold text-gray-900 text-[17px] mb-4 flex items-center gap-2">
                     <i class="fa-solid fa-clock-rotate-left text-[#007aff]"></i> ไทม์ไลน์ล่าสุด
                 </h2>
-                <!-- 🌟 ปุ่มกรองแยกสำหรับ Timeline (ซ่อนถ้านักศึกษาเข้า) -->
-                <div class="flex gap-2 overflow-x-auto no-scrollbar mb-5 pb-2 hidden" id="filter-timeline-students"></div>
+                <!-- 🌟 ปุ่มกรองแยกสำหรับ Timeline โดยเฉพาะ -->
+                <div class="flex gap-2 overflow-x-auto no-scrollbar mb-5 pb-2" id="filter-timeline-students"></div>
                 <div id="timeline-container" class="space-y-3 max-h-[400px] overflow-y-auto no-scrollbar pr-1">
                     <p class="text-center text-[13px] text-gray-400 py-4">กำลังโหลดประวัติ...</p>
                 </div>
@@ -354,6 +355,8 @@
                     if (userData.role === 'instructor') { 
                         roleContainer.innerHTML = '<span class="text-[10px] font-semibold text-white bg-[#ff9500] px-2 py-0.5 rounded text-xs mt-1 inline-block">อาจารย์แพทย์</span>';
                         document.getElementById('dash-instructor').classList.remove('hidden'); 
+                        // 🌟 ไทม์ไลน์จะถูกเปิดให้เห็นเฉพาะอาจารย์เท่านั้น (แก้ปัญหาโหลดหนักของนักศึกษา)
+                        document.getElementById('dash-timeline').classList.remove('hidden'); 
                         document.getElementById('nav-forms').style.display = 'none'; document.getElementById('nav-mycases').style.display = 'none';
                         document.getElementById('nav-feed').classList.replace('w-[24%]', 'w-[48%]'); document.getElementById('nav-dashboard').classList.replace('w-[24%]', 'w-[48%]');
                         switchMainView('dashboard'); loadDashboardData();
@@ -575,9 +578,10 @@
                     </div><div class="space-y-5">`;
                 
                 window.studentListForRank.forEach(s => {
+                    let safeName = (s.fullName || 'ไม่ระบุ').split(' ')[0];
                     statsHtml += `
                         <div class="bg-gray-50 p-4 rounded-[24px] border border-gray-100 shadow-sm">
-                            <div class="flex items-center gap-3 mb-3"><img src="${s.picUrl}" class="w-10 h-10 rounded-full border border-gray-200 object-cover"><p class="text-[14px] font-bold text-gray-900 flex-1">${s.fullName || 'ไม่ระบุ'}</p><span class="text-[11px] font-bold text-white bg-[#1d1d1f] px-2.5 py-1 rounded-lg">รวม ${s.total}</span></div>
+                            <div class="flex items-center gap-3 mb-3"><img src="${s.picUrl}" class="w-10 h-10 rounded-full border border-gray-200 object-cover"><p class="text-[14px] font-bold text-gray-900 flex-1">${safeName}</p><span class="text-[11px] font-bold text-white bg-[#1d1d1f] px-2.5 py-1 rounded-lg">รวม ${s.total}</span></div>
                             <div class="grid grid-cols-3 gap-2 mb-4">
                                 <div class="bg-white p-2.5 rounded-xl border border-gray-100 text-center"><p class="text-[10px] text-gray-400 font-semibold mb-0.5">ยังไม่ส่ง (ร่าง)</p><p class="text-[15px] font-bold text-gray-700">${s.draft}</p></div>
                                 <div class="bg-white p-2.5 rounded-xl border border-[#fff8e6] text-center"><p class="text-[10px] text-[#ff9500] font-semibold mb-0.5">ส่งแล้ว (รอตรวจ)</p><p class="text-[15px] font-bold text-[#b45309]">${s.pending}</p></div>
@@ -590,17 +594,24 @@
                             </div>
                         </div>`;
                 });
-                statsContainer.innerHTML = statsHtml + `</div>`; window.renderDiseaseRank('all');
+                statsContainer.innerHTML = statsHtml + `</div>`; 
+                window.renderDiseaseRank('all');
 
-                if (currentUser.role === 'instructor') {
+                if (currentUser && currentUser.role === 'instructor') {
+                    // 🌟 1. เปิดกล่องตรวจประเมิน และ กล่องไทม์ไลน์
+                    document.getElementById('dash-instructor').classList.remove('hidden');
+                    document.getElementById('dash-timeline').classList.remove('hidden');
+                    
                     document.getElementById('instructor-cases-container').innerHTML = '<p class="text-center text-[13px] text-gray-400 py-6">ดึงข้อมูลเคส...</p>';
                     allInstructorCases = []; let instStudentSet = new Set();
                     
                     allCases.forEach(c => { 
                         if (c.status !== 'draft') {
-                            let sName = (c.studentName || 'ไม่ระบุ').split(' ')[0];
-                            instStudentSet.add(JSON.stringify({uid: c.studentUid || 'unknown', name: sName}));
-                            if (c.instructorUid === currentUser.uid) { allInstructorCases.push(c); }
+                            if (c.instructorUid === currentUser.uid) { 
+                                let sName = (c.studentName || 'ไม่ระบุ').split(' ')[0];
+                                instStudentSet.add(JSON.stringify({uid: c.studentUid || 'unknown', name: sName}));
+                                allInstructorCases.push(c); 
+                            }
                         }
                     });
                     
@@ -610,17 +621,11 @@
                     
                     let timelineHtml = `<button class="px-4 py-1.5 rounded-full text-[12px] font-semibold ${currentTimelineStudentFilter === 'all' ? 'bg-[#007aff] text-white' : 'bg-gray-100 text-gray-600'}" onclick="setTimelineStudentFilter('all')" id="btn-time-all">ทุกคน</button>`;
                     Array.from(instStudentSet).forEach(sStr => { const s = JSON.parse(sStr); timelineHtml += `<button class="px-4 py-1.5 rounded-full text-[12px] font-semibold whitespace-nowrap ${currentTimelineStudentFilter === s.uid ? 'bg-[#007aff] text-white' : 'bg-gray-100 text-gray-600'}" onclick="setTimelineStudentFilter('${s.uid}')" id="btn-time-${s.uid}">${s.name}</button>`; });
-                    
-                    const filterEl = document.getElementById('filter-timeline-students');
-                    filterEl.innerHTML = timelineHtml;
-                    filterEl.classList.remove('hidden'); 
+                    document.getElementById('filter-timeline-students').innerHTML = timelineHtml;
                     
                     renderInstructorCases(); 
-                } else {
-                    document.getElementById('filter-timeline-students').classList.add('hidden');
+                    renderTimeline();
                 }
-                
-                renderTimeline();
 
             } catch (e) { 
                 console.error("Dashboard Error:", e);
@@ -637,48 +642,43 @@
 
         window.renderTimeline = function() {
             let events = [];
-            let isStudent = currentUser && currentUser.role === 'student';
-
             window.allCasesForRank.forEach(c => {
                if (c.status !== 'draft') {
-                   let shouldInclude = false;
-                   if (!isStudent) {
-                       if (currentTimelineStudentFilter === 'all' || c.studentUid === currentTimelineStudentFilter) shouldInclude = true;
-                   } else {
-                       if (c.studentUid === currentUser.uid) shouldInclude = true;
-                   }
+                   // โชว์เฉพาะไทม์ไลน์ของเคสที่ส่งมาหาอาจารย์คนนี้ (แบบเวอร์ชันที่นิ่งที่สุด)
+                   if (c.instructorUid === currentUser.uid) {
+                       if (currentTimelineStudentFilter === 'all' || c.studentUid === currentTimelineStudentFilter) {
+                           let instName = "อาจารย์";
+                           let instObj = instructorList.find(i => i.uid === c.instructorUid);
+                           if (instObj) instName = (instObj.name || 'อาจารย์').split(' ')[0];
 
-                   if (shouldInclude) {
-                       let instName = "อาจารย์";
-                       let instObj = instructorList.find(i => i.uid === c.instructorUid);
-                       if (instObj) instName = (instObj.name || 'อาจารย์').split(' ')[0];
-
-                       events.push({ id: c.caseId + '_s', type: 'submit', time: c.timestamp, hn: c.hn, studentName: c.studentName, instName: instName, dep: c.depName });
-                       if (c.approvedAt) { events.push({ id: c.caseId + '_a', type: c.status, time: c.approvedAt, hn: c.hn, studentName: c.studentName, instName: instName, remark: c.remark }); }
+                           events.push({ id: c.caseId + '_s', type: 'submit', time: c.timestamp, hn: c.hn, studentName: c.studentName, instName: instName, dep: c.depName });
+                           if (c.approvedAt && (c.status === 'approved' || c.status === 'returned' || c.status === 'rejected')) { 
+                               events.push({ id: c.caseId + '_a', type: c.status, time: c.approvedAt, hn: c.hn, studentName: c.studentName, instName: instName, remark: c.remark }); 
+                           }
+                       }
                    }
                }
             });
 
-            events.sort((a,b) => b.time - a.time);
+            events.sort((a,b) => (b.time || 0) - (a.time || 0));
             let html = '';
             events.forEach(ev => {
-                let icon, iconBg, title, desc;
-                
+                let icon = '', iconBg = '', title = '', desc = '';
                 let sName = (ev.studentName || 'ไม่ระบุ').split(' ')[0];
-                let studentText = isStudent ? "คุณ" : `นศ.${sName}`;
-                let studentTextPossessive = isStudent ? "ของคุณ" : `ของ นศ.${sName}`;
 
-                if (ev.type === 'submit') { icon = '<i class="fa-solid fa-paper-plane text-[#007aff]"></i>'; iconBg = 'bg-[#f0f7ff]'; title = `ส่งเคสใหม่ (HN: ${ev.hn || 'ไม่ระบุ'})`; desc = `${studentText}ส่งเคสให้ อ.${ev.instName}`; } 
-                else if (ev.type === 'approved') { icon = '<i class="fa-solid fa-check text-[#34c759]"></i>'; iconBg = 'bg-[#eaf8ed]'; title = `อนุมัติผ่าน (HN: ${ev.hn || 'ไม่ระบุ'})`; desc = `อ.${ev.instName} อนุมัติเคส${studentTextPossessive}`; } 
+                if (ev.type === 'submit') { icon = '<i class="fa-solid fa-paper-plane text-[#007aff]"></i>'; iconBg = 'bg-[#f0f7ff]'; title = `ส่งเคสใหม่ (HN: ${ev.hn || 'ไม่ระบุ'})`; desc = `นศ.${sName} ส่งเคสให้ อ.${ev.instName}`; } 
+                else if (ev.type === 'approved') { icon = '<i class="fa-solid fa-check text-[#34c759]"></i>'; iconBg = 'bg-[#eaf8ed]'; title = `อนุมัติผ่าน (HN: ${ev.hn || 'ไม่ระบุ'})`; desc = `อ.${ev.instName} อนุมัติเคสของ นศ.${sName}`; } 
                 else if (ev.type === 'returned') { icon = '<i class="fa-solid fa-rotate-left text-[#ff9500]"></i>'; iconBg = 'bg-[#fff6e5]'; title = `ส่งกลับแก้ไข (HN: ${ev.hn || 'ไม่ระบุ'})`; desc = `อ.${ev.instName} สั่งแก้: ${ev.remark || 'ตรวจสอบข้อมูล'}`; } 
-                else if (ev.type === 'rejected') { icon = '<i class="fa-solid fa-xmark text-[#ff3b30]"></i>'; iconBg = 'bg-[#ffeceb]'; title = `ปฏิเสธเคส (HN: ${ev.hn || 'ไม่ระบุ'})`; desc = `อ.${ev.instName} ไม่อนุมัติเคส${studentTextPossessive}`; }
+                else if (ev.type === 'rejected') { icon = '<i class="fa-solid fa-xmark text-[#ff3b30]"></i>'; iconBg = 'bg-[#ffeceb]'; title = `ปฏิเสธเคส (HN: ${ev.hn || 'ไม่ระบุ'})`; desc = `อ.${ev.instName} ไม่อนุมัติเคสของ นศ.${sName}`; }
 
-                html += `
-                <div class="flex items-center gap-3 bg-white p-3 rounded-2xl border border-gray-100 shadow-sm">
-                    <div class="w-10 h-10 ${iconBg} rounded-xl flex justify-center items-center flex-shrink-0">${icon}</div>
-                    <div class="flex-1 min-w-0"><p class="text-[13px] font-bold text-gray-900 truncate">${title}</p><p class="text-[11px] text-gray-500 truncate">${desc}</p></div>
-                    <div class="text-[10px] text-gray-400 text-right whitespace-nowrap">${formatTimelineTime(ev.time)}</div>
-                </div>`;
+                if (icon) {
+                    html += `
+                    <div class="flex items-center gap-3 bg-white p-3 rounded-2xl border border-gray-100 shadow-sm">
+                        <div class="w-10 h-10 ${iconBg} rounded-xl flex justify-center items-center flex-shrink-0">${icon}</div>
+                        <div class="flex-1 min-w-0"><p class="text-[13px] font-bold text-gray-900 truncate">${title}</p><p class="text-[11px] text-gray-500 truncate">${desc}</p></div>
+                        <div class="text-[10px] text-gray-400 text-right whitespace-nowrap">${formatTimelineTime(ev.time)}</div>
+                    </div>`;
+                }
             });
             document.getElementById('timeline-container').innerHTML = html || '<p class="text-center text-[12px] text-gray-400 py-4">ไม่มีความเคลื่อนไหว</p>';
         }
@@ -787,6 +787,36 @@
                     } else { Swal.fire('ข้อผิดพลาด', resData.message, 'error'); }
                 } catch(e) { Swal.fire('ข้อผิดพลาด', 'ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์', 'error'); }
             }
+        }
+        
+        window.renderDiseaseRank = function(studentUid) {
+            const container = document.getElementById('disease-rank-container');
+            let filterHtml = `<div class="flex gap-2 overflow-x-auto no-scrollbar mb-5 pb-2">`;
+            filterHtml += `<button class="px-4 py-1.5 rounded-full text-[12px] font-semibold whitespace-nowrap ${studentUid === 'all' ? 'bg-gradient-to-r from-[#ff9500] to-[#e68600] text-white shadow-md' : 'bg-gray-100 text-gray-600 border border-gray-200'}" onclick="renderDiseaseRank('all')">รวมทั้งหมด</button>`;
+            if (window.studentListForRank) { window.studentListForRank.forEach(s => { 
+                let safeName = (s.fullName || 'ไม่ระบุ').split(' ')[0];
+                filterHtml += `<button class="px-4 py-1.5 rounded-full text-[12px] font-semibold whitespace-nowrap ${studentUid === s.uid ? 'bg-gradient-to-r from-[#ff9500] to-[#e68600] text-white shadow-md' : 'bg-gray-100 text-gray-600 border border-gray-200'}" onclick="renderDiseaseRank('${s.uid}')">${safeName}</button>`; 
+            }); }
+            filterHtml += `</div>`;
+
+            let diseaseCount = {}; let maxCount = 0;
+            window.allCasesForRank.forEach(c => { if (c.status !== 'draft' && c.diseaseName) { if (studentUid === 'all' || c.studentUid === studentUid) { diseaseCount[c.diseaseName] = (diseaseCount[c.diseaseName] || 0) + 1; if (diseaseCount[c.diseaseName] > maxCount) maxCount = diseaseCount[c.diseaseName]; } } });
+
+            const sortedRank = Object.entries(diseaseCount).sort((a, b) => b[1] - a[1]);
+            let rankListHtml = '<div class="space-y-3 max-h-[450px] overflow-y-auto no-scrollbar pr-1">';
+            if (sortedRank.length > 0) {
+                sortedRank.forEach((item, index) => {
+                    let m = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `<span class="text-gray-400 text-[13px] font-bold w-6 text-center inline-block">${index+1}</span>`;
+                    let pct = (item[1] / maxCount) * 100;
+                    rankListHtml += `
+                    <div class="relative bg-white rounded-2xl overflow-hidden border border-gray-100 p-3 flex justify-between items-center shadow-sm z-0">
+                        <div class="absolute left-0 top-0 bottom-0 bg-gradient-to-r from-[#ff9500] to-[#e68600] opacity-10 transition-all duration-500 rounded-r-xl -z-10" style="width: ${pct}%"></div>
+                        <div class="flex items-center gap-3 w-[85%] z-10"><span class="text-lg drop-shadow-sm flex-shrink-0">${m}</span><span class="truncate font-semibold text-gray-800 text-[13px]">${item[0]}</span></div>
+                        <span class="font-bold text-[#1d1d1f] bg-white/80 backdrop-blur-sm border border-gray-100 shadow-sm px-2.5 py-1 rounded-lg text-[12px] z-10">${item[1]}</span>
+                    </div>`;
+                });
+            } else { rankListHtml += '<p class="text-center text-[13px] text-gray-400 py-6">ยังไม่มีข้อมูล</p>'; }
+            rankListHtml += '</div>'; container.innerHTML = filterHtml + rankListHtml;
         }
     </script>
 </body>
