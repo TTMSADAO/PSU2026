@@ -210,13 +210,13 @@
                 <div id="instructor-cases-container" class="space-y-4"><p class="text-center text-[13px] text-gray-500 py-6">ดึงข้อมูลเคส...</p></div>
             </div>
 
-            <!-- 🌟 ไทม์ไลน์ความเคลื่อนไหว (โชว์เฉพาะอาจารย์) -->
+            <!-- 🌟 ไทม์ไลน์ความเคลื่อนไหว (แสดงให้ทุกคนเห็น ดึงข้อมูลแบบ Global Audit) -->
             <div id="dash-timeline" class="hidden ios-card p-6">
                 <h2 class="font-bold text-gray-900 text-[17px] mb-4 flex items-center gap-2">
                     <i class="fa-solid fa-clock-rotate-left text-[#007aff]"></i> ไทม์ไลน์ล่าสุด
                 </h2>
                 <!-- 🌟 ปุ่มกรองแยกสำหรับ Timeline โดยเฉพาะ -->
-                <div class="flex gap-2 overflow-x-auto no-scrollbar mb-5 pb-2" id="filter-timeline-students"></div>
+                <div class="flex gap-2 overflow-x-auto no-scrollbar mb-5 pb-2 hidden" id="filter-timeline-students"></div>
                 <div id="timeline-container" class="space-y-3 max-h-[400px] overflow-y-auto no-scrollbar pr-1">
                     <p class="text-center text-[13px] text-gray-400 py-4">กำลังโหลดประวัติ...</p>
                 </div>
@@ -352,11 +352,13 @@
                 const roleContainer = document.getElementById('userRoleContainer');
                 if (userData && userData.isActive) {
                     currentUser = { uid: profile.userId, ...userData };
+                    
+                    // 🌟 เปิดให้กล่อง Timeline แสดงผลสำหรับทุกคน (ทั้งอาจารย์และนักศึกษา)
+                    document.getElementById('dash-timeline').classList.remove('hidden'); 
+
                     if (userData.role === 'instructor') { 
                         roleContainer.innerHTML = '<span class="text-[10px] font-semibold text-white bg-[#ff9500] px-2 py-0.5 rounded text-xs mt-1 inline-block">อาจารย์แพทย์</span>';
                         document.getElementById('dash-instructor').classList.remove('hidden'); 
-                        // 🌟 ไทม์ไลน์จะถูกเปิดให้เห็นเฉพาะอาจารย์เท่านั้น (แก้ปัญหาโหลดหนักของนักศึกษา)
-                        document.getElementById('dash-timeline').classList.remove('hidden'); 
                         document.getElementById('nav-forms').style.display = 'none'; document.getElementById('nav-mycases').style.display = 'none';
                         document.getElementById('nav-feed').classList.replace('w-[24%]', 'w-[48%]'); document.getElementById('nav-dashboard').classList.replace('w-[24%]', 'w-[48%]');
                         switchMainView('dashboard'); loadDashboardData();
@@ -597,14 +599,23 @@
                 statsContainer.innerHTML = statsHtml + `</div>`; 
                 window.renderDiseaseRank('all');
 
+                // 🌟 ตั้งค่าปุ่มฟิลเตอร์ของไทม์ไลน์ (โชว์ทุกคน ทุกเวลา)
+                let timelineHtml = `<button class="px-4 py-1.5 rounded-full text-[12px] font-semibold ${currentTimelineStudentFilter === 'all' ? 'bg-[#007aff] text-white' : 'bg-gray-100 text-gray-600'}" onclick="setTimelineStudentFilter('all')" id="btn-time-all">ทุกคน</button>`;
+                Array.from(window.studentListForRank).forEach(s => { 
+                    let safeName = (s.fullName || 'ไม่ระบุ').split(' ')[0];
+                    timelineHtml += `<button class="px-4 py-1.5 rounded-full text-[12px] font-semibold whitespace-nowrap ${currentTimelineStudentFilter === s.uid ? 'bg-[#007aff] text-white' : 'bg-gray-100 text-gray-600'}" onclick="setTimelineStudentFilter('${s.uid}')" id="btn-time-${s.uid}">${safeName}</button>`; 
+                });
+                
+                const filterEl = document.getElementById('filter-timeline-students');
+                filterEl.innerHTML = timelineHtml;
+                
+                // หากเป็นอาจารย์ ให้แสดงปุ่มกรองด้วย หากเป็นนักศึกษาให้ซ่อนปุ่มกรอง
                 if (currentUser && currentUser.role === 'instructor') {
-                    // 🌟 1. เปิดกล่องตรวจประเมิน และ กล่องไทม์ไลน์
+                    filterEl.classList.remove('hidden'); 
                     document.getElementById('dash-instructor').classList.remove('hidden');
-                    document.getElementById('dash-timeline').classList.remove('hidden');
                     
                     document.getElementById('instructor-cases-container').innerHTML = '<p class="text-center text-[13px] text-gray-400 py-6">ดึงข้อมูลเคส...</p>';
                     allInstructorCases = []; let instStudentSet = new Set();
-                    
                     allCases.forEach(c => { 
                         if (c.status !== 'draft') {
                             if (c.instructorUid === currentUser.uid) { 
@@ -619,13 +630,12 @@
                     Array.from(instStudentSet).forEach(sStr => { const s = JSON.parse(sStr); stdHtml += `<button class="px-4 py-1.5 rounded-full text-[12px] font-semibold whitespace-nowrap ${currentStudentFilter === s.uid ? 'bg-[#007aff] text-white' : 'bg-gray-100 text-gray-600'}" onclick="setStudentFilter('${s.uid}')" id="btn-std-${s.uid}">${s.name}</button>`; });
                     document.getElementById('filter-students').innerHTML = stdHtml; 
                     
-                    let timelineHtml = `<button class="px-4 py-1.5 rounded-full text-[12px] font-semibold ${currentTimelineStudentFilter === 'all' ? 'bg-[#007aff] text-white' : 'bg-gray-100 text-gray-600'}" onclick="setTimelineStudentFilter('all')" id="btn-time-all">ทุกคน</button>`;
-                    Array.from(instStudentSet).forEach(sStr => { const s = JSON.parse(sStr); timelineHtml += `<button class="px-4 py-1.5 rounded-full text-[12px] font-semibold whitespace-nowrap ${currentTimelineStudentFilter === s.uid ? 'bg-[#007aff] text-white' : 'bg-gray-100 text-gray-600'}" onclick="setTimelineStudentFilter('${s.uid}')" id="btn-time-${s.uid}">${s.name}</button>`; });
-                    document.getElementById('filter-timeline-students').innerHTML = timelineHtml;
-                    
                     renderInstructorCases(); 
-                    renderTimeline();
+                } else {
+                    filterEl.classList.add('hidden'); // ซ่อนปุ่มกรองถ้านักศึกษาดู
                 }
+                
+                renderTimeline();
 
             } catch (e) { 
                 console.error("Dashboard Error:", e);
@@ -640,21 +650,30 @@
             renderTimeline();
         }
 
+        // 🌟 วาด Timeline สำหรับทุกคน (Global Audit Trail มีลิมิต 50 รายการป้องกันการค้าง)
         window.renderTimeline = function() {
             let events = [];
+            let isStudent = currentUser && currentUser.role === 'student';
+
             window.allCasesForRank.forEach(c => {
                if (c.status !== 'draft') {
-                   // โชว์เฉพาะไทม์ไลน์ของเคสที่ส่งมาหาอาจารย์คนนี้ (แบบเวอร์ชันที่นิ่งที่สุด)
-                   if (c.instructorUid === currentUser.uid) {
-                       if (currentTimelineStudentFilter === 'all' || c.studentUid === currentTimelineStudentFilter) {
-                           let instName = "อาจารย์";
-                           let instObj = instructorList.find(i => i.uid === c.instructorUid);
-                           if (instObj) instName = (instObj.name || 'อาจารย์').split(' ')[0];
+                   let shouldInclude = false;
+                   if (!isStudent) {
+                       // อาจารย์ดู: ดูได้ทุกคนตามปุ่มฟิลเตอร์
+                       if (currentTimelineStudentFilter === 'all' || c.studentUid === currentTimelineStudentFilter) shouldInclude = true;
+                   } else {
+                       // นักศึกษาดู: ดูได้เฉพาะเคสของตัวเองเท่านั้น
+                       if (c.studentUid === currentUser.uid) shouldInclude = true;
+                   }
 
-                           events.push({ id: c.caseId + '_s', type: 'submit', time: c.timestamp, hn: c.hn, studentName: c.studentName, instName: instName, dep: c.depName });
-                           if (c.approvedAt && (c.status === 'approved' || c.status === 'returned' || c.status === 'rejected')) { 
-                               events.push({ id: c.caseId + '_a', type: c.status, time: c.approvedAt, hn: c.hn, studentName: c.studentName, instName: instName, remark: c.remark }); 
-                           }
+                   if (shouldInclude) {
+                       let instName = "อาจารย์";
+                       let instObj = instructorList.find(i => i.uid === c.instructorUid);
+                       if (instObj) instName = (instObj.name || 'อาจารย์').split(' ')[0];
+
+                       events.push({ id: c.caseId + '_s', type: 'submit', time: c.timestamp, hn: c.hn, studentName: c.studentName, instName: instName, dep: c.depName });
+                       if (c.approvedAt && (c.status === 'approved' || c.status === 'returned' || c.status === 'rejected')) { 
+                           events.push({ id: c.caseId + '_a', type: c.status, time: c.approvedAt, hn: c.hn, studentName: c.studentName, instName: instName, remark: c.remark }); 
                        }
                    }
                }
@@ -662,14 +681,19 @@
 
             events.sort((a,b) => (b.time || 0) - (a.time || 0));
             let html = '';
-            events.forEach(ev => {
+            
+            // 🌟 สำคัญมาก: แสดงผลแค่ 50 รายการล่าสุด เพื่อไม่ให้แอปค้างเวลาข้อมูลมีจำนวนมหาศาล
+            events.slice(0, 50).forEach(ev => {
                 let icon = '', iconBg = '', title = '', desc = '';
+                
                 let sName = (ev.studentName || 'ไม่ระบุ').split(' ')[0];
+                let studentText = isStudent ? "คุณ" : `นศ.${sName}`;
+                let studentTextPossessive = isStudent ? "ของคุณ" : `ของ นศ.${sName}`;
 
-                if (ev.type === 'submit') { icon = '<i class="fa-solid fa-paper-plane text-[#007aff]"></i>'; iconBg = 'bg-[#f0f7ff]'; title = `ส่งเคสใหม่ (HN: ${ev.hn || 'ไม่ระบุ'})`; desc = `นศ.${sName} ส่งเคสให้ อ.${ev.instName}`; } 
-                else if (ev.type === 'approved') { icon = '<i class="fa-solid fa-check text-[#34c759]"></i>'; iconBg = 'bg-[#eaf8ed]'; title = `อนุมัติผ่าน (HN: ${ev.hn || 'ไม่ระบุ'})`; desc = `อ.${ev.instName} อนุมัติเคสของ นศ.${sName}`; } 
+                if (ev.type === 'submit') { icon = '<i class="fa-solid fa-paper-plane text-[#007aff]"></i>'; iconBg = 'bg-[#f0f7ff]'; title = `ส่งเคสใหม่ (HN: ${ev.hn || 'ไม่ระบุ'})`; desc = `${studentText}ส่งเคสให้ อ.${ev.instName}`; } 
+                else if (ev.type === 'approved') { icon = '<i class="fa-solid fa-check text-[#34c759]"></i>'; iconBg = 'bg-[#eaf8ed]'; title = `อนุมัติผ่าน (HN: ${ev.hn || 'ไม่ระบุ'})`; desc = `อ.${ev.instName} อนุมัติเคส${studentTextPossessive}`; } 
                 else if (ev.type === 'returned') { icon = '<i class="fa-solid fa-rotate-left text-[#ff9500]"></i>'; iconBg = 'bg-[#fff6e5]'; title = `ส่งกลับแก้ไข (HN: ${ev.hn || 'ไม่ระบุ'})`; desc = `อ.${ev.instName} สั่งแก้: ${ev.remark || 'ตรวจสอบข้อมูล'}`; } 
-                else if (ev.type === 'rejected') { icon = '<i class="fa-solid fa-xmark text-[#ff3b30]"></i>'; iconBg = 'bg-[#ffeceb]'; title = `ปฏิเสธเคส (HN: ${ev.hn || 'ไม่ระบุ'})`; desc = `อ.${ev.instName} ไม่อนุมัติเคสของ นศ.${sName}`; }
+                else if (ev.type === 'rejected') { icon = '<i class="fa-solid fa-xmark text-[#ff3b30]"></i>'; iconBg = 'bg-[#ffeceb]'; title = `ปฏิเสธเคส (HN: ${ev.hn || 'ไม่ระบุ'})`; desc = `อ.${ev.instName} ไม่อนุมัติเคส${studentTextPossessive}`; }
 
                 if (icon) {
                     html += `
@@ -706,7 +730,6 @@
                 let imageBtn = (c.imageUrl && c.imageUrl !== "-") ? `<button onclick="viewImageInApp('${c.imageUrl}')" class="inline-block mt-3 text-[12px] font-semibold bg-white border border-gray-200 text-gray-700 px-3 py-1.5 rounded-lg mr-2"><i class="fa-solid fa-image text-gray-400"></i> ดูรูปนักศึกษา</button>` : "";
                 let buttons = ""; let remarkTxt = "";
                 let deleteIconBtn = `<button onclick="deleteCaseData('${c.depName}', '${c.caseId}')" class="absolute top-5 right-5 text-gray-300 hover:text-red-500 transition"><i class="fa-solid fa-trash"></i></button>`;
-                let sName = (c.studentName || 'ไม่ระบุ').split(' ')[0];
                 
                 if (c.status === 'pending') {
                     buttons = `<div class="flex gap-2 mt-2"><button onclick="judgeCase('${c.depName}', '${c.caseId}', 'approved')" class="btn-ios flex-1 py-3 text-[13px] bg-[#34c759] text-white"><i class="fa-solid fa-check"></i> ผ่าน</button><button onclick="judgeCase('${c.depName}', '${c.caseId}', 'returned')" class="btn-ios flex-1 py-3 text-[13px] bg-[#ff9500] text-white"><i class="fa-solid fa-rotate-left"></i> แก้</button><button onclick="judgeCase('${c.depName}', '${c.caseId}', 'rejected')" class="btn-ios flex-1 py-3 text-[13px] bg-[#ff3b30] text-white"><i class="fa-solid fa-xmark"></i> ตก</button></div>`;
