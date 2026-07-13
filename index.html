@@ -210,13 +210,13 @@
                 <div id="instructor-cases-container" class="space-y-4"><p class="text-center text-[13px] text-gray-500 py-6">ดึงข้อมูลเคส...</p></div>
             </div>
 
-            <!-- 🌟 ไทม์ไลน์ความเคลื่อนไหว (แสดงให้ทุกคนเห็น ดึงข้อมูลแบบ Global Audit) -->
+            <!-- 🌟 ไทม์ไลน์ความเคลื่อนไหว -->
             <div id="dash-timeline" class="hidden ios-card p-6">
                 <h2 class="font-bold text-gray-900 text-[17px] mb-4 flex items-center gap-2">
                     <i class="fa-solid fa-clock-rotate-left text-[#007aff]"></i> ไทม์ไลน์ล่าสุด
                 </h2>
                 <!-- 🌟 ปุ่มกรองแยกสำหรับ Timeline โดยเฉพาะ -->
-                <div class="flex gap-2 overflow-x-auto no-scrollbar mb-5 pb-2 hidden" id="filter-timeline-students"></div>
+                <div class="flex gap-2 overflow-x-auto no-scrollbar mb-5 pb-2" id="filter-timeline-students"></div>
                 <div id="timeline-container" class="space-y-3 max-h-[400px] overflow-y-auto no-scrollbar pr-1">
                     <p class="text-center text-[13px] text-gray-400 py-4">กำลังโหลดประวัติ...</p>
                 </div>
@@ -237,22 +237,33 @@
 
     </div>
 
-    <!-- 🖼️ Modal: อาจารย์ตรวจเคส -->
-    <div id="judge-modal" class="fixed inset-0 z-[60] hidden flex items-center justify-center p-5">
+    <!-- 🖼️ Modal: อาจารย์ตรวจเคส (อัปเดตเพิ่ม Quick Remarks) -->
+    <div id="judge-modal" class="fixed inset-0 z-[60] hidden flex items-center justify-center p-4">
         <div class="absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity" onclick="closeJudgeModal()"></div>
         <div class="bg-white w-full max-w-sm rounded-3xl shadow-2xl relative z-10 overflow-hidden animate-tab">
             <div class="bg-gray-50 border-b border-gray-100 p-4 text-center">
                 <h3 class="text-gray-900 font-bold text-[16px]" id="judge-title">ยืนยันการประเมิน</h3>
             </div>
-            <div class="p-6 space-y-5">
+            
+            <!-- 🌟 จำกัดความสูงให้ Modal เผื่อหน้าจอเล็ก -->
+            <div class="p-5 space-y-4 max-h-[75vh] overflow-y-auto no-scrollbar">
+                
+                <!-- 🌟 ส่วนพิมพ์ข้อความและแท็กด่วน (Quick Remarks) -->
                 <div>
-                    <label class="block text-[13px] font-semibold text-gray-700 mb-2">คำแนะนำ (ถ้ามี)</label>
-                    <textarea id="judge-remark" rows="3" placeholder="ระบุข้อความถึงนักศึกษา..." class="input-wow w-full text-[14px] px-4 py-3"></textarea>
+                    <label class="block text-[13px] font-semibold text-[#1d1d1f] mb-2"><i class="fa-solid fa-tags text-[#ff9500]"></i> หัวข้อที่ต้องแก้ไข (คลิกเลือกได้เลย)</label>
+                    <div class="flex flex-wrap gap-1.5 mb-3" id="quick-remark-container">
+                        <!-- ปุ่มจะถูกสร้างจาก JavaScript -->
+                    </div>
+                    
+                    <label class="block text-[13px] font-semibold text-gray-700 mb-2">คำแนะนำเพิ่มเติม (ถ้ามี)</label>
+                    <textarea id="judge-remark" rows="3" placeholder="พิมพ์ข้อความ..." class="input-wow w-full text-[14px] px-4 py-3"></textarea>
                 </div>
+                
                 <div class="bg-gray-50 p-4 rounded-2xl border border-gray-100">
                     <label class="block text-[13px] font-semibold text-gray-700 mb-2">แนบรูปกลับไป (ถ้ามี)</label>
                     <input type="file" id="judge-image" accept="image/*" capture="environment" class="w-full text-[13px] text-gray-600 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-[12px] file:font-medium file:bg-[#f0f7ff] file:text-[#007aff]">
                 </div>
+                
                 <div class="flex gap-3 pt-2">
                     <button onclick="closeJudgeModal()" class="flex-1 py-3 text-gray-600 font-semibold text-[14px] bg-gray-100 rounded-full hover:bg-gray-200 transition">ยกเลิก</button>
                     <button id="judge-submit-btn" class="flex-1 py-3 text-white font-semibold text-[14px] rounded-full btn-ios">ยืนยัน</button>
@@ -293,8 +304,17 @@
         window.myAllCases = []; window.feedAllCases = [];
         window.allCasesForRank = []; window.studentListForRank = [];
 
+        // 🌟 รายการ Quick Remarks (หัวข้อการแก้ไขด่วน)
+        const quickRemarksList = [
+            "ประวัติ", "อาการสำคัญ", "ประวัติการเจ็บป่วยปัจจุบัน", "ประวัติการเจ็บป่วยในอดีต", 
+            "ประวัติครอบครัว", "ประวัติส่วนตัว", "ประวัติประจำเดือน", "การตรวจสัญญาณชีพ", 
+            "การตรวจร่างกาย", "ผลการตรวจร่างกายอื่นๆ", "ข้อห้ามข้อควรระวัง", "การตรวจทางหัตถเวช", 
+            "การวินิจฉัย", "สูตรการรักษา", "คำแนะนำ", "ผลการรักษา"
+        ];
+
         window.onload = async () => {
             const today = new Date(); document.getElementById('msg_date').valueAsDate = today; document.getElementById('mid_date').valueAsDate = today; document.getElementById('med_date').valueAsDate = today;
+            initQuickRemarks(); // สร้างปุ่ม Quick Remarks
             await loadDropdownConfigs(); await fetchUsersAndRenderInstructors(); await initializeLiff();
         };
 
@@ -309,6 +329,42 @@
         }
 
         function viewImageInApp(url) { Swal.fire({ imageUrl: url, imageAlt: 'รูปหลักฐาน', showConfirmButton: false, showCloseButton: true, width: '90%', padding: '1em', customClass: { popup: 'rounded-[24px]', image: 'rounded-xl mb-0' } }); }
+
+        // 🌟 ฟังก์ชันสร้างปุ่ม Quick Remarks ตอนเปิดแอป
+        function initQuickRemarks() {
+            const container = document.getElementById('quick-remark-container');
+            if(!container) return;
+            container.innerHTML = quickRemarksList.map(text => 
+                `<button type="button" onclick="toggleQuickRemark(this, '${text}')" class="quick-remark-btn border border-gray-200 bg-white text-gray-600 px-3 py-1.5 rounded-full text-[11px] font-medium transition-all shadow-sm">${text}</button>`
+            ).join('');
+        }
+
+        // 🌟 ฟังก์ชันเมื่ออาจารย์กดปุ่ม Quick Remark
+        function toggleQuickRemark(btn, text) {
+            const ta = document.getElementById('judge-remark');
+            const isActive = btn.classList.contains('active-remark');
+            
+            if (!isActive) {
+                // เลือก: เปลี่ยนเป็นสีส้ม และนำข้อความไปต่อท้าย
+                btn.classList.add('active-remark', 'bg-[#ff9500]', 'text-white', 'border-[#ff9500]');
+                btn.classList.remove('bg-white', 'text-gray-600', 'border-gray-200');
+                
+                if (ta.value.length === 0) {
+                    ta.value = text;
+                } else {
+                    ta.value += ta.value.endsWith(' ') || ta.value.endsWith('\n') ? text : ", " + text;
+                }
+            } else {
+                // ยกเลิกเลือก: เปลี่ยนสีกลับ และลบข้อความออก
+                btn.classList.remove('active-remark', 'bg-[#ff9500]', 'text-white', 'border-[#ff9500]');
+                btn.classList.add('bg-white', 'text-gray-600', 'border-gray-200');
+                
+                // ลบข้อความที่เกี่ยวข้องออกอย่างเนียนๆ
+                ta.value = ta.value.replace(", " + text, "").replace(text + ", ", "").replace(text, "").trim();
+                if(ta.value.startsWith(",")) ta.value = ta.value.substring(1).trim();
+                if(ta.value.endsWith(",")) ta.value = ta.value.substring(0, ta.value.length - 1).trim();
+            }
+        }
 
         async function loadDropdownConfigs() {
             try {
@@ -353,7 +409,6 @@
                 if (userData && userData.isActive) {
                     currentUser = { uid: profile.userId, ...userData };
                     
-                    // 🌟 เปิดให้กล่อง Timeline แสดงผลสำหรับทุกคน (ทั้งอาจารย์และนักศึกษา)
                     document.getElementById('dash-timeline').classList.remove('hidden'); 
 
                     if (userData.role === 'instructor') { 
@@ -599,7 +654,7 @@
                 statsContainer.innerHTML = statsHtml + `</div>`; 
                 window.renderDiseaseRank('all');
 
-                // 🌟 ตั้งค่าปุ่มฟิลเตอร์ของไทม์ไลน์ (โชว์ทุกคน ทุกเวลา)
+                // ตั้งค่าปุ่มฟิลเตอร์ของไทม์ไลน์
                 let timelineHtml = `<button class="px-4 py-1.5 rounded-full text-[12px] font-semibold ${currentTimelineStudentFilter === 'all' ? 'bg-[#007aff] text-white' : 'bg-gray-100 text-gray-600'}" onclick="setTimelineStudentFilter('all')" id="btn-time-all">ทุกคน</button>`;
                 Array.from(window.studentListForRank).forEach(s => { 
                     let safeName = (s.fullName || 'ไม่ระบุ').split(' ')[0];
@@ -609,7 +664,6 @@
                 const filterEl = document.getElementById('filter-timeline-students');
                 filterEl.innerHTML = timelineHtml;
                 
-                // หากเป็นอาจารย์ ให้แสดงปุ่มกรองด้วย หากเป็นนักศึกษาให้ซ่อนปุ่มกรอง
                 if (currentUser && currentUser.role === 'instructor') {
                     filterEl.classList.remove('hidden'); 
                     document.getElementById('dash-instructor').classList.remove('hidden');
@@ -632,7 +686,7 @@
                     
                     renderInstructorCases(); 
                 } else {
-                    filterEl.classList.add('hidden'); // ซ่อนปุ่มกรองถ้านักศึกษาดู
+                    filterEl.classList.add('hidden');
                 }
                 
                 renderTimeline();
@@ -650,7 +704,6 @@
             renderTimeline();
         }
 
-        // 🌟 วาด Timeline สำหรับทุกคน (Global Audit Trail มีลิมิต 50 รายการป้องกันการค้าง)
         window.renderTimeline = function() {
             let events = [];
             let isStudent = currentUser && currentUser.role === 'student';
@@ -659,10 +712,8 @@
                if (c.status !== 'draft') {
                    let shouldInclude = false;
                    if (!isStudent) {
-                       // อาจารย์ดู: ดูได้ทุกคนตามปุ่มฟิลเตอร์
                        if (currentTimelineStudentFilter === 'all' || c.studentUid === currentTimelineStudentFilter) shouldInclude = true;
                    } else {
-                       // นักศึกษาดู: ดูได้เฉพาะเคสของตัวเองเท่านั้น
                        if (c.studentUid === currentUser.uid) shouldInclude = true;
                    }
 
@@ -682,7 +733,6 @@
             events.sort((a,b) => (b.time || 0) - (a.time || 0));
             let html = '';
             
-            // 🌟 สำคัญมาก: แสดงผลแค่ 50 รายการล่าสุด เพื่อไม่ให้แอปค้างเวลาข้อมูลมีจำนวนมหาศาล
             events.slice(0, 50).forEach(ev => {
                 let icon = '', iconBg = '', title = '', desc = '';
                 
@@ -730,6 +780,7 @@
                 let imageBtn = (c.imageUrl && c.imageUrl !== "-") ? `<button onclick="viewImageInApp('${c.imageUrl}')" class="inline-block mt-3 text-[12px] font-semibold bg-white border border-gray-200 text-gray-700 px-3 py-1.5 rounded-lg mr-2"><i class="fa-solid fa-image text-gray-400"></i> ดูรูปนักศึกษา</button>` : "";
                 let buttons = ""; let remarkTxt = "";
                 let deleteIconBtn = `<button onclick="deleteCaseData('${c.depName}', '${c.caseId}')" class="absolute top-5 right-5 text-gray-300 hover:text-red-500 transition"><i class="fa-solid fa-trash"></i></button>`;
+                let sName = (c.studentName || 'ไม่ระบุ').split(' ')[0];
                 
                 if (c.status === 'pending') {
                     buttons = `<div class="flex gap-2 mt-2"><button onclick="judgeCase('${c.depName}', '${c.caseId}', 'approved')" class="btn-ios flex-1 py-3 text-[13px] bg-[#34c759] text-white"><i class="fa-solid fa-check"></i> ผ่าน</button><button onclick="judgeCase('${c.depName}', '${c.caseId}', 'returned')" class="btn-ios flex-1 py-3 text-[13px] bg-[#ff9500] text-white"><i class="fa-solid fa-rotate-left"></i> แก้</button><button onclick="judgeCase('${c.depName}', '${c.caseId}', 'rejected')" class="btn-ios flex-1 py-3 text-[13px] bg-[#ff3b30] text-white"><i class="fa-solid fa-xmark"></i> ตก</button></div>`;
@@ -749,12 +800,25 @@
         }
 
         let pendingJudgeData = null; 
+        
+        // 🌟 อัปเดต: ล้างคลาส active ของปุ่ม Quick Remarks ก่อนเปิด Modal เสมอ
         function judgeCase(department, caseId, status) {
-            pendingJudgeData = { department, caseId, status }; document.getElementById('judge-remark').value = ""; document.getElementById('judge-image').value = ""; document.getElementById('judge-modal').classList.remove('hidden');
+            pendingJudgeData = { department, caseId, status }; 
+            document.getElementById('judge-remark').value = ""; 
+            document.getElementById('judge-image').value = ""; 
+            
+            // รีเซ็ตปุ่ม Quick Remarks
+            document.querySelectorAll('.quick-remark-btn').forEach(btn => {
+                btn.classList.remove('active-remark', 'bg-[#ff9500]', 'text-white', 'border-[#ff9500]');
+                btn.classList.add('bg-white', 'text-gray-600', 'border-gray-200');
+            });
+            
+            document.getElementById('judge-modal').classList.remove('hidden');
             const title = document.getElementById('judge-title');
             if(status === 'approved') { title.innerHTML = '✅ อนุมัติผ่านเคสนี้'; title.className = 'text-[#34c759] font-bold text-[16px]'; }
             else if(status === 'returned') { title.innerHTML = '⚠️ ส่งกลับให้แก้ไข'; title.className = 'text-[#ff9500] font-bold text-[16px]'; }
             else { title.innerHTML = '❌ ปฏิเสธเคสนี้'; title.className = 'text-[#ff3b30] font-bold text-[16px]'; }
+            
             let submitBtn = document.getElementById('judge-submit-btn');
             submitBtn.className = `flex-1 py-3 text-white font-semibold text-[14px] rounded-full btn-ios ${status === 'approved' ? 'bg-[#34c759]' : status === 'returned' ? 'bg-[#ff9500]' : 'bg-[#ff3b30]'}`;
             submitBtn.onclick = submitJudgeResult;
