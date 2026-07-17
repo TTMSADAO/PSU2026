@@ -73,9 +73,9 @@
 </head>
 <body>
 
-    <!-- Header สไตล์คลีนๆ -->
+    <!-- Header สไตล์คลีนๆ (🌟 ฝังฟังก์ชัน triggerGodMode() ไว้ที่ปุ่มโลโก้) -->
     <div class="sticky top-0 z-40 px-5 py-4 flex items-center justify-between mb-2 bg-white/80 backdrop-blur-xl border-b border-gray-100">
-        <div class="flex items-center gap-3">
+        <div class="flex items-center gap-3" onclick="triggerGodMode()">
             <div class="w-12 h-12 bg-white rounded-2xl shadow-sm border border-gray-100 flex items-center justify-center p-1.5">
                 <img src="https://github.com/TTMSADAO/ttmed-sadao-queue/blob/PIC/%E0%B9%82%E0%B8%A5%E0%B9%82%E0%B8%81%E0%B9%89%E0%B9%81%E0%B8%9C%E0%B8%99%E0%B8%81%E0%B8%B2%E0%B8%A3%E0%B8%B8%E0%B9%88%E0%B8%99%E0%B8%A1%E0%B8%AB%E0%B8%B2%E0%B9%80%E0%B8%AA%E0%B8%99%E0%B9%88%E0%B8%AB%E0%B9%8C.png?raw=true" class="w-full h-full object-contain">
             </div>
@@ -182,7 +182,7 @@
             <div id="mycases-container" class="space-y-4"><p class="text-center text-[13px] text-gray-500 py-10">กำลังโหลดข้อมูล...</p></div>
         </div>
 
-        <!-- ================= VIEW 3: กระดานเคสรวม ================= -->
+        <!-- ================= VIEW 3: กระดานเคสรวม (หน้า Feed / God Mode) ================= -->
         <div id="view-feed" class="hidden ios-card p-6 mb-6">
             <h2 class="font-bold text-gray-900 text-[18px] mb-4 flex items-center gap-3">
                 <i class="fa-solid fa-globe text-[#34c759] text-xl"></i> กระดานเคสรวม
@@ -210,13 +210,13 @@
                 <div id="instructor-cases-container" class="space-y-4"><p class="text-center text-[13px] text-gray-500 py-6">ดึงข้อมูลเคส...</p></div>
             </div>
 
-            <!-- 🌟 ไทม์ไลน์ความเคลื่อนไหว (แสดงให้ทุกคนเห็น ดึงข้อมูลแบบ Global Audit) -->
+            <!-- 🌟 ไทม์ไลน์ความเคลื่อนไหว (โชว์เฉพาะอาจารย์) -->
             <div id="dash-timeline" class="hidden ios-card p-6">
                 <h2 class="font-bold text-gray-900 text-[17px] mb-4 flex items-center gap-2">
                     <i class="fa-solid fa-clock-rotate-left text-[#007aff]"></i> ไทม์ไลน์ล่าสุด
                 </h2>
                 <!-- 🌟 ปุ่มกรองแยกสำหรับ Timeline โดยเฉพาะ -->
-                <div class="flex gap-2 overflow-x-auto no-scrollbar mb-5 pb-2 hidden" id="filter-timeline-students"></div>
+                <div class="flex gap-2 overflow-x-auto no-scrollbar mb-5 pb-2" id="filter-timeline-students"></div>
                 <div id="timeline-container" class="space-y-3 max-h-[400px] overflow-y-auto no-scrollbar pr-1">
                     <p class="text-center text-[13px] text-gray-400 py-4">กำลังโหลดประวัติ...</p>
                 </div>
@@ -237,22 +237,29 @@
 
     </div>
 
-    <!-- 🖼️ Modal: อาจารย์ตรวจเคส -->
-    <div id="judge-modal" class="fixed inset-0 z-[60] hidden flex items-center justify-center p-5">
+    <!-- 🖼️ Modal: อาจารย์ตรวจเคส (มี Quick Remarks) -->
+    <div id="judge-modal" class="fixed inset-0 z-[60] hidden flex items-center justify-center p-4">
         <div class="absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity" onclick="closeJudgeModal()"></div>
         <div class="bg-white w-full max-w-sm rounded-3xl shadow-2xl relative z-10 overflow-hidden animate-tab">
             <div class="bg-gray-50 border-b border-gray-100 p-4 text-center">
                 <h3 class="text-gray-900 font-bold text-[16px]" id="judge-title">ยืนยันการประเมิน</h3>
             </div>
-            <div class="p-6 space-y-5">
+            
+            <div class="p-5 space-y-4 max-h-[75vh] overflow-y-auto no-scrollbar">
                 <div>
-                    <label class="block text-[13px] font-semibold text-gray-700 mb-2">คำแนะนำ (ถ้ามี)</label>
-                    <textarea id="judge-remark" rows="3" placeholder="ระบุข้อความถึงนักศึกษา..." class="input-wow w-full text-[14px] px-4 py-3"></textarea>
+                    <label class="block text-[13px] font-semibold text-[#1d1d1f] mb-2"><i class="fa-solid fa-tags text-[#ff9500]"></i> หัวข้อที่ต้องแก้ไข (คลิกเลือกได้เลย)</label>
+                    <div class="flex flex-wrap gap-1.5 mb-3" id="quick-remark-container">
+                        <!-- ปุ่มจะถูกสร้างจาก JavaScript -->
+                    </div>
+                    <label class="block text-[13px] font-semibold text-gray-700 mb-2">คำแนะนำเพิ่มเติม (ถ้ามี)</label>
+                    <textarea id="judge-remark" rows="3" placeholder="พิมพ์ข้อความ..." class="input-wow w-full text-[14px] px-4 py-3"></textarea>
                 </div>
+                
                 <div class="bg-gray-50 p-4 rounded-2xl border border-gray-100">
                     <label class="block text-[13px] font-semibold text-gray-700 mb-2">แนบรูปกลับไป (ถ้ามี)</label>
                     <input type="file" id="judge-image" accept="image/*" capture="environment" class="w-full text-[13px] text-gray-600 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-[12px] file:font-medium file:bg-[#f0f7ff] file:text-[#007aff]">
                 </div>
+                
                 <div class="flex gap-3 pt-2">
                     <button onclick="closeJudgeModal()" class="flex-1 py-3 text-gray-600 font-semibold text-[14px] bg-gray-100 rounded-full hover:bg-gray-200 transition">ยกเลิก</button>
                     <button id="judge-submit-btn" class="flex-1 py-3 text-white font-semibold text-[14px] rounded-full btn-ios">ยืนยัน</button>
@@ -293,8 +300,48 @@
         window.myAllCases = []; window.feedAllCases = [];
         window.allCasesForRank = []; window.studentListForRank = [];
 
+        // 🌟 ตัวแปรเก็บสถานะ God Mode
+        let isGodModeActive = false;
+        let godModeTaps = 0;
+        let godModeTimer = null;
+
+        // 🌟 ฟังก์ชันเปิดโหมดแอดมินลับ (กดรัว 5 ครั้งที่โลโก้)
+        function triggerGodMode() {
+            if (!currentUser || currentUser.role !== 'instructor') return; // ล็อกให้อาจารย์เท่านั้น
+            
+            godModeTaps++;
+            clearTimeout(godModeTimer);
+            
+            if (godModeTaps >= 5) {
+                isGodModeActive = !isGodModeActive; 
+                godModeTaps = 0;
+                
+                if (isGodModeActive) {
+                    Swal.fire({ icon: 'warning', title: '🚨 GOD MODE ACTIVATED', text: 'โหมดผู้ดูแลระบบสูงสุดทำงาน! คุณสามารถบังคับให้ผ่าน หรือลบเคสของนักศึกษาทุกคนในหน้าเคสรวมได้แล้ว', timer: 2000, showConfirmButton: false, backdrop: `rgba(255,59,48,0.4)` });
+                } else {
+                    Swal.fire({ icon: 'info', title: 'GOD MODE DEACTIVATED', text: 'ปิดโหมดผู้ดูแลระบบ', timer: 1500, showConfirmButton: false });
+                }
+                
+                // รีโหลดหน้า Feed ทันทีเพื่อแสดง/ซ่อนปุ่ม
+                if (!document.getElementById('view-feed').classList.contains('hidden')) {
+                    loadGlobalFeed(); 
+                }
+            }
+            
+            godModeTimer = setTimeout(() => { godModeTaps = 0; }, 600); // ระยะเวลากดรัว
+        }
+
+        // 🌟 รายการ Quick Remarks
+        const quickRemarksList = [
+            "ประวัติ", "อาการสำคัญ", "ประวัติการเจ็บป่วยปัจจุบัน", "ประวัติการเจ็บป่วยในอดีต", 
+            "ประวัติครอบครัว", "ประวัติส่วนตัว", "ประวัติประจำเดือน", "การตรวจสัญญาณชีพ", 
+            "การตรวจร่างกาย", "ผลการตรวจร่างกายอื่นๆ", "ข้อห้ามข้อควรระวัง", "การตรวจทางหัตถเวช", 
+            "การวินิจฉัย", "สูตรการรักษา", "คำแนะนำ", "ผลการรักษา"
+        ];
+
         window.onload = async () => {
             const today = new Date(); document.getElementById('msg_date').valueAsDate = today; document.getElementById('mid_date').valueAsDate = today; document.getElementById('med_date').valueAsDate = today;
+            initQuickRemarks(); 
             await loadDropdownConfigs(); await fetchUsersAndRenderInstructors(); await initializeLiff();
         };
 
@@ -309,6 +356,32 @@
         }
 
         function viewImageInApp(url) { Swal.fire({ imageUrl: url, imageAlt: 'รูปหลักฐาน', showConfirmButton: false, showCloseButton: true, width: '90%', padding: '1em', customClass: { popup: 'rounded-[24px]', image: 'rounded-xl mb-0' } }); }
+
+        function initQuickRemarks() {
+            const container = document.getElementById('quick-remark-container');
+            if(!container) return;
+            container.innerHTML = quickRemarksList.map(text => 
+                `<button type="button" onclick="toggleQuickRemark(this, '${text}')" class="quick-remark-btn border border-gray-200 bg-white text-gray-600 px-3 py-1.5 rounded-full text-[11px] font-medium transition-all shadow-sm">${text}</button>`
+            ).join('');
+        }
+
+        function toggleQuickRemark(btn, text) {
+            const ta = document.getElementById('judge-remark');
+            const isActive = btn.classList.contains('active-remark');
+            
+            if (!isActive) {
+                btn.classList.add('active-remark', 'bg-[#ff9500]', 'text-white', 'border-[#ff9500]');
+                btn.classList.remove('bg-white', 'text-gray-600', 'border-gray-200');
+                if (ta.value.length === 0) { ta.value = text; } 
+                else { ta.value += ta.value.endsWith(' ') || ta.value.endsWith('\n') ? text : ", " + text; }
+            } else {
+                btn.classList.remove('active-remark', 'bg-[#ff9500]', 'text-white', 'border-[#ff9500]');
+                btn.classList.add('bg-white', 'text-gray-600', 'border-gray-200');
+                ta.value = ta.value.replace(", " + text, "").replace(text + ", ", "").replace(text, "").trim();
+                if(ta.value.startsWith(",")) ta.value = ta.value.substring(1).trim();
+                if(ta.value.endsWith(",")) ta.value = ta.value.substring(0, ta.value.length - 1).trim();
+            }
+        }
 
         async function loadDropdownConfigs() {
             try {
@@ -352,13 +425,11 @@
                 const roleContainer = document.getElementById('userRoleContainer');
                 if (userData && userData.isActive) {
                     currentUser = { uid: profile.userId, ...userData };
-                    
-                    // 🌟 เปิดให้กล่อง Timeline แสดงผลสำหรับทุกคน (ทั้งอาจารย์และนักศึกษา)
-                    document.getElementById('dash-timeline').classList.remove('hidden'); 
 
                     if (userData.role === 'instructor') { 
                         roleContainer.innerHTML = '<span class="text-[10px] font-semibold text-white bg-[#ff9500] px-2 py-0.5 rounded text-xs mt-1 inline-block">อาจารย์แพทย์</span>';
                         document.getElementById('dash-instructor').classList.remove('hidden'); 
+                        document.getElementById('dash-timeline').classList.remove('hidden'); 
                         document.getElementById('nav-forms').style.display = 'none'; document.getElementById('nav-mycases').style.display = 'none';
                         document.getElementById('nav-feed').classList.replace('w-[24%]', 'w-[48%]'); document.getElementById('nav-dashboard').classList.replace('w-[24%]', 'w-[48%]');
                         switchMainView('dashboard'); loadDashboardData();
@@ -530,10 +601,25 @@
             filteredCases.forEach(c => { 
                 let badge = c.status === 'pending' ? 'รอตรวจ' : c.status === 'returned' ? 'แก้ไข' : 'ผ่าน'; 
                 let sName = (c.studentName || 'ไม่ระบุ').split(' ')[0];
+                
+                let adminBtns = "";
+                if (currentUser && currentUser.role === 'instructor' && isGodModeActive) {
+                    let actionBtn = c.status !== 'approved' 
+                        ? `<button onclick="judgeCase('${c.depName}', '${c.caseId}', 'approved')" class="flex-1 text-[12px] font-semibold text-[#007aff] bg-[#f0f7ff] py-2 rounded-xl"><i class="fa-solid fa-check-double"></i> บังคับผ่าน</button>`
+                        : `<button onclick="judgeCase('${c.depName}', '${c.caseId}', 'returned')" class="flex-1 text-[12px] font-semibold text-[#ff9500] bg-[#fff6e5] py-2 rounded-xl"><i class="fa-solid fa-rotate-left"></i> ดึงกลับมาแก้</button>`;
+                    
+                    adminBtns = `
+                    <div class="flex gap-2 mt-3 pt-3 border-t border-gray-100">
+                        ${actionBtn}
+                        <button onclick="deleteCaseData('${c.depName}', '${c.caseId}')" class="text-[12px] font-semibold text-[#ff3b30] bg-[#ffeceb] px-4 py-2 rounded-xl"><i class="fa-solid fa-trash"></i> ลบทิ้ง</button>
+                    </div>`;
+                }
+
                 html += `<div class="feed-card bg-white p-5 rounded-3xl shadow-sm border border-gray-100 mb-4">
                             <div class="flex justify-between items-start mb-1"><p class="text-[15px] font-bold text-gray-900">HN <span class="search-target">${c.hn || 'ไม่ระบุ'}</span></p><span class="text-[12px] font-medium text-gray-400">${badge}</span></div>
                             <p class="text-[14px] text-gray-700 search-target">${c.patientName || 'ไม่ระบุ'}</p><p class="text-[11px] text-gray-400 mt-1">${formatTimeThai(c.timestamp)}</p>
                             <div class="flex justify-between items-center mt-3 pt-3 border-t border-gray-100"><p class="text-[12px] font-medium text-gray-600 truncate w-2/3 search-target">${c.diseaseName || 'ผดุงครรภ์'}</p><p class="text-[11px] font-semibold text-[#007aff] bg-[#f0f7ff] px-2.5 py-1 rounded-md">นศ. ${sName}</p></div>
+                            ${adminBtns}
                          </div>`; 
             });
             container.innerHTML = html || '<p class="text-center text-[13px] text-gray-400 py-10">ไม่มีข้อมูล</p>';
@@ -599,23 +685,11 @@
                 statsContainer.innerHTML = statsHtml + `</div>`; 
                 window.renderDiseaseRank('all');
 
-                // 🌟 ตั้งค่าปุ่มฟิลเตอร์ของไทม์ไลน์ (โชว์ทุกคน ทุกเวลา)
-                let timelineHtml = `<button class="px-4 py-1.5 rounded-full text-[12px] font-semibold ${currentTimelineStudentFilter === 'all' ? 'bg-[#007aff] text-white' : 'bg-gray-100 text-gray-600'}" onclick="setTimelineStudentFilter('all')" id="btn-time-all">ทุกคน</button>`;
-                Array.from(window.studentListForRank).forEach(s => { 
-                    let safeName = (s.fullName || 'ไม่ระบุ').split(' ')[0];
-                    timelineHtml += `<button class="px-4 py-1.5 rounded-full text-[12px] font-semibold whitespace-nowrap ${currentTimelineStudentFilter === s.uid ? 'bg-[#007aff] text-white' : 'bg-gray-100 text-gray-600'}" onclick="setTimelineStudentFilter('${s.uid}')" id="btn-time-${s.uid}">${safeName}</button>`; 
-                });
-                
-                const filterEl = document.getElementById('filter-timeline-students');
-                filterEl.innerHTML = timelineHtml;
-                
-                // หากเป็นอาจารย์ ให้แสดงปุ่มกรองด้วย หากเป็นนักศึกษาให้ซ่อนปุ่มกรอง
                 if (currentUser && currentUser.role === 'instructor') {
-                    filterEl.classList.remove('hidden'); 
                     document.getElementById('dash-instructor').classList.remove('hidden');
-                    
                     document.getElementById('instructor-cases-container').innerHTML = '<p class="text-center text-[13px] text-gray-400 py-6">ดึงข้อมูลเคส...</p>';
                     allInstructorCases = []; let instStudentSet = new Set();
+                    
                     allCases.forEach(c => { 
                         if (c.status !== 'draft') {
                             if (c.instructorUid === currentUser.uid) { 
@@ -631,10 +705,7 @@
                     document.getElementById('filter-students').innerHTML = stdHtml; 
                     
                     renderInstructorCases(); 
-                } else {
-                    filterEl.classList.add('hidden'); // ซ่อนปุ่มกรองถ้านักศึกษาดู
                 }
-                
                 renderTimeline();
 
             } catch (e) { 
@@ -643,14 +714,6 @@
             }
         }
 
-        window.setTimelineStudentFilter = function(uid) {
-            currentTimelineStudentFilter = uid;
-            Array.from(document.getElementById('filter-timeline-students').children).forEach(btn => btn.className = `px-4 py-1.5 rounded-full text-[12px] font-semibold whitespace-nowrap bg-gray-100 text-gray-600`);
-            document.getElementById(`btn-time-${uid}`).className = `px-4 py-1.5 rounded-full text-[12px] font-semibold whitespace-nowrap bg-[#007aff] text-white`;
-            renderTimeline();
-        }
-
-        // 🌟 วาด Timeline สำหรับทุกคน (Global Audit Trail มีลิมิต 50 รายการป้องกันการค้าง)
         window.renderTimeline = function() {
             let events = [];
             let isStudent = currentUser && currentUser.role === 'student';
@@ -659,11 +722,9 @@
                if (c.status !== 'draft') {
                    let shouldInclude = false;
                    if (!isStudent) {
-                       // อาจารย์ดู: ดูได้ทุกคนตามปุ่มฟิลเตอร์
-                       if (currentTimelineStudentFilter === 'all' || c.studentUid === currentTimelineStudentFilter) shouldInclude = true;
+                       shouldInclude = true; // อาจารย์ดูได้ทั้งหมด
                    } else {
-                       // นักศึกษาดู: ดูได้เฉพาะเคสของตัวเองเท่านั้น
-                       if (c.studentUid === currentUser.uid) shouldInclude = true;
+                       if (c.studentUid === currentUser.uid) shouldInclude = true; // นศ.ดูเฉพาะตัวเอง
                    }
 
                    if (shouldInclude) {
@@ -682,7 +743,6 @@
             events.sort((a,b) => (b.time || 0) - (a.time || 0));
             let html = '';
             
-            // 🌟 สำคัญมาก: แสดงผลแค่ 50 รายการล่าสุด เพื่อไม่ให้แอปค้างเวลาข้อมูลมีจำนวนมหาศาล
             events.slice(0, 50).forEach(ev => {
                 let icon = '', iconBg = '', title = '', desc = '';
                 
@@ -730,11 +790,15 @@
                 let imageBtn = (c.imageUrl && c.imageUrl !== "-") ? `<button onclick="viewImageInApp('${c.imageUrl}')" class="inline-block mt-3 text-[12px] font-semibold bg-white border border-gray-200 text-gray-700 px-3 py-1.5 rounded-lg mr-2"><i class="fa-solid fa-image text-gray-400"></i> ดูรูปนักศึกษา</button>` : "";
                 let buttons = ""; let remarkTxt = "";
                 let deleteIconBtn = `<button onclick="deleteCaseData('${c.depName}', '${c.caseId}')" class="absolute top-5 right-5 text-gray-300 hover:text-red-500 transition"><i class="fa-solid fa-trash"></i></button>`;
+                let sName = (c.studentName || 'ไม่ระบุ').split(' ')[0];
                 
                 if (c.status === 'pending') {
                     buttons = `<div class="flex gap-2 mt-2"><button onclick="judgeCase('${c.depName}', '${c.caseId}', 'approved')" class="btn-ios flex-1 py-3 text-[13px] bg-[#34c759] text-white"><i class="fa-solid fa-check"></i> ผ่าน</button><button onclick="judgeCase('${c.depName}', '${c.caseId}', 'returned')" class="btn-ios flex-1 py-3 text-[13px] bg-[#ff9500] text-white"><i class="fa-solid fa-rotate-left"></i> แก้</button><button onclick="judgeCase('${c.depName}', '${c.caseId}', 'rejected')" class="btn-ios flex-1 py-3 text-[13px] bg-[#ff3b30] text-white"><i class="fa-solid fa-xmark"></i> ตก</button></div>`;
-                } else if (c.status === 'returned' && c.remark) {
-                    remarkTxt = `<p class="text-[12px] text-[#ff3b30] bg-[#ffeceb] p-3 rounded-xl mt-3"><b>คำแนะนำที่ส่งไป:</b> ${c.remark}</p>`;
+                } else if (c.status === 'returned') {
+                    remarkTxt = c.remark ? `<p class="text-[12px] text-[#ff3b30] bg-[#ffeceb] p-3 rounded-xl mt-3"><b>คำแนะนำที่ส่งไป:</b> ${c.remark}</p>` : "";
+                    buttons = `<div class="flex gap-2 mt-3"><button onclick="judgeCase('${c.depName}', '${c.caseId}', 'approved')" class="btn-ios flex-1 py-2.5 text-[12px] bg-[#34c759] text-white shadow-sm"><i class="fa-solid fa-check-double"></i> ดึงมาตรวจผ่าน (นศ.ลืมกดส่ง)</button></div>`;
+                } else if (c.status === 'approved') {
+                    buttons = `<div class="flex gap-2 mt-3"><button onclick="judgeCase('${c.depName}', '${c.caseId}', 'returned')" class="btn-ios flex-1 py-2.5 text-[12px] bg-[#ff9500] text-white shadow-sm"><i class="fa-solid fa-rotate-left"></i> ดึงกลับมาสั่งแก้</button></div>`;
                 }
                 
                 html += `<div class="bg-gray-50 p-5 rounded-3xl border border-gray-100 relative" id="card_${c.caseId}">
@@ -750,11 +814,21 @@
 
         let pendingJudgeData = null; 
         function judgeCase(department, caseId, status) {
-            pendingJudgeData = { department, caseId, status }; document.getElementById('judge-remark').value = ""; document.getElementById('judge-image').value = ""; document.getElementById('judge-modal').classList.remove('hidden');
+            pendingJudgeData = { department, caseId, status }; 
+            document.getElementById('judge-remark').value = ""; 
+            document.getElementById('judge-image').value = ""; 
+            
+            document.querySelectorAll('.quick-remark-btn').forEach(btn => {
+                btn.classList.remove('active-remark', 'bg-[#ff9500]', 'text-white', 'border-[#ff9500]');
+                btn.classList.add('bg-white', 'text-gray-600', 'border-gray-200');
+            });
+            
+            document.getElementById('judge-modal').classList.remove('hidden');
             const title = document.getElementById('judge-title');
             if(status === 'approved') { title.innerHTML = '✅ อนุมัติผ่านเคสนี้'; title.className = 'text-[#34c759] font-bold text-[16px]'; }
             else if(status === 'returned') { title.innerHTML = '⚠️ ส่งกลับให้แก้ไข'; title.className = 'text-[#ff9500] font-bold text-[16px]'; }
             else { title.innerHTML = '❌ ปฏิเสธเคสนี้'; title.className = 'text-[#ff3b30] font-bold text-[16px]'; }
+            
             let submitBtn = document.getElementById('judge-submit-btn');
             submitBtn.className = `flex-1 py-3 text-white font-semibold text-[14px] rounded-full btn-ios ${status === 'approved' ? 'bg-[#34c759]' : status === 'returned' ? 'bg-[#ff9500]' : 'bg-[#ff3b30]'}`;
             submitBtn.onclick = submitJudgeResult;
@@ -841,6 +915,16 @@
             } else { rankListHtml += '<p class="text-center text-[13px] text-gray-400 py-6">ยังไม่มีข้อมูล</p>'; }
             rankListHtml += '</div>'; container.innerHTML = filterHtml + rankListHtml;
         }
+    </script>
+    
+    <!-- สคริปต์ป้องกันภาพแตก (Fallback Image) -->
+    <script>
+        document.addEventListener("error", function (e) {
+            if (e.target.tagName.toLowerCase() === 'img') {
+                e.target.src = "https://ui-avatars.com/api/?name=U&background=f0f7ff&color=007aff";
+                e.target.onerror = null; 
+            }
+        }, true);
     </script>
 </body>
 </html>
