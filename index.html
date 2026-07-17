@@ -210,7 +210,7 @@
                 <div id="instructor-cases-container" class="space-y-4"><p class="text-center text-[13px] text-gray-500 py-6">ดึงข้อมูลเคส...</p></div>
             </div>
 
-            <!-- 🌟 ไทม์ไลน์ความเคลื่อนไหว -->
+            <!-- 🌟 ไทม์ไลน์ความเคลื่อนไหว (โชว์เฉพาะอาจารย์) -->
             <div id="dash-timeline" class="hidden ios-card p-6">
                 <h2 class="font-bold text-gray-900 text-[17px] mb-4 flex items-center gap-2">
                     <i class="fa-solid fa-clock-rotate-left text-[#007aff]"></i> ไทม์ไลน์ล่าสุด
@@ -569,7 +569,6 @@
 
         function cancelEdit() { currentEditCaseId = null; window.tempImageUrl = null; document.getElementById('edit-banner').classList.add('hidden'); document.getElementById('formObj-massage').reset(); document.getElementById('formObj-midwifery').reset(); document.getElementById('formObj-medicine').reset(); const today = new Date(); document.getElementById('msg_date').valueAsDate = today; document.getElementById('mid_date').valueAsDate = today; document.getElementById('med_date').valueAsDate = today; }
 
-        // 🌟 โหลดกระดานเคสรวม (และฟีเจอร์ God Mode ของอาจารย์)
         async function loadGlobalFeed() {
             const container = document.getElementById('feed-container'); container.innerHTML = '<p class="text-center text-[13px] text-gray-400 py-10">กำลังโหลด...</p>';
             try {
@@ -603,7 +602,6 @@
                 let badge = c.status === 'pending' ? 'รอตรวจ' : c.status === 'returned' ? 'แก้ไข' : 'ผ่าน'; 
                 let sName = (c.studentName || 'ไม่ระบุ').split(' ')[0];
                 
-                // 🌟 แทรกปุ่ม God Mode ถ้าระบบเปิดใช้งานอยู่
                 let adminBtns = "";
                 if (currentUser && currentUser.role === 'instructor' && isGodModeActive) {
                     let actionBtn = c.status !== 'approved' 
@@ -706,18 +704,8 @@
                     Array.from(instStudentSet).forEach(sStr => { const s = JSON.parse(sStr); stdHtml += `<button class="px-4 py-1.5 rounded-full text-[12px] font-semibold whitespace-nowrap ${currentStudentFilter === s.uid ? 'bg-[#007aff] text-white' : 'bg-gray-100 text-gray-600'}" onclick="setStudentFilter('${s.uid}')" id="btn-std-${s.uid}">${s.name}</button>`; });
                     document.getElementById('filter-students').innerHTML = stdHtml; 
                     
-                    let timelineHtml = `<button class="px-4 py-1.5 rounded-full text-[12px] font-semibold ${currentTimelineStudentFilter === 'all' ? 'bg-[#007aff] text-white' : 'bg-gray-100 text-gray-600'}" onclick="setTimelineStudentFilter('all')" id="btn-time-all">ทุกคน</button>`;
-                    Array.from(instStudentSet).forEach(sStr => { const s = JSON.parse(sStr); timelineHtml += `<button class="px-4 py-1.5 rounded-full text-[12px] font-semibold whitespace-nowrap ${currentTimelineStudentFilter === s.uid ? 'bg-[#007aff] text-white' : 'bg-gray-100 text-gray-600'}" onclick="setTimelineStudentFilter('${s.uid}')" id="btn-time-${s.uid}">${s.name}</button>`; });
-                    
-                    const filterEl = document.getElementById('filter-timeline-students');
-                    filterEl.innerHTML = timelineHtml;
-                    filterEl.classList.remove('hidden'); 
-                    
                     renderInstructorCases(); 
-                } else {
-                    document.getElementById('filter-timeline-students').classList.add('hidden');
                 }
-                
                 renderTimeline();
 
             } catch (e) { 
@@ -726,27 +714,27 @@
             }
         }
 
-        window.setTimelineStudentFilter = function(uid) {
-            currentTimelineStudentFilter = uid;
-            Array.from(document.getElementById('filter-timeline-students').children).forEach(btn => btn.className = `px-4 py-1.5 rounded-full text-[12px] font-semibold whitespace-nowrap bg-gray-100 text-gray-600`);
-            document.getElementById(`btn-time-${uid}`).className = `px-4 py-1.5 rounded-full text-[12px] font-semibold whitespace-nowrap bg-[#007aff] text-white`;
-            renderTimeline();
-        }
-
         window.renderTimeline = function() {
             let events = [];
+            let isStudent = currentUser && currentUser.role === 'student';
+
             window.allCasesForRank.forEach(c => {
                if (c.status !== 'draft') {
-                   if (c.instructorUid === currentUser.uid) {
-                       if (currentTimelineStudentFilter === 'all' || c.studentUid === currentTimelineStudentFilter) {
-                           let instName = "อาจารย์";
-                           let instObj = instructorList.find(i => i.uid === c.instructorUid);
-                           if (instObj) instName = (instObj.name || 'อาจารย์').split(' ')[0];
+                   let shouldInclude = false;
+                   if (!isStudent) {
+                       shouldInclude = true; // อาจารย์ดูได้ทั้งหมด
+                   } else {
+                       if (c.studentUid === currentUser.uid) shouldInclude = true; // นศ.ดูเฉพาะตัวเอง
+                   }
 
-                           events.push({ id: c.caseId + '_s', type: 'submit', time: c.timestamp, hn: c.hn, studentName: c.studentName, instName: instName, dep: c.depName });
-                           if (c.approvedAt && (c.status === 'approved' || c.status === 'returned' || c.status === 'rejected')) { 
-                               events.push({ id: c.caseId + '_a', type: c.status, time: c.approvedAt, hn: c.hn, studentName: c.studentName, instName: instName, remark: c.remark }); 
-                           }
+                   if (shouldInclude) {
+                       let instName = "อาจารย์";
+                       let instObj = instructorList.find(i => i.uid === c.instructorUid);
+                       if (instObj) instName = (instObj.name || 'อาจารย์').split(' ')[0];
+
+                       events.push({ id: c.caseId + '_s', type: 'submit', time: c.timestamp, hn: c.hn, studentName: c.studentName, instName: instName, dep: c.depName });
+                       if (c.approvedAt && (c.status === 'approved' || c.status === 'returned' || c.status === 'rejected')) { 
+                           events.push({ id: c.caseId + '_a', type: c.status, time: c.approvedAt, hn: c.hn, studentName: c.studentName, instName: instName, remark: c.remark }); 
                        }
                    }
                }
@@ -754,14 +742,18 @@
 
             events.sort((a,b) => (b.time || 0) - (a.time || 0));
             let html = '';
-            events.forEach(ev => {
+            
+            events.slice(0, 50).forEach(ev => {
                 let icon = '', iconBg = '', title = '', desc = '';
+                
                 let sName = (ev.studentName || 'ไม่ระบุ').split(' ')[0];
+                let studentText = isStudent ? "คุณ" : `นศ.${sName}`;
+                let studentTextPossessive = isStudent ? "ของคุณ" : `ของ นศ.${sName}`;
 
-                if (ev.type === 'submit') { icon = '<i class="fa-solid fa-paper-plane text-[#007aff]"></i>'; iconBg = 'bg-[#f0f7ff]'; title = `ส่งเคสใหม่ (HN: ${ev.hn || 'ไม่ระบุ'})`; desc = `นศ.${sName} ส่งเคสให้ อ.${ev.instName}`; } 
-                else if (ev.type === 'approved') { icon = '<i class="fa-solid fa-check text-[#34c759]"></i>'; iconBg = 'bg-[#eaf8ed]'; title = `อนุมัติผ่าน (HN: ${ev.hn || 'ไม่ระบุ'})`; desc = `อ.${ev.instName} อนุมัติเคสของ นศ.${sName}`; } 
+                if (ev.type === 'submit') { icon = '<i class="fa-solid fa-paper-plane text-[#007aff]"></i>'; iconBg = 'bg-[#f0f7ff]'; title = `ส่งเคสใหม่ (HN: ${ev.hn || 'ไม่ระบุ'})`; desc = `${studentText}ส่งเคสให้ อ.${ev.instName}`; } 
+                else if (ev.type === 'approved') { icon = '<i class="fa-solid fa-check text-[#34c759]"></i>'; iconBg = 'bg-[#eaf8ed]'; title = `อนุมัติผ่าน (HN: ${ev.hn || 'ไม่ระบุ'})`; desc = `อ.${ev.instName} อนุมัติเคส${studentTextPossessive}`; } 
                 else if (ev.type === 'returned') { icon = '<i class="fa-solid fa-rotate-left text-[#ff9500]"></i>'; iconBg = 'bg-[#fff6e5]'; title = `ส่งกลับแก้ไข (HN: ${ev.hn || 'ไม่ระบุ'})`; desc = `อ.${ev.instName} สั่งแก้: ${ev.remark || 'ตรวจสอบข้อมูล'}`; } 
-                else if (ev.type === 'rejected') { icon = '<i class="fa-solid fa-xmark text-[#ff3b30]"></i>'; iconBg = 'bg-[#ffeceb]'; title = `ปฏิเสธเคส (HN: ${ev.hn || 'ไม่ระบุ'})`; desc = `อ.${ev.instName} ไม่อนุมัติเคสของ นศ.${sName}`; }
+                else if (ev.type === 'rejected') { icon = '<i class="fa-solid fa-xmark text-[#ff3b30]"></i>'; iconBg = 'bg-[#ffeceb]'; title = `ปฏิเสธเคส (HN: ${ev.hn || 'ไม่ระบุ'})`; desc = `อ.${ev.instName} ไม่อนุมัติเคส${studentTextPossessive}`; }
 
                 if (icon) {
                     html += `
@@ -821,7 +813,6 @@
         }
 
         let pendingJudgeData = null; 
-        
         function judgeCase(department, caseId, status) {
             pendingJudgeData = { department, caseId, status }; 
             document.getElementById('judge-remark').value = ""; 
@@ -924,6 +915,16 @@
             } else { rankListHtml += '<p class="text-center text-[13px] text-gray-400 py-6">ยังไม่มีข้อมูล</p>'; }
             rankListHtml += '</div>'; container.innerHTML = filterHtml + rankListHtml;
         }
+    </script>
+    
+    <!-- สคริปต์ป้องกันภาพแตก (Fallback Image) -->
+    <script>
+        document.addEventListener("error", function (e) {
+            if (e.target.tagName.toLowerCase() === 'img') {
+                e.target.src = "https://ui-avatars.com/api/?name=U&background=f0f7ff&color=007aff";
+                e.target.onerror = null; 
+            }
+        }, true);
     </script>
 </body>
 </html>
